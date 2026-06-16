@@ -1,18 +1,23 @@
 import { useState } from "react";
-import { PanoStage } from "./components/PanoStage";
+import { PanoLoopStage } from "./components/PanoLoopStage";
 import { DebugPanel } from "./components/DebugPanel";
-import { DEFAULT_SCENE_ID, getSceneById } from "./scenes/sceneManifests";
+import { PANO_LOOP } from "./pano/panoLoop";
 import { useReducedMotion } from "./useReducedMotion";
 
 export default function App() {
-  const [sceneId, setSceneId] = useState(DEFAULT_SCENE_ID);
+  // Seam markers are an inspection aid, off by default so the reel reads cleanly.
+  const [showSeams, setShowSeams] = useState(false);
   const reducedMotion = useReducedMotion();
-  const scene = getSceneById(sceneId);
 
   return (
     <main className="app">
-      <PanoStage scene={scene} />
-      <DebugPanel scene={scene} onSelect={setSceneId} reducedMotion={reducedMotion} />
+      <PanoLoopStage loop={PANO_LOOP} showSeams={showSeams} />
+      <DebugPanel
+        loop={PANO_LOOP}
+        showSeams={showSeams}
+        onToggleSeams={setShowSeams}
+        reducedMotion={reducedMotion}
+      />
     </main>
   );
 }

@@ -27,55 +27,96 @@ body {
   overflow: hidden;
 }
 
-/* ---------- Panorama stage ---------- */
+/* ---------- Pano loop strip ---------- */
 
-.pano-stage {
+.pano-loop-stage {
   position: absolute;
   inset: 0;
   overflow: hidden;
-}
-
-.pano-fallback {
-  position: absolute;
-  inset: 0;
+  /* Fallback behind the strip (no white flash before images paint). */
   background: linear-gradient(180deg, #1a1530 0%, #06060f 100%);
 }
 
-.pano-image {
-  position: absolute;
-  /* Overscanned box: pulled out past every viewport edge so that `cover` + drift
-     never reveal an empty edge, in any orientation. Amounts come from the scene
-     manifest via the --overscan-* custom properties set on the element. */
-  top: calc(var(--overscan-y) * -1);
-  right: calc(var(--overscan-x) * -1);
-  bottom: calc(var(--overscan-y) * -1);
-  left: calc(var(--overscan-x) * -1);
+/* The track is the segment sequence rendered twice: [A B C A B C]. Its width is
+   the sum of the children, so translateX(-50%) == one full sequence. */
+.pano-loop-track {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 100%;
+  width: max-content;
   will-change: transform;
 }
 
-.pano-overlay {
+/* One 100vw window per segment; clips the per-segment zoom so it can't bleed
+   across a seam into the neighbour. */
+.pano-segment {
+  position: relative;
+  flex: 0 0 100vw;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pano-segment-image {
+  position: absolute;
+  inset: 0;
+  /* background-* + transform (framing/zoom) come from inline styles. */
+}
+
+.pano-segment-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-/* Slow horizontal drift, there-and-back. Only translateX animates; the constant
-   vertical framing offset and the baseScale zoom ride along unchanged. Amplitude
-   + duration come from the manifest via custom properties set on the element. */
-@keyframes pano-drift {
-  0%,
-  100% {
-    transform: translate(calc(var(--drift-vw) * -1), var(--offset-y)) scale(var(--base-scale));
+/* Vignette across the whole viewport, above the moving strip. */
+.pano-loop-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Endless leftward scroll. -50% of the track width is exactly one sequence, and
+   the second half is identical to the first, so the wrap is pixel-seamless. */
+@keyframes pano-loop {
+  from {
+    transform: translateX(0);
   }
-  50% {
-    transform: translate(var(--drift-vw), var(--offset-y)) scale(var(--base-scale));
+  to {
+    transform: translateX(-50%);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pano-image {
+  .pano-loop-track {
     animation: none !important;
   }
+}
+
+/* ---------- Seam inspection (debug) ---------- */
+
+.pano-seam-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: rgba(120, 230, 255, 0.7);
+  box-shadow: 0 0 8px rgba(120, 230, 255, 0.6);
+  pointer-events: none;
+}
+
+.pano-seam-label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(8, 16, 26, 0.7);
+  border: 1px solid rgba(120, 230, 255, 0.5);
+  color: #bfefff;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
 }
 
 /* ---------- Debug panel ---------- */
@@ -105,28 +146,24 @@ body {
   opacity: 0.85;
 }
 
-.debug-field {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.debug-field select {
-  flex: 1;
-  padding: 6px 8px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  font: inherit;
-}
-
 .debug-readout {
   display: grid;
   gap: 4px;
+}
+
+.debug-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
   padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.debug-toggle input {
+  accent-color: #78e6ff;
 }
 
 .debug-row {
