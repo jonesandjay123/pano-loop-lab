@@ -1,37 +1,80 @@
 import type { CSSProperties } from "react";
 import { useMemo } from "react";
-import type { PanoRingConfig, RingSegment } from "../pano/panoTypes";
-import { buildRingSegments } from "../pano/panoRing";
+import type { FitMode, PanoRingConfig, RingBoundary, RingSegment } from "../pano/panoTypes";
+import { buildBoundaries, buildRingSegments } from "../pano/panoRing";
 import { usePanoRingScroll } from "../pano/usePanoRingScroll";
-import { useReducedMotion } from "../useReducedMotion";
+
+/** Seam-lab UI state, owned by App and shared with the debug panel. */
+export interface SeamLabState {
+  /** Overlap + feather width in vw. 0 = raw butt-join (reveals the real seam). */
+  blendVw: number;
+  /** Draw the contact line + label at each boundary. */
+  labels: boolean;
+  /** Pause auto-scroll. */
+  paused: boolean;
+  /** Boundary index to center & hold, or null for the whole loop. */
+  inspectIndex: number | null;
+}
 
 interface PanoRingStageProps {
   ring: PanoRingConfig;
-  /** Draw a line + label at each segment boundary, and tint seam windows. */
-  showSeams?: boolean;
+  lab: SeamLabState;
+  /** Pause from reduced-motion (folded into the hook alongside lab.paused). */
+  reducedMotion: boolean;
 }
 
-/** One window of the strip — a plate or a seam — shown in a 100vw cover frame. */
-function Segment({ segment, showSeams }: { segment: RingSegment; showSeams?: boolean }) {
+function backgroundSizeFor(fit: FitMode): string {
+  if (fit === "height") return "auto 100%";
+  if (fit === "width") return "100% auto";
+  return "cover";
+}
+
+function Segment({
+  segment,
+  boundary,
+  blendVw,
+  labels,
+  inspected,
+}: {
+  segment: RingSegment;
+  boundary: RingBoundary;
+  blendVw: number;
+  labels: boolean;
+  inspected: boolean;
+}) {
+  const feather = blendVw > 0;
+  const mask = feather
+    ? `linear-gradient(to right, transparent 0, #000 ${blendVw}vw, #000 calc(100% - ${blendVw}vw), transparent 100%)`
+    : "none";
+
+  const segStyle: CSSProperties = {
+    flex: `0 0 ${segment.widthVw}vw`,
+    marginLeft: feather ? `-${blendVw}vw` : 0,
+  };
+
+  // Mask only the image layer (not the whole segment) so the overlap cross-fades
+  // while debug lines/labels stay fully visible.
   const imageStyle: CSSProperties = {
     backgroundImage: `url("${segment.imageUrl}")`,
-    backgroundSize: segment.fitMode === "height" ? "auto 100%" : "cover",
+    backgroundSize: backgroundSizeFor(segment.fitMode),
     backgroundPosition: "center center",
     backgroundRepeat: "no-repeat",
-    transform: `translateY(${segment.verticalOffset * 100}vh) scale(${segment.baseScale})`,
+    transform: `translate(${segment.xOffset * 100}%, ${segment.yOffset * 100}%) scale(${segment.scale})`,
+    maskImage: mask,
+    WebkitMaskImage: mask,
   };
 
   const isSeam = segment.kind === "seam";
 
   return (
-    <div className={`pano-segment${isSeam ? " is-seam" : ""}`} aria-hidden="true">
+    <div className={`pano-segment${isSeam ? " is-seam" : ""}`} style={segStyle} aria-hidden="true">
       <div className="pano-segment-image" style={imageStyle} />
-      {showSeams && (
+      {labels && (
         <>
-          <span className="pano-seam-line" />
-          <span className={`pano-seam-label${isSeam ? " is-seam" : ""}`}>
-            {isSeam ? "⇄ " : "▣ "}
-            {segment.label}
+          {/* The line sits on this segment's LEFT edge = the boundary into it. */}
+          <span className={`pano-seam-line${inspected ? " is-inspected" : ""}`} />
+          <span className={`pano-seam-label${isSeam ? " is-seam" : ""}${inspected ? " is-inspected" : ""}`}>
+            {boundary.label}
           </span>
         </>
       )}
@@ -40,27 +83,28 @@ function Segment({ segment, showSeams }: { segment: RingSegment; showSeams?: boo
 }
 
 /**
- * Continuous panorama RING.
+ * Continuous panorama RING / seam lab.
  *
  * `buildRingSegments` flattens the config into `[plate, seam, plate, seam, …]`
- * (wrapping last→first). That sequence is rendered **twice** so the modulo-wrapped
- * `translateX` from `usePanoRingScroll` loops forever with no visible jump. The
- * same offset is driven by both auto-scroll and pointer drag, so the world can be
- * grabbed and scrubbed left/right at any time and the auto-scroll resumes seamlessly.
+ * (wrapping last→first); that sequence is rendered twice for a seamless modulo
+ * wrap. Adjacent windows may OVERLAP by `blendVw` and cross-fade via a CSS mask —
+ * or, at `blendVw === 0`, butt-join so the *real* seam shows (debug honesty).
+ * Per-segment `fitMode` / `scale` / `xOffset` / `yOffset` are the alignment knobs.
  *
- * No Three.js / canvas / GSAP — the far environment for the 3D site is a plain CSS
- * image strip, which is the whole performance argument.
+ * No Three.js / canvas / GSAP — the far layer is a plain CSS image strip.
  */
-export function PanoRingStage({ ring, showSeams }: PanoRingStageProps) {
-  const reducedMotion = useReducedMotion();
+export function PanoRingStage({ ring, lab, reducedMotion }: PanoRingStageProps) {
   const segments = useMemo(() => buildRingSegments(ring), [ring]);
-  // Duplicate the sequence so the wrap point is pixel-identical.
+  const boundaries = useMemo(() => buildBoundaries(segments), [segments]);
   const rendered = useMemo(() => [...segments, ...segments], [segments]);
+  const seqLen = segments.length;
 
   const { trackRef, onPointerDown, dragging } = usePanoRingScroll<HTMLDivElement>({
     loopDurationSeconds: ring.loopDurationSeconds,
     direction: ring.direction,
-    reducedMotion,
+    paused: lab.paused || reducedMotion || lab.inspectIndex != null,
+    inspectIndex: lab.inspectIndex,
+    layoutKey: lab.blendVw,
   });
 
   return (
@@ -69,9 +113,20 @@ export function PanoRingStage({ ring, showSeams }: PanoRingStageProps) {
       onPointerDown={onPointerDown}
     >
       <div className="pano-ring-track" ref={trackRef}>
-        {rendered.map((segment, i) => (
-          <Segment key={`${segment.key}-${i}`} segment={segment} showSeams={showSeams} />
-        ))}
+        {rendered.map((segment, j) => {
+          // This segment's left edge is the boundary between seg j-1 and j.
+          const boundaryIndex = ((j - 1) % seqLen + seqLen) % seqLen;
+          return (
+            <Segment
+              key={`${segment.key}-${j}`}
+              segment={segment}
+              boundary={boundaries[boundaryIndex]}
+              blendVw={lab.blendVw}
+              labels={lab.labels}
+              inspected={lab.inspectIndex === boundaryIndex}
+            />
+          );
+        })}
       </div>
       {ring.overlayGradient && (
         <div

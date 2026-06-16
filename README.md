@@ -4,127 +4,122 @@ A research lab for the **far-background environment of an immersive 3D website**
 (Jovicheer), built as a flat image strip instead of real 3D geometry — that's the
 performance argument: the distant world costs almost nothing to render.
 
-> **Can N panorama plates be stitched into one continuous, seamless background
-> RING** — auto-scrolling and drag-scrubbable, looping a full lap back to the
-> start — **using only web primitives (HTML/CSS/React + requestAnimationFrame)?**
+> **The hard problem:** take **N independently AI-generated panorama plates** and
+> make them read as **one continuous world band** — looping forever — using only
+> web primitives (HTML/CSS/React + requestAnimationFrame).
 
-The key idea is the **seam**. Between every two adjacent plates sits a generated
-*transition image* whose left edge continues plate A and whose right edge continues
-plate B, so A→B reads as one world rather than a hard cut. A ring of **N** plates
-therefore has **N** seams (including the wrap seam from the last plate back to the
-first). This is a **pipeline for any N**, demonstrated here at N=3.
+The ring is `plate0, seam0→1, plate1, …, plateN-1, seamN-1→0` (the wrap closes it).
+A **seam** is a generated transition image whose left edge continues plate A and
+right edge continues plate B. N plates ⇒ N seams. This is a pipeline for any N,
+shown here at N=3.
 
-No Three.js, R3F, GSAP, canvas, routing, or backend — the whole point is that the
-far layer is a plain CSS image strip.
+No Three.js, R3F, GSAP, canvas, routing, or backend.
 
-## What this prototype tests
+## Current phase: a seam *inspection lab* (not a solved seam)
 
-- An ordered **ring**: `plate0, seam0→1, plate1, seam1→2, …, plateN-1, seamN-1→0`,
-  assembled automatically from the config for any number of plates.
-- **Seams** (Higgsfield-generated) that visually bridge each adjacent pair so the
-  journey is continuous, plus the **wrap seam** that closes night → dawn.
-- **Endless auto-scroll**: the assembled sequence is rendered twice and a
-  modulo-wrapped `translateX` loops forever with no visible jump.
-- **Manual drag**: grab the background and scrub left/right at any time; auto-scroll
-  pauses while held and resumes exactly where you let go.
-- **No empty edges**: each window is `100vw` painted `cover`, so it fills any aspect
-  (desktop or portrait).
-- **Seam inspection**: a debug toggle marks every boundary and tints seam windows.
-- **`prefers-reduced-motion`** pauses auto-scroll (drag still works).
+The honest state: stitching independently-generated plates leaves **visible
+boundaries** — colours are close, but composition, horizon height, and ridge lines
+don't truly line up. This phase does **not** claim to fix that. It turns the
+renderer into an instrument to *study* the boundaries and to measure how far cheap
+CSS techniques get us:
 
-## What it intentionally does NOT yet prove
+- **Overlap + feather blend.** Adjacent windows can overlap by `blendVw`
+  (0 / 8 / 12 / 16) and cross-fade via a CSS mask. At `blendVw = 0` they butt-join
+  so the **real contact seam is revealed** — debug must not hide the problem.
+- **Per-segment alignment knobs.** Every plate/seam exposes `fitMode`
+  (`cover` / `height` / `width`), `scale`, `xOffset`, `yOffset` so horizons and
+  ridges can be hand-aligned. (Seam edges are still `cover`-trimmed by default —
+  see "What this does NOT solve".)
+- **Inspect mode.** Pick any boundary to **center, hold, and highlight** it
+  (magenta line) for close study; toggle labels/lines; pause auto-scroll.
+- Still a continuous, drag-scrubbable, infinitely-looping ring.
 
-- **Pixel-exact edge matching.** Seams are generated to *continue* their neighbours
-  tonally and compositionally, and each window is `cover`-cropped, so the join is
-  visually continuous but not pixel-welded. A future pass could pin seam widths to
-  the image aspect (no horizontal crop) for exact edge alignment.
-- **Drag inertia / momentum.** Drag is a direct 1:1 scrub; no fling physics yet.
-- **Parallax depth.** The ring is one flat plane.
-- **Foreground / Jovicheer integration** (the interactive 3D near layers, wish UI).
-- Performance optimization beyond "it's just CSS", testing framework, backend.
+What the lab already shows: for these **soft atmospheric mattes**, overlap+feather
+hides most of the *tonal/line* discontinuity — but a **structural** mismatch (e.g.
+a lake on the seam side meeting a mountain on the plate side) only softens into
+haze; it is not resolved. That is the motivation for the next phase.
+
+## What this does NOT solve (yet)
+
+- **Pixel-perfect welds.** Seams *continue* their neighbours tonally, and each
+  window is `cover`-cropped, so joins are visually continuous at best, not welded.
+  CSS overlap cannot make a ridge line actually connect.
+- The real fix is **edge-locked outpainting per boundary**: take plate A's right
+  edge as a hard source, outpaint right; take plate B's left edge as a hard source,
+  outpaint left; blend only in the invented middle. That is a **separate next
+  phase**, to be proven on **one** boundary (dawn → dusk) before scaling to N.
+- Also out of scope here: drag inertia, parallax depth, UI polish, regenerating
+  all seams, any claim of "done".
 
 ## Run it
 
 ```bash
 npm install
-npm run dev      # opens straight into the auto-scrolling, drag-scrubbable ring
+npm run dev      # opens into the auto-scrolling, drag-scrubbable ring
 npm run build    # type-check + production build (must pass)
-npm run preview  # serve the built output
+npm run preview
 ```
 
-The floating **debug panel** is an instrument readout (plate count, seam coverage,
-the assembled ring order, lap time, motion mode) plus a **"show segment seams"**
-toggle. It does not drive the motion — the ring moves on its own and responds to
-drag.
+In the debug panel:
+- **blend** — `raw — 0` reveals the true seams; `8/12/16vw` test overlap blending.
+- **inspect** — center & hold one boundary for study (auto-pauses).
+- **boundary labels + lines** — show every contact line + its A▸B label.
+- **pause auto-scroll** — freeze the loop. Drag the background to scrub.
 
 ## Project structure
 
 ```
-pano-loop-lab/
-  src/
-    main.tsx
-    App.tsx
-    styles.css
-    useReducedMotion.ts
-    pano/
-      panoTypes.ts          # PanoPlate, PanoSeam, PanoRingConfig, RingSegment
-      panoRing.ts           # default ring + buildRingSegments() / seamCoverage()
-      usePanoRingScroll.ts   # rAF auto-scroll + pointer-drag, infinite modulo wrap
-    components/
-      PanoRingStage.tsx     # the continuous ring renderer
-      DebugPanel.tsx        # ring readout + seam toggle
-  public/
-    panos/
-      dawn-valley.jpg              # plate A (Higgsfield, 21:9)
-      dusk-ridge.jpg               # plate B (Higgsfield, 16:9)
-      moonlit-tidelands.jpg        # plate C (Higgsfield, 16:9)
-      seams/
-        dawn-valley__dusk-ridge.jpg          # seam A→B (Higgsfield)
-        dusk-ridge__moonlit-tidelands.jpg    # seam B→C (Higgsfield)
-        moonlit-tidelands__dawn-valley.jpg   # seam C→A (wrap, Higgsfield)
-      *-placeholder.svg            # original SVG placeholders (fallback reference)
+src/
+  App.tsx                    # owns the SeamLabState (blend/labels/pause/inspect)
+  pano/
+    panoTypes.ts             # PanoPlate, PanoSeam, PanoRingConfig, RingSegment, RingBoundary
+    panoRing.ts              # default ring + buildRingSegments / buildBoundaries / seamCoverage
+    usePanoRingScroll.ts     # rAF auto-scroll + drag + inspect-centering, infinite wrap
+  components/
+    PanoRingStage.tsx        # overlap/feather renderer + per-segment knobs + SeamLabState
+    DebugPanel.tsx           # readout + lab controls
+public/panos/
+  dawn-valley.jpg  dusk-ridge.jpg  moonlit-tidelands.jpg     # plates (Higgsfield)
+  seams/
+    dawn-valley__dusk-ridge.jpg          # seam A→B (Higgsfield)
+    dusk-ridge__moonlit-tidelands.jpg    # seam B→C
+    moonlit-tidelands__dawn-valley.jpg   # seam C→A (wrap)
 ```
 
-## How the ring works
+## How it works
 
 1. `buildRingSegments(config)` flattens plates + seams into the ordered window list
-   `[plate, seam, plate, seam, …]`, wrapping last → first. A missing seam simply
-   butt-joins its neighbours, so the ring still works at any seam coverage.
-2. `PanoRingStage` renders that sequence **twice** in a flex track; each window is
-   `flex: 0 0 100vw`, full height, `overflow: hidden`, with an inner image painted
-   `cover` (its `baseScale` zoom / vertical framing clipped to the window).
-3. `usePanoRingScroll` drives the track's `translate3d` imperatively via
-   `requestAnimationFrame`, keeping an `offset` in `[0, sequenceWidth)` by modulo so
-   it loops forever both ways. Auto-scroll advances the offset; a pointer drag
-   overrides it and scrubs directly. Because both share the same wrapped offset,
-   releasing a drag resumes auto-scroll with no jump.
+   (wrapping last→first), resolving each window's fit/scale/offset defaults.
+2. `PanoRingStage` renders that sequence **twice** in a flex track. Each window is
+   `widthVw` wide; the image layer is `cover`/`height`/`width`-sized, panned by
+   `xOffset`/`yOffset`, zoomed by `scale`, and **overscanned 6%** so the pan knobs
+   don't reveal an edge. With `blendVw > 0`, windows get `margin-left: -blendVw`
+   and a left/right `mask-image` feather so the overlap cross-fades.
+3. `usePanoRingScroll` drives the track's `translate3d` via `requestAnimationFrame`,
+   keeping `offset` in `[0, sequenceWidth)` by modulo (infinite both ways). Auto-
+   scroll advances it; pointer drag scrubs it; inspect snaps it to a boundary
+   centre. All share the one wrapped offset, so hand-offs never jump.
 
 ### Adding plates (the N-image pipeline)
 
-Add a `PanoPlate` to `plates` and the two `PanoSeam`s that connect it to its new
-neighbours (regenerate the affected wrap seam too). No renderer changes — the ring
-re-assembles itself. Generate seams with Higgsfield: pass the two adjacent plate
-images as references and prompt for a left→right transition with one continuous
-horizon and no hard seam (see the prompts used for the current three in git
-history / `params` of the Higgsfield generations).
+Add a `PanoPlate` plus the two `PanoSeam`s connecting it to its new neighbours
+(regenerate the affected wrap seam). No renderer changes — the ring re-assembles.
 
-## How this feeds back into Jovicheer
+## Roadmap
 
-A region's far background becomes a small **ring manifest** (ordered plates +
-seams + lap time) loaded at runtime and rendered as this CSS strip behind the
-interactive 3D near layers — cheap, data-driven, and template-friendly. New regions
-are "list plates + generate seams," not "build a 3D scene."
+```
+done   : continuous ring + N seams + overlap/feather + per-segment knobs + inspect lab
+next   : edge-locked OUTPAINT on ONE boundary (dawn → dusk), verify a real weld
+then   : scale the proven outpaint method to all N seams
+later  : drag inertia, parallax depth bands, format/responsive passes
+```
 
-## Open questions / what remains uncertain
+## Open questions
 
-- **Edge precision.** `cover`-cropping each `100vw` window trims a little off seam
-  edges. Pinning seam window width to the image's natural aspect (height-fit, no
-  horizontal crop) would align edges exactly — at the cost of variable segment
-  widths. Worth trying next.
-- **Seam length / pacing.** Seams are currently the same `100vw` as plates; making
-  them narrower or wider changes how fast the world morphs.
-- **Drag feel.** Add inertia/snap-to-plate if the scrub feels too raw.
-- **Image weight.** Plates + seams are ~0.6–1.1 MB JPEGs (quality 88 from 2K). A
-  production pass would want WebP/AVIF and responsive sources.
-- **Parallax.** Splitting each plate into depth bands would add real 3D-feel — a
-  separate experiment.
+- **How much can overlap+offset hide?** The lab exists to answer this per boundary;
+  early read: most tonal mismatch, not structural.
+- **Edge preservation vs. fill.** `cover` trims the seam's engineered edges; a
+  `height`/`width` fit preserves them but letterboxes — the real answer is the
+  outpaint phase, not a CSS fit mode.
+- **Loop closure.** The wrap seam (C→A) is the hardest; outpaint must still meet
+  plate A's left edge there.

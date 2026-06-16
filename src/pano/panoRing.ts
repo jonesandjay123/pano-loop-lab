@@ -1,41 +1,44 @@
-import type { PanoRingConfig, PanoSeam, RingSegment } from "./panoTypes";
+import type {
+  PanoRingConfig,
+  PanoSeam,
+  RingBoundary,
+  RingSegment,
+  SegmentVisuals,
+} from "./panoTypes";
 
 /**
  * The default ring.
  *
- * Three Higgsfield plates (dawn → dusk → night) plus three Higgsfield-generated
- * **seam** plates that bridge each adjacent pair, including the wrap seam that
- * closes night back to dawn. Add a 4th plate + its two new seams and the renderer
- * picks it up with no other changes — that's the N-image pipeline.
+ * Three Higgsfield plates (dawn → dusk → night) plus three Higgsfield seam plates
+ * that bridge each adjacent pair, including the wrap seam (night → dawn). The
+ * per-segment knobs below are the alignment controls — tune `scale` / `xOffset` /
+ * `yOffset` / `fitMode` to line up horizons and ridges across a boundary.
  */
 export const PANO_RING: PanoRingConfig = {
   id: "day-night-ring",
   label: "Day → Night ring",
-  loopDurationSeconds: 120, // one slow lap of the whole ring
+  loopDurationSeconds: 120,
   direction: "left",
+  defaultOverlapVw: 12,
   plates: [
     {
       id: "dawn-valley",
       label: "Dawn Valley",
       imageUrl: "/panos/dawn-valley.jpg",
-      baseScale: 1.04,
-      verticalOffset: 0.0,
       notes: "Golden-hour valley + winding lake (21:9).",
     },
     {
       id: "dusk-ridge",
       label: "Dusk Ridge",
       imageUrl: "/panos/dusk-ridge.jpg",
-      baseScale: 1.04,
-      verticalOffset: -0.02,
+      yOffset: -0.02,
       notes: "Indigo/magenta twilight ridges (16:9).",
     },
     {
       id: "moonlit-tidelands",
       label: "Moonlit Tidelands",
       imageUrl: "/panos/moonlit-tidelands.jpg",
-      baseScale: 1.04,
-      verticalOffset: 0.02,
+      yOffset: 0.02,
       notes: "Moonlit tideland, reflective flats (16:9).",
     },
   ],
@@ -63,22 +66,43 @@ export const PANO_RING: PanoRingConfig = {
     css: "linear-gradient(180deg, rgba(10,8,20,0.10) 0%, rgba(10,8,20,0.0) 40%, rgba(8,6,16,0.26) 100%)",
     opacity: 1,
   },
-  notes: "N=3 plates + 3 seams. Drag to scrub, or let it auto-scroll one lap / 120s.",
+  notes: "N=3 plates + 3 seams. Seam lab: tune overlap/fit/offset, inspect each boundary.",
 };
 
-const DEFAULTS = { fitMode: "cover" as const, baseScale: 1.04, verticalOffset: 0 };
+const PLATE_DEFAULTS: Required<SegmentVisuals> = {
+  widthVw: 100,
+  fitMode: "cover",
+  scale: 1,
+  xOffset: 0,
+  yOffset: 0,
+};
+
+const SEAM_DEFAULTS: Required<SegmentVisuals> = {
+  widthVw: 100,
+  fitMode: "cover",
+  scale: 1,
+  xOffset: 0,
+  yOffset: 0,
+};
+
+function resolve(v: SegmentVisuals, defaults: Required<SegmentVisuals>): Required<SegmentVisuals> {
+  return {
+    widthVw: v.widthVw ?? defaults.widthVw,
+    fitMode: v.fitMode ?? defaults.fitMode,
+    scale: v.scale ?? defaults.scale,
+    xOffset: v.xOffset ?? defaults.xOffset,
+    yOffset: v.yOffset ?? defaults.yOffset,
+  };
+}
 
 function findSeam(seams: PanoSeam[] | undefined, fromId: string, toId: string) {
   return seams?.find((s) => s.fromId === fromId && s.toId === toId);
 }
 
 /**
- * Flatten a ring config into the ordered list of render windows:
- * `[plate0, seam0→1, plate1, seam1→2, …, plateN-1, seamN-1→0]`.
- *
- * Works for any number of plates. A seam is only inserted when its image is
- * provided; a missing seam simply butt-joins its neighbours (still a valid ring,
- * just a harder cut there). The wrap seam (last → first) closes the loop.
+ * Flatten a ring config into the ordered window list:
+ * `[plate0, seam0→1, plate1, …, plateN-1, seamN-1→0]` (wrapping last→first).
+ * A missing seam simply butt-joins its neighbours. Works for any N.
  */
 export function buildRingSegments(config: PanoRingConfig): RingSegment[] {
   const { plates, seams } = config;
@@ -86,32 +110,38 @@ export function buildRingSegments(config: PanoRingConfig): RingSegment[] {
   const segments: RingSegment[] = [];
 
   plates.forEach((plate, i) => {
-    segments.push({
-      key: `plate-${plate.id}`,
-      kind: "plate",
-      label: plate.id,
-      imageUrl: plate.imageUrl,
-      fitMode: plate.fitMode ?? DEFAULTS.fitMode,
-      baseScale: plate.baseScale ?? DEFAULTS.baseScale,
-      verticalOffset: plate.verticalOffset ?? DEFAULTS.verticalOffset,
-    });
+    const v = resolve(plate, PLATE_DEFAULTS);
+    segments.push({ key: `plate-${plate.id}`, kind: "plate", label: plate.id, imageUrl: plate.imageUrl, ...v });
 
     const next = plates[(i + 1) % n];
     const seam = findSeam(seams, plate.id, next.id);
     if (seam) {
+      const sv = resolve(seam, SEAM_DEFAULTS);
       segments.push({
         key: `seam-${plate.id}-${next.id}`,
         kind: "seam",
         label: `${plate.id} → ${next.id}`,
         imageUrl: seam.imageUrl,
-        fitMode: seam.fitMode ?? DEFAULTS.fitMode,
-        baseScale: seam.baseScale ?? 1.0,
-        verticalOffset: seam.verticalOffset ?? DEFAULTS.verticalOffset,
+        ...sv,
       });
     }
   });
 
   return segments;
+}
+
+/** Every boundary in the ring (between segment i and i+1, wrapping at the end). */
+export function buildBoundaries(segments: RingSegment[]): RingBoundary[] {
+  const n = segments.length;
+  return segments.map((seg, i) => {
+    const right = segments[(i + 1) % n];
+    return {
+      index: i,
+      label: `${seg.label}  ▸  ${right.label}`,
+      leftKind: seg.kind,
+      rightKind: right.kind,
+    };
+  });
 }
 
 /** How many of the ring's adjacent pairs actually have a seam image. */

@@ -65,8 +65,10 @@ body {
 
 .pano-segment-image {
   position: absolute;
-  inset: 0;
-  /* background-* + transform (framing/zoom) come from inline styles. */
+  /* Overscan so the per-segment xOffset/yOffset pan (alignment knobs) doesn't
+     reveal an empty edge within +/-6% of travel. background-* + transform come
+     from inline styles. */
+  inset: -6%;
   pointer-events: none;
 }
 
@@ -115,6 +117,19 @@ body {
   color: #ffd9a8;
 }
 
+/* The boundary currently being inspected: bright magenta, full-height line. */
+.pano-seam-line.is-inspected {
+  width: 3px;
+  background: rgba(255, 120, 220, 0.95);
+  box-shadow: 0 0 12px rgba(255, 120, 220, 0.8);
+}
+
+.pano-seam-label.is-inspected {
+  border-color: rgba(255, 120, 220, 0.9);
+  color: #ffd0f2;
+  font-weight: 600;
+}
+
 /* ---------- Debug panel ---------- */
 
 .debug-panel {
@@ -147,19 +162,45 @@ body {
   gap: 4px;
 }
 
-.debug-toggle {
-  display: flex;
-  align-items: center;
+.debug-controls {
+  display: grid;
   gap: 8px;
   margin-top: 12px;
   padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.debug-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.debug-field select {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font: inherit;
+}
+
+.debug-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
   user-select: none;
 }
 
 .debug-toggle input {
   accent-color: #78e6ff;
+}
+
+.debug-toggle input:disabled {
+  opacity: 0.4;
 }
 
 .debug-row {

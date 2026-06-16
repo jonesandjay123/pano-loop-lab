@@ -1,14 +1,14 @@
 import type { PanoRingConfig } from "../pano/panoTypes";
-import { buildRingSegments, seamCoverage } from "../pano/panoRing";
+import type { SeamLabState } from "./PanoRingStage";
+import { buildBoundaries, buildRingSegments, seamCoverage } from "../pano/panoRing";
 
 interface DebugPanelProps {
   ring: PanoRingConfig;
-  showSeams: boolean;
-  onToggleSeams: (next: boolean) => void;
+  lab: SeamLabState;
+  onChange: (patch: Partial<SeamLabState>) => void;
   reducedMotion: boolean;
 }
 
-/** A tiny labelled key/value row used in the readout. */
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="debug-row">
@@ -18,44 +18,93 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
+const BLEND_OPTIONS = [0, 8, 12, 16];
+
 /**
- * Instrument readout for the pano ring. It does NOT drive the motion — the ring
- * auto-scrolls and is drag-scrubbable on its own — it reports the ring structure
- * (plates, seams, assembled track) and offers a seam-inspection toggle.
+ * Seam-lab instrument. Reports ring structure and exposes the inspection controls:
+ * overlap/feather width (0 = raw seams revealed), boundary labels, pause, and a
+ * per-boundary inspect that centers & holds one seam for close study.
  */
-export function DebugPanel({ ring, showSeams, onToggleSeams, reducedMotion }: DebugPanelProps) {
+export function DebugPanel({ ring, lab, onChange, reducedMotion }: DebugPanelProps) {
   const segments = buildRingSegments(ring);
+  const boundaries = buildBoundaries(segments);
   const coverage = seamCoverage(ring);
-  const plateIds = ring.plates.map((p) => p.id);
-  // The assembled ring order, e.g. dawn ▸ ⇄ ▸ dusk ▸ ⇄ ▸ moon ▸ ⇄(wrap)
-  const ringOrder = segments.map((s) => (s.kind === "seam" ? "⇄" : s.label)).join(" · ");
+
+  const motion = reducedMotion
+    ? "reduced (paused)"
+    : lab.inspectIndex != null
+      ? "inspecting"
+      : lab.paused
+        ? "paused"
+        : "auto + drag";
 
   return (
     <aside className="debug-panel">
-      <div className="debug-title">pano-loop-lab · {ring.label}</div>
+      <div className="debug-title">pano-loop-lab · seam lab</div>
 
       <div className="debug-readout">
         <Row label="plates (N)" value={String(ring.plates.length)} />
         <Row label="seams" value={`${coverage.present} / ${coverage.total}`} />
-        <Row label="segments" value={`${segments.length} (×2 rendered)`} />
-        <Row label="plate order" value={plateIds.join(" → ")} />
-        <Row label="ring" value={ringOrder} />
-        <Row label="lap" value={`${ring.loopDurationSeconds}s`} />
-        <Row label="direction" value={ring.direction ?? "left"} />
-        <Row label="motion" value={reducedMotion ? "reduced (auto paused)" : "auto + drag"} />
+        <Row label="segments" value={`${segments.length} (×2)`} />
+        <Row label="motion" value={motion} />
       </div>
 
-      <label className="debug-toggle">
-        <input
-          type="checkbox"
-          checked={showSeams}
-          onChange={(e) => onToggleSeams(e.target.checked)}
-        />
-        <span>show segment seams</span>
-      </label>
+      <div className="debug-controls">
+        <label className="debug-field">
+          <span className="debug-key">blend</span>
+          <select
+            value={lab.blendVw}
+            onChange={(e) => onChange({ blendVw: Number(e.target.value) })}
+          >
+            {BLEND_OPTIONS.map((v) => (
+              <option key={v} value={v}>
+                {v === 0 ? "raw — 0 (real seams)" : `${v}vw overlap`}
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <p className="debug-notes">Drag the background left/right to scrub the ring.</p>
-      {ring.notes && <p className="debug-notes">{ring.notes}</p>}
+        <label className="debug-field">
+          <span className="debug-key">inspect</span>
+          <select
+            value={lab.inspectIndex ?? ""}
+            onChange={(e) =>
+              onChange({ inspectIndex: e.target.value === "" ? null : Number(e.target.value) })
+            }
+          >
+            <option value="">— whole loop —</option>
+            {boundaries.map((b) => (
+              <option key={b.index} value={b.index}>
+                {b.index}. {b.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="debug-toggle">
+          <input
+            type="checkbox"
+            checked={lab.labels}
+            onChange={(e) => onChange({ labels: e.target.checked })}
+          />
+          <span>boundary labels + lines</span>
+        </label>
+
+        <label className="debug-toggle">
+          <input
+            type="checkbox"
+            checked={lab.paused}
+            onChange={(e) => onChange({ paused: e.target.checked })}
+            disabled={lab.inspectIndex != null}
+          />
+          <span>pause auto-scroll</span>
+        </label>
+      </div>
+
+      <p className="debug-notes">
+        Set blend to <strong>raw — 0</strong> to reveal the true contact seams; raise
+        overlap to test how much CSS feather + offsets can hide. Drag to scrub.
+      </p>
     </aside>
   );
 }
