@@ -156,6 +156,10 @@ plan) as of handoff.
 - Don't add Three.js / R3F / GSAP / canvas / backend.
 - Don't regenerate everything or claim "pixel-perfect / done."
 
+> **Do not optimize for making the current three-scene demo look good. Optimize for
+> discovering a repeatable adapter-generation method that would still work if the
+> middle scene is replaced by Christmas / Snow / World Cup tomorrow.**
+
 ---
 
 ## 7. Suggested first move for the next session
