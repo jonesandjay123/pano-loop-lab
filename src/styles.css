@@ -27,19 +27,26 @@ body {
   overflow: hidden;
 }
 
-/* ---------- Pano loop strip ---------- */
+/* ---------- Pano ring strip ---------- */
 
-.pano-loop-stage {
+.pano-ring-stage {
   position: absolute;
   inset: 0;
   overflow: hidden;
   /* Fallback behind the strip (no white flash before images paint). */
   background: linear-gradient(180deg, #1a1530 0%, #06060f 100%);
+  /* Grab-to-scrub; let vertical page gestures through, capture horizontal drags. */
+  cursor: grab;
+  touch-action: pan-y;
 }
 
-/* The track is the segment sequence rendered twice: [A B C A B C]. Its width is
-   the sum of the children, so translateX(-50%) == one full sequence. */
-.pano-loop-track {
+.pano-ring-stage.is-dragging {
+  cursor: grabbing;
+}
+
+/* The track is the assembled ring sequence rendered twice: [A sAB B sBC C sCA] x2.
+   Its transform (translate3d) is driven imperatively by usePanoRingScroll. */
+.pano-ring-track {
   display: flex;
   flex-wrap: nowrap;
   height: 100%;
@@ -48,7 +55,7 @@ body {
 }
 
 /* One 100vw window per segment; clips the per-segment zoom so it can't bleed
-   across a seam into the neighbour. */
+   across a boundary into the neighbour. */
 .pano-segment {
   position: relative;
   flex: 0 0 100vw;
@@ -60,36 +67,14 @@ body {
   position: absolute;
   inset: 0;
   /* background-* + transform (framing/zoom) come from inline styles. */
-}
-
-.pano-segment-overlay {
-  position: absolute;
-  inset: 0;
   pointer-events: none;
 }
 
 /* Vignette across the whole viewport, above the moving strip. */
-.pano-loop-overlay {
+.pano-ring-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
-}
-
-/* Endless leftward scroll. -50% of the track width is exactly one sequence, and
-   the second half is identical to the first, so the wrap is pixel-seamless. */
-@keyframes pano-loop {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pano-loop-track {
-    animation: none !important;
-  }
 }
 
 /* ---------- Seam inspection (debug) ---------- */
@@ -105,6 +90,12 @@ body {
   pointer-events: none;
 }
 
+/* Tint seam windows so transitions are obvious when inspecting. */
+.pano-segment.is-seam .pano-seam-line {
+  background: rgba(255, 196, 120, 0.8);
+  box-shadow: 0 0 8px rgba(255, 196, 120, 0.6);
+}
+
 .pano-seam-label {
   position: absolute;
   top: 12px;
@@ -117,6 +108,11 @@ body {
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   pointer-events: none;
+}
+
+.pano-seam-label.is-seam {
+  border-color: rgba(255, 196, 120, 0.6);
+  color: #ffd9a8;
 }
 
 /* ---------- Debug panel ---------- */

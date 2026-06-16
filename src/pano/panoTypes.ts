@@ -1,69 +1,95 @@
 /**
- * Data model for the panorama loop.
+ * Data model for the panorama RING.
  *
- * The lab no longer thinks in "scenes you switch between". It thinks in an ordered
- * **pano strip**: a sequence of pano *segments* laid side-by-side into one long
- * horizontal track that scrolls forever. The question this model exists to answer
- * is whether several panorama plates can read as one continuous moving far world.
+ * This lab builds the far-background environment for a 3D immersive site as a flat
+ * image strip (cheap) instead of real geometry. The strip is a **ring**: an ordered
+ * list of N background *plates* that you can scroll/drag around forever and come
+ * back to the start.
  *
- * Everything here is plain, serializable data — no functions, no class instances —
- * so a segment/loop could live in a JSON manifest later.
+ * The crucial piece is the **seam**: between every two adjacent plates sits a
+ * transition image whose left edge continues plate A and whose right edge continues
+ * plate B, so A→B reads as one continuous world rather than a hard cut. A ring of N
+ * plates therefore has N seams (including the wrap seam from the last plate back to
+ * the first). The renderer assembles `[A, seamAB, B, seamBC, …, lastPlate,
+ * seamLastFirst]` automatically for any N — this is a pipeline, not a fixed 3-up.
+ *
+ * Everything here is plain serializable data, so a ring could live in a JSON
+ * manifest the 3D site loads at runtime.
  */
 
-/**
- * How a segment's image is sized inside its 100vw window.
- * - `cover`  : fill the window on both axes (may crop). The default.
- * - `height` : height fills, width may overflow (rarely needed for a strip).
- */
+/** How an image is sized inside its window. `cover` fills both axes (may crop). */
 export type FitMode = "cover" | "height";
 
-/** Optional darkening/vignette overlay painted on top of the image(s). */
+/** Optional darkening/vignette overlay painted across the whole strip. */
 export interface OverlayGradient {
-  /** Any valid CSS `background` value (e.g. a linear-gradient or radial-gradient). */
+  /** Any valid CSS `background` value. */
   css: string;
-  /** 0..1 opacity of the overlay layer. */
+  /** 0..1 opacity. */
   opacity: number;
 }
 
-/** One panel of the strip: a single wide image shown in a 100vw window. */
-export interface PanoSegment {
-  /** Stable identifier, used as the React key and in the debug readout. */
-  id: string;
-  /** Human-readable name shown in debug labels. */
-  label: string;
-  /** Path to the wide panoramic image (served from /public). */
-  imageUrl: string;
-
-  /** How the image fills its window. */
-  fitMode: FitMode;
-  /** Aesthetic zoom (>= 1). 1 = exact cover. Contained per-segment, no seam bleed. */
-  baseScale: number;
-  /**
-   * Vertical framing offset as a fraction of viewport height (-0.5..0.5).
-   * Negative nudges the image up (more sky), positive nudges it down.
-   */
-  verticalOffset: number;
-
-  /** Optional per-segment overlay tint (usually left off so the strip reads as one world). */
-  overlayGradient?: OverlayGradient;
-  /** Free-form notes for whoever reads the manifest next. */
-  notes?: string;
+/** Shared visual tuning for a single window of the strip. */
+interface SegmentVisuals {
+  /** How the image fills its window. Defaults to `cover`. */
+  fitMode?: FitMode;
+  /** Aesthetic zoom (>= 1). 1 = exact cover. Clipped per-window, no seam bleed. */
+  baseScale?: number;
+  /** Vertical framing offset as a fraction of viewport height (-0.5..0.5). */
+  verticalOffset?: number;
 }
 
-/** The whole reel: an ordered list of segments + how they loop. */
-export interface PanoLoopConfig {
-  /** Stable identifier for this loop. */
+/** One background plate — a "scene" in the ring (N of these). */
+export interface PanoPlate extends SegmentVisuals {
+  /** Stable identifier, referenced by seams and shown in debug. */
   id: string;
   /** Human-readable name. */
   label: string;
-  /** Segments in render order. The strip is this sequence, duplicated once. */
-  segments: PanoSegment[];
-  /** Seconds for one full sequence to scroll past (i.e. for the loop to repeat). */
-  loopDurationSeconds: number;
-  /** Travel direction of the world. Defaults to "left". */
-  direction?: "left" | "right";
-  /** Optional vignette painted across the whole strip for consistent mood/readability. */
-  overlayGradient?: OverlayGradient;
+  /** Path to the wide plate image (served from /public). */
+  imageUrl: string;
   /** Free-form notes. */
   notes?: string;
+}
+
+/** A transition image stitched between two adjacent plates. */
+export interface PanoSeam extends SegmentVisuals {
+  /** Plate id this seam's LEFT edge continues. */
+  fromId: string;
+  /** Plate id this seam's RIGHT edge continues. */
+  toId: string;
+  /** Path to the seam image (served from /public). */
+  imageUrl: string;
+  /** Free-form notes. */
+  notes?: string;
+}
+
+/** The whole ring: ordered plates + the seams that connect them. */
+export interface PanoRingConfig {
+  id: string;
+  label: string;
+  /** Plates in ring order. The wrap (last → first) is implied. */
+  plates: PanoPlate[];
+  /** Seam images, matched to plate pairs by `fromId`/`toId`. Optional / partial. */
+  seams?: PanoSeam[];
+  /** Seconds for one full lap of the ring at auto-scroll speed. */
+  loopDurationSeconds: number;
+  /** Auto-scroll travel direction. Defaults to "left". */
+  direction?: "left" | "right";
+  /** Optional vignette across the whole strip for consistent mood/readability. */
+  overlayGradient?: OverlayGradient;
+  notes?: string;
+}
+
+/**
+ * A flattened, render-ready window of the ring (either a plate or a seam), with all
+ * visual defaults resolved. Produced by `buildRingSegments`.
+ */
+export interface RingSegment {
+  key: string;
+  kind: "plate" | "seam";
+  /** Debug label, e.g. "dawn-valley" or "dawn-valley → dusk-ridge". */
+  label: string;
+  imageUrl: string;
+  fitMode: FitMode;
+  baseScale: number;
+  verticalOffset: number;
 }

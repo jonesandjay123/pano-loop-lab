@@ -1,134 +1,130 @@
 # pano-loop-lab
 
-A small, clean research lab to answer one engineering question:
+A research lab for the **far-background environment of an immersive 3D website**
+(Jovicheer), built as a flat image strip instead of real 3D geometry — that's the
+performance argument: the distant world costs almost nothing to render.
 
-> **Can multiple generated panorama plates be arranged into a continuous moving
-> background *reel* that feels like one wider world** — a slow, endless
-> side-scrolling far background — **using only web primitives (HTML/CSS/a little
-> React state)?**
+> **Can N panorama plates be stitched into one continuous, seamless background
+> RING** — auto-scrolling and drag-scrubbable, looping a full lap back to the
+> start — **using only web primitives (HTML/CSS/React + requestAnimationFrame)?**
 
-It is **not** "can we swap backgrounds with a dropdown?" — that's a trivial
-manifest check. The thing worth proving is whether ordered panorama **segments**
-can be stitched into one horizontal **loop track** that scrolls forever and wraps
-without a visible jump.
+The key idea is the **seam**. Between every two adjacent plates sits a generated
+*transition image* whose left edge continues plate A and whose right edge continues
+plate B, so A→B reads as one world rather than a hard cut. A ring of **N** plates
+therefore has **N** seams (including the wrap seam from the last plate back to the
+first). This is a **pipeline for any N**, demonstrated here at N=3.
 
-This repo is **not** Jovicheer. It deliberately contains no Three.js, R3F, GSAP,
-shaders, canvas, routing, backend, or any Jovicheer runtime code. The first
-milestone is **not visual beauty** — it is proving the continuous-strip loop
-mechanism with the smallest possible architecture.
+No Three.js, R3F, GSAP, canvas, routing, or backend — the whole point is that the
+far layer is a plain CSS image strip.
 
 ## What this prototype tests
 
-- An ordered **pano strip**: segments laid side-by-side into one horizontal track.
-- The strip **scrolls left forever** and **loops seamlessly** back to the start.
-- Seamless wrap via a **duplicated sequence** `[A, B, C, A, B, C]` animated from
-  `translateX(0)` to `translateX(-50%)` (linear, infinite). −50% of the track is
-  exactly one sequence, and the second half is identical to the first, so the wrap
-  point is pixel-identical — no jump.
-- **No manual scene selection** — the reel auto-plays on load.
-- **No visible empty edges**: each segment is a `100vw` window painted with
-  `background-size: cover`, so it fills any viewport aspect (desktop or portrait).
-- **Segment-boundary inspection**: a debug toggle draws a thin line + id label at
-  each seam so you can judge whether A→B→C reads as a continuous journey.
-- **`prefers-reduced-motion`** pauses the loop.
+- An ordered **ring**: `plate0, seam0→1, plate1, seam1→2, …, plateN-1, seamN-1→0`,
+  assembled automatically from the config for any number of plates.
+- **Seams** (Higgsfield-generated) that visually bridge each adjacent pair so the
+  journey is continuous, plus the **wrap seam** that closes night → dawn.
+- **Endless auto-scroll**: the assembled sequence is rendered twice and a
+  modulo-wrapped `translateX` loops forever with no visible jump.
+- **Manual drag**: grab the background and scrub left/right at any time; auto-scroll
+  pauses while held and resumes exactly where you let go.
+- **No empty edges**: each window is `100vw` painted `cover`, so it fills any aspect
+  (desktop or portrait).
+- **Seam inspection**: a debug toggle marks every boundary and tints seam windows.
+- **`prefers-reduced-motion`** pauses auto-scroll (drag still works).
 
 ## What it intentionally does NOT yet prove
 
-- **True image-seam blending.** Boundaries between segments are currently *hard
-  cuts*. This lab tests the loop *mechanism*, not smooth visual continuity across
-  the seam.
-- **AI-generated tileable panoramas / connecting "seam" plates** (e.g. a B→C
-  transition frame generated to bridge two scenes). The three plates here were
-  generated independently.
-- **Parallax depth.** The strip moves as one flat plane.
-- **Foreground integration with Jovicheer** (wish UI, anchor posts, near layers).
-- Performance optimization, testing framework, auth, backend.
+- **Pixel-exact edge matching.** Seams are generated to *continue* their neighbours
+  tonally and compositionally, and each window is `cover`-cropped, so the join is
+  visually continuous but not pixel-welded. A future pass could pin seam widths to
+  the image aspect (no horizontal crop) for exact edge alignment.
+- **Drag inertia / momentum.** Drag is a direct 1:1 scrub; no fling physics yet.
+- **Parallax depth.** The ring is one flat plane.
+- **Foreground / Jovicheer integration** (the interactive 3D near layers, wish UI).
+- Performance optimization beyond "it's just CSS", testing framework, backend.
 
 ## Run it
 
 ```bash
 npm install
-npm run dev      # start the lab — it loops automatically
+npm run dev      # opens straight into the auto-scrolling, drag-scrubbable ring
 npm run build    # type-check + production build (must pass)
 npm run preview  # serve the built output
 ```
 
-The app opens **directly into the auto-looping reel**. The floating **debug panel**
-(top-left) is an instrument readout, not the main control: it reports segment
-count, ordered ids, loop duration, the virtual `[A,B,C,A,B,C]` track, and
-reduced-motion status, and offers a **"show segment seams"** toggle for inspection.
+The floating **debug panel** is an instrument readout (plate count, seam coverage,
+the assembled ring order, lap time, motion mode) plus a **"show segment seams"**
+toggle. It does not drive the motion — the ring moves on its own and responds to
+drag.
 
 ## Project structure
 
 ```
 pano-loop-lab/
-  index.html
-  vite.config.ts
   src/
     main.tsx
     App.tsx
     styles.css
     useReducedMotion.ts
     pano/
-      panoTypes.ts        # PanoSegment + PanoLoopConfig data model
-      panoLoop.ts         # the default reel (3 ordered segments)
+      panoTypes.ts          # PanoPlate, PanoSeam, PanoRingConfig, RingSegment
+      panoRing.ts           # default ring + buildRingSegments() / seamCoverage()
+      usePanoRingScroll.ts   # rAF auto-scroll + pointer-drag, infinite modulo wrap
     components/
-      PanoLoopStage.tsx   # the continuous horizontal strip renderer
-      DebugPanel.tsx      # floating loop readout + seam toggle
+      PanoRingStage.tsx     # the continuous ring renderer
+      DebugPanel.tsx        # ring readout + seam toggle
   public/
     panos/
-      dawn-valley.jpg          # real Higgsfield matte (21:9)
-      dusk-ridge.jpg           # real Higgsfield matte (16:9)
-      moonlit-tidelands.jpg    # real Higgsfield matte (16:9)
-      dawn-placeholder.svg     # original SVG placeholders (fallback reference)
-      dusk-placeholder.svg
-      moon-placeholder.svg
+      dawn-valley.jpg              # plate A (Higgsfield, 21:9)
+      dusk-ridge.jpg               # plate B (Higgsfield, 16:9)
+      moonlit-tidelands.jpg        # plate C (Higgsfield, 16:9)
+      seams/
+        dawn-valley__dusk-ridge.jpg          # seam A→B (Higgsfield)
+        dusk-ridge__moonlit-tidelands.jpg    # seam B→C (Higgsfield)
+        moonlit-tidelands__dawn-valley.jpg   # seam C→A (wrap, Higgsfield)
+      *-placeholder.svg            # original SVG placeholders (fallback reference)
 ```
 
-## How the loop works
+## How the ring works
 
-`PanoLoopStage` renders:
+1. `buildRingSegments(config)` flattens plates + seams into the ordered window list
+   `[plate, seam, plate, seam, …]`, wrapping last → first. A missing seam simply
+   butt-joins its neighbours, so the ring still works at any seam coverage.
+2. `PanoRingStage` renders that sequence **twice** in a flex track; each window is
+   `flex: 0 0 100vw`, full height, `overflow: hidden`, with an inner image painted
+   `cover` (its `baseScale` zoom / vertical framing clipped to the window).
+3. `usePanoRingScroll` drives the track's `translate3d` imperatively via
+   `requestAnimationFrame`, keeping an `offset` in `[0, sequenceWidth)` by modulo so
+   it loops forever both ways. Auto-scroll advances the offset; a pointer drag
+   overrides it and scrubs directly. Because both share the same wrapped offset,
+   releasing a drag resumes auto-scroll with no jump.
 
-1. a stage container that fills the viewport with `overflow: hidden` (and a solid
-   fallback gradient so there's no white flash before images paint),
-2. a flex **track** holding the segment sequence **rendered twice**
-   (`[...segments, ...segments]`); each segment is `flex: 0 0 100vw`, full height,
-   `overflow: hidden`, with an inner image layer painted `cover` (its `baseScale`
-   zoom / vertical framing are clipped to the window so they never bleed across a
-   seam), and
-3. an optional vignette painted across the whole viewport above the strip.
+### Adding plates (the N-image pipeline)
 
-The track animates `pano-loop` from `translateX(0)` to `translateX(-50%)`, `linear
-infinite`. Because the second half of the track is identical to the first, when it
-reaches −50% the visible result equals the start → the loop is seamless. Direction
-`"right"` is supported via `animation-direction: reverse`.
+Add a `PanoPlate` to `plates` and the two `PanoSeam`s that connect it to its new
+neighbours (regenerate the affected wrap seam too). No renderer changes — the ring
+re-assembles itself. Generate seams with Higgsfield: pass the two adjacent plate
+images as references and prompt for a left→right transition with one continuous
+horizon and no hard seam (see the prompts used for the current three in git
+history / `params` of the Higgsfield generations).
 
-Data model (`src/pano/panoTypes.ts`):
+## How this feeds back into Jovicheer
 
-- **`PanoSegment`** — `id`, `label`, `imageUrl`, `fitMode`, `baseScale`,
-  `verticalOffset`, optional `overlayGradient`, optional `notes`.
-- **`PanoLoopConfig`** — `id`, `label`, `segments: PanoSegment[]`,
-  `loopDurationSeconds`, optional `direction`, optional `overlayGradient`, `notes`.
-
-## How this could feed back into Jovicheer
-
-If a far background can be a *continuous data-driven strip*, then a Jovicheer
-region could ship as a small loop manifest (ordered plates + duration) rather than
-a bespoke 3D far-background setup, sitting behind the existing interactive near
-layers. New regions become "list some plates in order," not "build a scene."
+A region's far background becomes a small **ring manifest** (ordered plates +
+seams + lap time) loaded at runtime and rendered as this CSS strip behind the
+interactive 3D near layers — cheap, data-driven, and template-friendly. New regions
+are "list plates + generate seams," not "build a 3D scene."
 
 ## Open questions / what remains uncertain
 
-- **Seam continuity.** The hard cut between independently-generated plates is the
-  weakest point. Next step is likely **Higgsfield-generated connecting plates** (a
-  panel whose left edge matches scene A and right edge matches scene B), or a soft
-  cross-fade band at each boundary, so the journey reads as one world.
-- **Tileable wrap plate.** The wrap C→A is also a hard cut; a plate designed so its
-  right edge meets its own left edge would make the full loop feel endless.
-- **Per-segment width.** Every segment is exactly `100vw`; very wide (21:9) plates
-  are cropped to a viewport window. Showing more of each plate (segments wider than
-  the viewport) is a tuning question once seam blending is solved.
-- **Image weight & format.** Plates are ~0.7–1.1 MB JPEGs (quality 88 from 2K). A
-  production pass would likely want WebP/AVIF and responsive sources.
-- **Parallax.** A single flat strip has no depth; multi-layer parallax would need
-  each plate split into depth bands — out of scope for now.
+- **Edge precision.** `cover`-cropping each `100vw` window trims a little off seam
+  edges. Pinning seam window width to the image's natural aspect (height-fit, no
+  horizontal crop) would align edges exactly — at the cost of variable segment
+  widths. Worth trying next.
+- **Seam length / pacing.** Seams are currently the same `100vw` as plates; making
+  them narrower or wider changes how fast the world morphs.
+- **Drag feel.** Add inertia/snap-to-plate if the scrub feels too raw.
+- **Image weight.** Plates + seams are ~0.6–1.1 MB JPEGs (quality 88 from 2K). A
+  production pass would want WebP/AVIF and responsive sources.
+- **Parallax.** Splitting each plate into depth bands would add real 3D-feel — a
+  separate experiment.

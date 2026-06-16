@@ -1,7 +1,8 @@
-import type { PanoLoopConfig } from "../pano/panoTypes";
+import type { PanoRingConfig } from "../pano/panoTypes";
+import { buildRingSegments, seamCoverage } from "../pano/panoRing";
 
 interface DebugPanelProps {
-  loop: PanoLoopConfig;
+  ring: PanoRingConfig;
   showSeams: boolean;
   onToggleSeams: (next: boolean) => void;
   reducedMotion: boolean;
@@ -18,27 +19,30 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 /**
- * Instrument readout for the pano loop. It does NOT drive the main behaviour — the
- * strip auto-loops on its own — it just reports the loop configuration and offers
- * a seam-inspection toggle.
+ * Instrument readout for the pano ring. It does NOT drive the motion — the ring
+ * auto-scrolls and is drag-scrubbable on its own — it reports the ring structure
+ * (plates, seams, assembled track) and offers a seam-inspection toggle.
  */
-export function DebugPanel({ loop, showSeams, onToggleSeams, reducedMotion }: DebugPanelProps) {
-  const ids = loop.segments.map((s) => s.id);
-  const ordered = ids.join(" → ");
-  // The actual rendered track: the sequence duplicated once.
-  const virtualTrack = `[${[...ids, ...ids].join(", ")}]`;
+export function DebugPanel({ ring, showSeams, onToggleSeams, reducedMotion }: DebugPanelProps) {
+  const segments = buildRingSegments(ring);
+  const coverage = seamCoverage(ring);
+  const plateIds = ring.plates.map((p) => p.id);
+  // The assembled ring order, e.g. dawn ▸ ⇄ ▸ dusk ▸ ⇄ ▸ moon ▸ ⇄(wrap)
+  const ringOrder = segments.map((s) => (s.kind === "seam" ? "⇄" : s.label)).join(" · ");
 
   return (
     <aside className="debug-panel">
-      <div className="debug-title">pano-loop-lab · {loop.label}</div>
+      <div className="debug-title">pano-loop-lab · {ring.label}</div>
 
       <div className="debug-readout">
-        <Row label="segments" value={String(loop.segments.length)} />
-        <Row label="order" value={ordered} />
-        <Row label="loop dur" value={`${loop.loopDurationSeconds}s / full sequence`} />
-        <Row label="direction" value={loop.direction ?? "left"} />
-        <Row label="track" value={virtualTrack} />
-        <Row label="motion" value={reducedMotion ? "reduced (loop paused)" : "auto-scrolling"} />
+        <Row label="plates (N)" value={String(ring.plates.length)} />
+        <Row label="seams" value={`${coverage.present} / ${coverage.total}`} />
+        <Row label="segments" value={`${segments.length} (×2 rendered)`} />
+        <Row label="plate order" value={plateIds.join(" → ")} />
+        <Row label="ring" value={ringOrder} />
+        <Row label="lap" value={`${ring.loopDurationSeconds}s`} />
+        <Row label="direction" value={ring.direction ?? "left"} />
+        <Row label="motion" value={reducedMotion ? "reduced (auto paused)" : "auto + drag"} />
       </div>
 
       <label className="debug-toggle">
@@ -50,7 +54,8 @@ export function DebugPanel({ loop, showSeams, onToggleSeams, reducedMotion }: De
         <span>show segment seams</span>
       </label>
 
-      {loop.notes && <p className="debug-notes">{loop.notes}</p>}
+      <p className="debug-notes">Drag the background left/right to scrub the ring.</p>
+      {ring.notes && <p className="debug-notes">{ring.notes}</p>}
     </aside>
   );
 }
