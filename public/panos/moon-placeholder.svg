@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1000" preserveAspectRatio="xMidYMid slice" width="2400" height="1000">
+  <defs>
+    <linearGradient id="moonSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#04081c"/>
+      <stop offset="0.5" stop-color="#0b1740"/>
+      <stop offset="0.78" stop-color="#163056"/>
+      <stop offset="1" stop-color="#1d3f63"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="0.34" cy="0.26" r="0.32">
+      <stop offset="0" stop-color="#dceaff" stop-opacity="0.9"/>
+      <stop offset="0.4" stop-color="#9fc0ff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#9fc0ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="moonWater" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16335a"/>
+      <stop offset="1" stop-color="#0a1830"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="2400" height="1000" fill="url(#moonSky)"/>
+  <rect width="2400" height="1000" fill="url(#moonGlow)"/>
+
+  <g fill="#dfe9ff">
+    <circle cx="120" cy="90" r="1.6" opacity="0.7"/><circle cx="500" cy="60" r="1.3" opacity="0.6"/>
+    <circle cx="860" cy="120" r="1.8" opacity="0.8"/><circle cx="1180" cy="70" r="1.4" opacity="0.6"/>
+    <circle cx="1520" cy="110" r="1.7" opacity="0.75"/><circle cx="1880" cy="64" r="1.3" opacity="0.6"/>
+    <circle cx="2180" cy="120" r="1.8" opacity="0.8"/><circle cx="2330" cy="80" r="1.4" opacity="0.6"/>
+  </g>
+
+  <!-- moon -->
+  <circle cx="816" cy="260" r="82" fill="#eef4ff" opacity="0.95"/>
+  <circle cx="788" cy="240" r="82" fill="#0b1740" opacity="0.18"/>
+
+  <!-- distant headland -->
+  <path d="M0 660 L320 632 L680 658 L1040 624 L1420 656 L1820 626 L2400 654 L2400 720 L0 720 Z"
+        fill="#0d2243" opacity="0.85"/>
+  <path d="M0 700 L380 678 L820 704 L1280 676 L1740 706 L2200 680 L2400 700 L2400 740 L0 740 Z"
+        fill="#0a1a36"/>
+
+  <!-- wet tideland flats with moon reflection -->
+  <rect y="740" width="2400" height="260" fill="url(#moonWater)"/>
+  <rect x="770" y="740" width="92" height="260" fill="#cfe0ff" opacity="0.16"/>
+  <rect x="800" y="740" width="34" height="260" fill="#eef4ff" opacity="0.12"/>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1000" preserveAspectRatio="xMidYMid slice" width="2400" height="1000">
+  <defs>
+    <linearGradient id="duskSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#140a26"/>
+      <stop offset="0.4" stop-color="#3a1850"/>
+      <stop offset="0.68" stop-color="#7a2a63"/>
+      <stop offset="0.86" stop-color="#c44a6e"/>
+      <stop offset="1" stop-color="#f08a5d"/>
+    </linearGradient>
+    <radialGradient id="duskGlow" cx="0.7" cy="0.82" r="0.5">
+      <stop offset="0" stop-color="#ffc27a" stop-opacity="0.8"/>
+      <stop offset="0.55" stop-color="#e0628a" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#e0628a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="2400" height="1000" fill="url(#duskSky)"/>
+  <rect width="2400" height="1000" fill="url(#duskGlow)"/>
+
+  <!-- scattered stars in the upper band -->
+  <g fill="#e8d8ff" opacity="0.7">
+    <circle cx="180" cy="120" r="2"/><circle cx="430" cy="80" r="1.6"/><circle cx="700" cy="150" r="2.2"/>
+    <circle cx="980" cy="90" r="1.5"/><circle cx="1280" cy="140" r="2"/><circle cx="1560" cy="70" r="1.8"/>
+    <circle cx="1840" cy="130" r="2.1"/><circle cx="2120" cy="95" r="1.6"/><circle cx="2300" cy="160" r="2"/>
+  </g>
+
+  <!-- far ridge -->
+  <path d="M0 720 L280 686 L600 716 L920 672 L1260 710 L1600 668 L1960 712 L2400 678 L2400 1000 L0 1000 Z"
+        fill="#5a2a5e" opacity="0.6"/>
+  <!-- mid ridge -->
+  <path d="M0 800 L340 760 L700 804 L1060 754 L1420 806 L1800 760 L2400 802 L2400 1000 L0 1000 Z"
+        fill="#3a1748" opacity="0.8"/>
+  <!-- near ridge -->
+  <path d="M0 884 L380 850 L800 892 L1220 848 L1640 894 L2060 852 L2400 890 L2400 1000 L0 1000 Z"
+        fill="#1c0d2c"/>
+  <rect y="912" width="2400" height="88" fill="#100720" opacity="0.9"/>
+</svg>

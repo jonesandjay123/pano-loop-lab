@@ -1,0 +1,154 @@
+:root {
+  color-scheme: dark;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  /* Fallback behind everything; the pano fills it. */
+  background: #06060f;
+  overflow: hidden;
+}
+
+.app {
+  position: relative;
+  width: 100vw;
+  height: 100dvh; /* dvh keeps it correct under mobile browser chrome */
+  overflow: hidden;
+}
+
+/* ---------- Panorama stage ---------- */
+
+.pano-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.pano-fallback {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #1a1530 0%, #06060f 100%);
+}
+
+.pano-image {
+  position: absolute;
+  /* Overscanned box: pulled out past every viewport edge so that `cover` + drift
+     never reveal an empty edge, in any orientation. Amounts come from the scene
+     manifest via the --overscan-* custom properties set on the element. */
+  top: calc(var(--overscan-y) * -1);
+  right: calc(var(--overscan-x) * -1);
+  bottom: calc(var(--overscan-y) * -1);
+  left: calc(var(--overscan-x) * -1);
+  will-change: transform;
+}
+
+.pano-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Slow horizontal drift, there-and-back. Only translateX animates; the constant
+   vertical framing offset and the baseScale zoom ride along unchanged. Amplitude
+   + duration come from the manifest via custom properties set on the element. */
+@keyframes pano-drift {
+  0%,
+  100% {
+    transform: translate(calc(var(--drift-vw) * -1), var(--offset-y)) scale(var(--base-scale));
+  }
+  50% {
+    transform: translate(var(--drift-vw), var(--offset-y)) scale(var(--base-scale));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pano-image {
+    animation: none !important;
+  }
+}
+
+/* ---------- Debug panel ---------- */
+
+.debug-panel {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  width: min(280px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(10, 10, 20, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  color: #e8e8f2;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.debug-title {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+
+.debug-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.debug-field select {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font: inherit;
+}
+
+.debug-readout {
+  display: grid;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.debug-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.debug-key {
+  opacity: 0.6;
+}
+
+.debug-val {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  word-break: break-all;
+}
+
+.debug-notes {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  opacity: 0.7;
+}
