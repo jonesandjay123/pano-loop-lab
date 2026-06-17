@@ -6,68 +6,70 @@
 
 ---
 
-## Next turn = Loop 2 — RUN ONE EDGE-ANCHORED ADAPTER EXPERIMENT
+## Next turn = Loop 6 — PLANNER: REVISED DAWN-TO-DUSK EXPERIMENT
 
 ### Goal
-Run **exactly one** adapter-generation experiment for **one** boundary only:
-`dawn-valley -> dusk-ridge`.
+Design the next single experiment for `dawn-valley -> dusk-ridge`, based on the
+Loop 5 review.
 
-Use `docs/research/experiments/001-dawn-to-dusk-adapter-options.md` and execute
-**Candidate B — Edge-anchored bridge from boundary crops** only.
+Do **not** generate images yet. Act as Research Planner.
 
-The research question for Loop 2:
+The planning question:
 
-> Does using the actual right-edge crop of `dawn-valley` and the actual left-edge
-> crop of `dusk-ridge` improve the raw adapter joins at `blend = 0` compared with
-> the current baseline?
+> Since `exp001-edge-anchored-v1` improved the `adapter -> dusk-ridge` endpoint but
+> worsened / complicated the `dawn-valley -> adapter` endpoint, what is the smallest
+> next adapter-generation experiment that specifically targets the left-endpoint
+> failure without losing the right-endpoint gain?
 
 ### Allowed changes
-- Create temporary crop inputs only if needed for generation. If kept, place them
-  under `docs/research/experiments/working/001-dawn-to-dusk/` or another clearly
-  marked research-working folder, not in runtime asset paths.
-- Generate exactly one new adapter variant:
-  `public/panos/adapters/dawn-valley__dusk-ridge/exp001-edge-anchored-v1.jpg`.
-- Add the new adapter as a comparison option only through the smallest data/config
-  registration needed for inspection; keep the existing baseline available.
-- Update `EXPERIMENT_LOG.md` with the actual method, output path, inspection notes,
-  and verdict: ACCEPT / REJECT / INCONCLUSIVE.
-- Rewrite this `NEXT.md` for Loop 3.
+- Create one docs-only experiment spec for a revised Candidate B-style run, likely
+  one of:
+  - stricter left-edge anchoring / no-dark-mass prompt revision
+  - narrower or asymmetric boundary crops
+  - split-endpoint prompt strategy that explicitly preserves the dawn-side socket
+    while keeping the dusk-side ridge/foreground gain
+- The spec must cover only `dawn-valley -> dusk-ridge`.
+- The spec must include:
+  - hypothesis
+  - input assets needed
+  - generation method
+  - exact prompt strategy
+  - expected success
+  - likely failure mode
+  - evaluation method using inspect mode with `blend = 0` and `blend = 16`
+  - whether it still supports future insertion of Christmas / Snow / World Cup
+    scenes
+  - ACCEPT / REJECT / INCONCLUSIVE criteria
+- Update `EXPERIMENT_LOG.md` with the planning result.
+- Update `FINDINGS.md` only if the planning step sharpens a durable finding.
+- Rewrite `NEXT.md` for Loop 7.
 
 ### Forbidden this turn
-- Do **not** run Candidate A or Candidate C.
-- Do **not** generate multiple adapter variants.
-- Do **not** overwrite or delete `public/panos/seams/dawn-valley__dusk-ridge.jpg`.
-- Do **not** regenerate existing plates or other seams.
-- Do **not** touch any other boundary.
-- Do **not** lock plate / seam / socket sizes. Do **not** add libraries.
-- Do **not** add Three.js / R3F / GSAP / canvas / backend.
-- Do **not** add UI polish, drag inertia, parallax, or new interaction behavior.
-- Do **not** modify renderer, debug-panel, scroll, layout, or interaction logic. If
-  the candidate cannot be inspected without touching those areas, record the
-  blocker honestly and stop.
+- Do **not** generate images.
+- Do **not** create new adapters, crops, or assets.
+- Do **not** change runtime code.
+- Do **not** change the comparison selector.
+- Do **not** run Candidate A, Candidate B again, Candidate C, or any new
+  generation.
+- Do **not** broaden to another boundary.
+- Do **not** add libraries.
+- Do **not** change renderer, DebugPanel, scroll, drag, layout, or interaction
+  behavior.
+- Do **not** lock plate / seam / socket sizes.
 - Do **not** claim the adapter problem is solved.
 
-### Required evaluation
-- Inspect the candidate against the baseline in the repo's inspection lab.
-- Evaluate both raw joins at **`blend = 0`**:
-  - `dawn-valley -> exp001-edge-anchored-v1`
-  - `exp001-edge-anchored-v1 -> dusk-ridge`
-- Also inspect at **`blend = 16`** to understand whether feathering makes a
-  production-ish view plausible.
-- Record concrete evidence: color/value break, horizon continuity, major landform
-  continuity, and whether the middle reads as a transition world.
-- If the candidate cannot be registered for visual comparison without exceeding
-  the allowed scope, record that blocker honestly and stop with docs updated.
-
-### Stop condition
-Stop after one candidate is generated, inspected, logged, and `NEXT.md` is rewritten
-for Loop 3. Report the exact diff scope (docs/assets/code), the generated asset path,
-whether baseline remained untouched, and whether `npm run build` passed.
+### Required evaluation / stop condition
+- Stop after one revised experiment plan is written and Loop 7 is scoped.
+- Loop 7 may be an Experiment Runner only if Loop 6 produces a narrow, reviewable
+  spec for exactly one new adapter variant.
+- Because Loop 6 is docs-only, `npm run build` is optional; if any runtime code is
+  changed, that is a guardrail issue and must be documented.
 
 ---
 
-## Then Loop 3 (preview, do not start yet)
-Run a Skeptical Reviewer turn. Do not generate images. Check the Loop 2 diff,
-guardrails, baseline preservation, and visual evidence. Grade the edge-anchored
-candidate ACCEPT / REJECT / INCONCLUSIVE against `blend = 0` truth, then decide the
-next hypothesis.
+## Then Loop 7 (preview, do not start yet)
+Depends on Loop 6. Likely task:
+- Run exactly one revised dawn-to-dusk adapter generation from the Loop 6 spec,
+  register it as a selectable comparison option next to `baseline` and
+  `exp001-edge-anchored-v1`, inspect at `blend = 0` and `blend = 16`, log ACCEPT /
+  REJECT / INCONCLUSIVE, and stop.

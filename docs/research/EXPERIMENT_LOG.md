@@ -6,6 +6,173 @@
 
 ---
 
+## Turn 5 — 2026-06-17 — Loop 5: skeptical review of comparison repair
+- **Role:** Skeptical Reviewer
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Hypothesis:** review only — no image-generation experiment run.
+- **What was checked:** reviewed the Loop 4 diff, the app/config comparison
+  registration, the debug-panel selector, `blend = 0` / `blend = 16` inspection
+  controls, documentation accuracy, and build status.
+- **Runtime / assets changed:** none in this review. Docs-only review notes.
+- **Verification:**
+  - `npm run build` passed.
+  - The app exposes a `dawn->dusk` comparison selector with exactly:
+    - `baseline`
+    - `exp001 edge-anchored`
+  - Switching the selector changes only the first seam image:
+    - `baseline` -> `/panos/seams/dawn-valley__dusk-ridge.jpg`
+    - `exp001-edge-anchored-v1` ->
+      `/panos/adapters/dawn-valley__dusk-ridge/exp001-edge-anchored-v1.jpg`
+  - The other two seam URLs stayed unchanged while switching comparison options.
+  - `blend = 0`, `blend = 16`, and inspect boundaries `0` and `1` remained usable
+    with both adapter options.
+- **Visual re-check:**
+  - At `blend = 0`, `exp001-edge-anchored-v1` still improves the
+    `adapter -> dusk-ridge` endpoint by reducing the baseline lake-to-land
+    collision.
+  - At `blend = 0`, it still worsens / complicates the
+    `dawn-valley -> adapter` endpoint with a large dark mountain/value mass.
+  - At `blend = 16`, feathering makes both options more plausible, but this does
+    not satisfy the research rule because ACCEPT must hold at raw `blend = 0`.
+- **Review answers:**
+  - Baseline vs candidate is actually selectable without manual code edits: yes.
+  - The selector only affects `dawn-valley -> dusk-ridge`: yes.
+  - Loop 4 did not change renderer/stage logic, scroll/drag behavior, layout
+    behavior, existing assets, or other boundaries.
+  - The DebugPanel change is minimal and limited to research comparison.
+  - Baseline and `exp001-edge-anchored-v1` both remain available.
+  - Loop 2's INCONCLUSIVE verdict is still correct.
+- **Result:** ✅ READY FOR LOOP 6. The comparison-registration repair is valid.
+  No further tooling repair is required before planning the next experiment.
+- **Next:** see `NEXT.md` — Loop 6 should be a Planner turn for a revised single
+  dawn-to-dusk experiment that addresses the left-endpoint failure before any new
+  image generation happens.
+
+## Turn 4 — 2026-06-17 — Loop 4: baseline/candidate comparison repair
+- **Role:** Experiment Runner + skeptical self-review
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Hypothesis:** tooling repair only — no image-generation experiment run.
+- **What was done:**
+  - Added a small dawn-to-dusk adapter option registry in `src/pano/panoRing.ts`.
+  - Restored `PANO_RING`'s base `dawn-valley -> dusk-ridge` seam to the original
+    baseline file:
+    `public/panos/seams/dawn-valley__dusk-ridge.jpg`.
+  - Added `buildPanoRingWithDawnDuskAdapter()` so the active ring can use either:
+    - `baseline`
+    - `exp001-edge-anchored-v1`
+  - Added a minimal debug-panel selector labeled `dawn->dusk` for switching only
+    this boundary's active adapter option.
+- **Runtime / assets changed:** code/config only. No new image assets, crops,
+  adapters, libraries, renderer changes, scroll changes, layout system changes,
+  or other-boundary changes.
+- **Verification:**
+  - `npm run build` passed.
+  - In the app, the dawn-to-dusk selector exposes both `baseline` and
+    `exp001 edge-anchored`.
+  - Browser verification confirmed the active first seam image changes from
+    `/panos/adapters/dawn-valley__dusk-ridge/exp001-edge-anchored-v1.jpg` to
+    `/panos/seams/dawn-valley__dusk-ridge.jpg` and back without manual code edits.
+  - `blend = 0` and `blend = 16` remain selectable while using the comparison
+    selector.
+- **Skeptical self-review:**
+  - Baseline is actually selectable/comparable now: yes.
+  - `exp001-edge-anchored-v1` is still available: yes.
+  - Renderer, scroll, drag, layout behavior, and existing assets were not changed.
+  - The UI change is limited to a single comparison selector in the existing debug
+    panel; it is not product polish.
+  - No plate / seam / socket widths were locked.
+- **Result:** ✅ comparison-registration repair complete. This does not change the
+  Loop 2 visual verdict; `exp001-edge-anchored-v1` remains INCONCLUSIVE.
+- **Next:** see `NEXT.md` — Loop 5 should run a Skeptical Reviewer re-check using
+  the now-selectable baseline/candidate comparison path.
+
+## Turn 3 — 2026-06-17 — Loop 3: skeptical review of Loop 2
+- **Role:** Skeptical Reviewer
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Hypothesis:** review only — no experiment run.
+- **What was checked:** reviewed the Loop 2 diff, generated assets, Candidate B
+  spec, `src/pano/panoRing.ts` registration change, baseline preservation, and the
+  INCONCLUSIVE verdict.
+- **Runtime / assets changed:** none in this review. Docs-only review notes.
+- **Inspection:** no new images generated and no new visual experiment run. Review
+  relied on Loop 2's recorded `blend = 0` / `blend = 16` inspection evidence and
+  the actual diff.
+- **Findings:**
+  - Exactly one new adapter was generated:
+    `public/panos/adapters/dawn-valley__dusk-ridge/exp001-edge-anchored-v1.jpg`.
+  - Candidate B was followed: the generation used the right edge of `dawn-valley`
+    and the left edge of `dusk-ridge` as references. It did not drift into
+    Candidate A or Candidate C.
+  - The generated asset is standalone pair-specific transition material. It is not
+    a permanent outpaint of either neighboring plate.
+  - The INCONCLUSIVE verdict is justified. The candidate improved the
+    `adapter -> dusk-ridge` endpoint by reducing the baseline lake-to-land
+    collision, but it worsened / complicated the `dawn-valley -> adapter` endpoint
+    with a large dark ridge/value mass. It does not meet ACCEPT criteria because
+    both endpoints are not clearly better at `blend = 0`.
+  - Baseline was preserved as a file, but **baseline comparison is not actually
+    selectable in the app/config after Loop 2**. The active `PANO_RING` now points
+    directly to the candidate adapter. The baseline can only be compared by a manual
+    code/config swap or by relying on Loop 2's pre-swap screenshots. This is a
+    review issue.
+  - The `src/pano/panoRing.ts` change stayed small and data/config-like, but it did
+    not fully satisfy the intent of "add as a comparison option" because it replaced
+    the active seam rather than registering baseline and candidate side by side.
+  - No renderer, debug-panel, scroll, layout, interaction behavior, existing plates,
+    or existing seam assets were changed.
+- **Result:** 🟡 NEEDS FOLLOW-UP. Keep Loop 2's visual verdict as INCONCLUSIVE, but
+  repair comparison registration before running any more image-generation
+  experiments.
+- **Next:** see `NEXT.md` — Loop 4 should add the smallest reviewable comparison
+  mechanism for `dawn-valley -> dusk-ridge` baseline vs `exp001-edge-anchored-v1`
+  and stop before generating more images.
+
+## Turn 2 — 2026-06-17 — Loop 2: edge-anchored dawn-to-dusk adapter
+- **Role:** Experiment Runner
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Hypothesis:** H1 — edge-anchored pair-specific adapter generation. Feeding the
+  actual right edge of `dawn-valley` and actual left edge of `dusk-ridge` should
+  improve raw endpoint alignment at `blend = 0`.
+- **What was done:**
+  - Created 30% edge-crop references:
+    - `docs/research/experiments/working/001-dawn-to-dusk/dawn-valley-right-30pct.jpg`
+    - `docs/research/experiments/working/001-dawn-to-dusk/dusk-ridge-left-30pct.jpg`
+  - Generated exactly one Higgsfield `nano_banana_2` adapter candidate, 21:9, 2k:
+    `public/panos/adapters/dawn-valley__dusk-ridge/exp001-edge-anchored-v1.jpg`
+  - Registered it with the smallest data/config change available: updated only the
+    `dawn-valley -> dusk-ridge` seam `imageUrl` in `src/pano/panoRing.ts`.
+    Baseline asset remains untouched at
+    `public/panos/seams/dawn-valley__dusk-ridge.jpg`.
+- **Generation details:** Higgsfield job `3c46d706-2627-4b2e-8ce4-7e4d5536f5fe`,
+  model `nano_banana_2` / Nano Banana Pro, output URL captured during run.
+- **Runtime / assets changed:** one new adapter asset, two research crop inputs,
+  and one data/config registration line. No renderer, debug-panel, scroll, layout,
+  interaction logic, libraries, existing plates, or existing seams were changed.
+- **Inspection:** used the existing inspect lab at `blend = 0` and `blend = 16`.
+  Baseline was inspected before registration; candidate was inspected after the
+  data/config registration.
+  - Baseline `dawn-valley -> baseline`: tonal continuity was acceptable, but the
+    seam introduced lake/water structure immediately at the join.
+  - Baseline `baseline -> dusk-ridge`: clear structural mismatch; lake/water on
+    the seam side met ridge/land on the dusk side.
+  - Candidate `dawn-valley -> exp001-edge-anchored-v1`: no immediate lake/water
+    collision, but a large dark mountain mass enters at the join and creates a
+    stronger structural/value change than desired.
+  - Candidate `exp001-edge-anchored-v1 -> dusk-ridge`: visibly better than
+    baseline; ridge/foreground language is closer and the lake-to-land collision is
+    mostly removed.
+  - At `blend = 16`, the candidate is production-plausible on the right join and
+    somewhat plausible on the left join, but the left-side mass is still doing a
+    lot of hidden work.
+- **Build:** `npm run build` passed after installing existing lockfile
+  dependencies with `npm ci`.
+- **Result:** 🟡 INCONCLUSIVE. Edge anchoring improved the adapter's right endpoint
+  into `dusk-ridge`, but did not clearly improve both endpoints. The left endpoint
+  introduced a large dark ridge/value shift, so this does not meet ACCEPT criteria.
+- **Next:** run Loop 3 as Skeptical Reviewer. Do not generate images. Review the
+  Loop 2 diff, the visual evidence, the data/config registration choice, and the
+  INCONCLUSIVE verdict.
+
 ## Turn 1R — 2026-06-17 — Loop 1 Review: experiment design readiness
 - **Role:** Skeptical Reviewer
 - **Boundary:** `dawn-valley -> dusk-ridge`

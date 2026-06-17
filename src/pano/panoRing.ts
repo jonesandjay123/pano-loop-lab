@@ -6,6 +6,32 @@ import type {
   SegmentVisuals,
 } from "./panoTypes";
 
+export type DawnDuskAdapterOptionId = "baseline" | "exp001-edge-anchored-v1";
+
+export interface DawnDuskAdapterOption {
+  id: DawnDuskAdapterOptionId;
+  label: string;
+  imageUrl: string;
+  notes: string;
+}
+
+export const DAWN_DUSK_ADAPTER_OPTIONS: DawnDuskAdapterOption[] = [
+  {
+    id: "baseline",
+    label: "baseline",
+    imageUrl: "/panos/seams/dawn-valley__dusk-ridge.jpg",
+    notes: "Original dawn-valley -> dusk-ridge seam baseline.",
+  },
+  {
+    id: "exp001-edge-anchored-v1",
+    label: "exp001 edge-anchored",
+    imageUrl: "/panos/adapters/dawn-valley__dusk-ridge/exp001-edge-anchored-v1.jpg",
+    notes: "Loop 2 edge-anchored adapter candidate; verdict INCONCLUSIVE.",
+  },
+];
+
+export const DEFAULT_DAWN_DUSK_ADAPTER_OPTION_ID: DawnDuskAdapterOptionId = "exp001-edge-anchored-v1";
+
 /**
  * The default ring.
  *
@@ -68,6 +94,23 @@ export const PANO_RING: PanoRingConfig = {
   },
   notes: "N=3 plates + 3 seams. Seam lab: tune overlap/fit/offset, inspect each boundary.",
 };
+
+function findDawnDuskAdapterOption(optionId: DawnDuskAdapterOptionId) {
+  return DAWN_DUSK_ADAPTER_OPTIONS.find((option) => option.id === optionId) ?? DAWN_DUSK_ADAPTER_OPTIONS[0];
+}
+
+export function buildPanoRingWithDawnDuskAdapter(optionId: DawnDuskAdapterOptionId): PanoRingConfig {
+  const option = findDawnDuskAdapterOption(optionId);
+
+  return {
+    ...PANO_RING,
+    seams: PANO_RING.seams?.map((seam) =>
+      seam.fromId === "dawn-valley" && seam.toId === "dusk-ridge"
+        ? { ...seam, imageUrl: option.imageUrl, notes: option.notes }
+        : seam,
+    ),
+  };
+}
 
 const PLATE_DEFAULTS: Required<SegmentVisuals> = {
   widthVw: 100,
