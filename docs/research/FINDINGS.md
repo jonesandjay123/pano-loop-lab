@@ -41,6 +41,15 @@
   `blend = 0` and `blend = 16`. This is a tooling finding only; it does not accept
   the adapter visually. _Source: EXPERIMENT_LOG.md Turns 4 and 5._
 
+- ✅ **The next engineering unit should be an Adapter Workbench, not a loop-engine
+  rewrite.** Source inspection of `openOutpaint` and `stablediffusion-infinity`
+  suggests the practical missing layer is a repeatable prep/generation contract:
+  edge crops, wide adapter work canvas, explicit mask, optional structure guide,
+  prompt files, manifest, and candidate batch output. This supports Jones's goal
+  of generating several candidates and selecting the best, while leaving the
+  existing React/CSS renderer intact. _Source: EXPERIMENT_LOG.md Turn 6 and
+  `adapter-workbench-source-dive.md`._
+
 ## Open hypotheses (not yet tested in the loop)
 
 - **H1 — Pair-specific adapter generation** (primary candidate). Generate a dedicated

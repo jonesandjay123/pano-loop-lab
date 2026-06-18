@@ -6,6 +6,50 @@
 
 ---
 
+## Turn 6 — 2026-06-18 — Adapter Workbench source dive
+- **Role:** Engineering Scout / Archivist
+- **Boundary:** `dawn-valley -> dusk-ridge` as the motivating case, but no visual
+  experiment was run.
+- **Hypothesis:** source-code references from existing outpainting tools can clarify
+  how to structure a small `pano-loop-lab` Adapter Workbench before generating more
+  candidates.
+- **What was checked:**
+  - `zero01101/openOutpaint` source:
+    - `js/ui/tool/dream.js`
+    - `js/ui/tool/maskbrush.js`
+    - `js/lib/commands.js`
+    - `js/lib/layers.js`
+    - `js/extensions.js`
+    - `js/index.js`
+  - `lkwq007/stablediffusion-infinity` source:
+    - `app.py`
+    - `utils.py`
+    - `postprocess.py`
+    - `process.py`
+    - `canvas.py`
+- **What was learned:**
+  - `openOutpaint` is a strong reference for candidate-oriented outpainting
+    workflow: bounded generation region, visible init canvas, mask canvas,
+    overmask, prompt/payload construction, optional ControlNet input, candidate
+    navigation, generate-more, accept/discard, and command-history application.
+  - `stablediffusion-infinity` is a strong reference for RGBA selection buffers,
+    mask-as-alpha, prefill strategies (`edge_pad`, PatchMatch, Perlin/Gaussian
+    noise, OpenCV inpaint), batch candidate generation, and photometric/Poisson
+    postprocess hooks.
+  - The next useful tooling step is not a new renderer and not a full drawing app.
+    It is a deterministic Adapter Workbench prep contract: edge crops, wide work
+    canvas, mask, optional structure guide, prompt files, and manifest.
+  - Jones clarified that wide plates and wide adapters are desirable for immersion
+    and transition breathing room, and that the pipeline should support generating
+    several candidates and selecting the best rather than expecting one perfect
+    generation.
+- **Runtime / assets changed:** none. Docs-only.
+- **New documentation:** `docs/research/adapter-workbench-source-dive.md`.
+- **Result:** ✅ source dive complete. Adapter Workbench is now the recommended
+  next engineering direction.
+- **Next:** see `NEXT.md` — implement the smallest no-backend `adapter:prep`
+  script to create reproducible workbench artifacts for one boundary.
+
 ## Turn 5 — 2026-06-17 — Loop 5: skeptical review of comparison repair
 - **Role:** Skeptical Reviewer
 - **Boundary:** `dawn-valley -> dusk-ridge`
