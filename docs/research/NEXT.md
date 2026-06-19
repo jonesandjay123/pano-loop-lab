@@ -5,67 +5,59 @@
 
 ---
 
-## Next turn = Stand up a mask-inpaint backend for one anchor-preserved adapter
+## Next turn = Run the ComfyUI mask-inpaint test on the RTX 5080 (Windows)
 
 ### Goal
 
-Turn 11's visual verdict was **PARTIAL**: Higgsfield whole-frame image-to-image makes
-nice standalone panoramas but does **not** pixel-weld at `blend = 0`, because it has no
-mask and repaints the anchors. Test the smallest **true mask-inpaint** route on the
-single boundary `dawn-valley -> dusk-ridge`, using the existing prep artifacts that
-were built for exactly this — **preserve the anchors, regenerate only the center band**.
+Execute `experiments/working/002-wide-structure-workbench/comfyui-inpaint-plan.md` on
+Jones's Windows + RTX 5080 box. Produce the first **anchor-preserved** dawn→dusk adapter
+and prove whether it welds at `blend = 0` where Higgsfield whole-frame (c08/c04, verdict
+PARTIAL) could not.
 
-```text
-adapter-work-canvas.png  +  adapter-mask.png  (white = regenerate, black = preserve)
-```
+This turn runs on the Windows box, not this Mac (M2/8 GB is unfit — see Turn 12).
 
 ### Why this is next
 
-This is the first turn that can produce a candidate whose left/right edges are the
-**real plate pixels**, so a `blend = 0` weld is even possible. Higgsfield cannot do
-this; an inpainting backend (A1111 `img2img` inpaint, or ComfyUI) can. The prep
-contract (Turn 7, reviewed Turn 8) already emits the canvas + mask in the right shape.
+Turn 11 showed the only thing missing is **anchor preservation**: keep the real plate
+crops, regenerate only the center band. ComfyUI inpaint + the `ImageCompositeMasked`
+restore step makes the adapter's edges byte-identical to the plate edges → a `blend = 0`
+weld becomes possible. The prep artifacts are already in the right shape.
 
 ### Allowed changes
 
-- Choose **one** local inpaint backend (A1111 inpaint API or a minimal ComfyUI graph).
-  Feed `adapter-work-canvas.png` as the init image and `adapter-mask.png` as the inpaint
-  mask, with `prompt.txt` / `negative-prompt.txt`. Generate a small batch (2-4).
-- Save raw results under the workbench `candidates/` folder with an `inpaint-` prefix
-  and extend `candidates.md` (do not overwrite the Higgsfield batch records).
-- Promote at most 1 inpaint candidate into the selector as a **new** comparison option
-  (never overwrite baseline / exp001 / c08 / c04). Inspect both joins at `blend = 0`
-  and `blend = 16` and log whether anchors now actually weld.
+- Follow the plan: SDXL inpaint (Tier B first), round-1 **1536×640**, batch **2–4**,
+  ControlNet OFF, params per §5.
+- Save outputs to `candidates/inpaint-sdxl-0X.png` and the workflow to
+  `workflows/inpaint-sdxl.json`; **append** to `candidates.md`. Do not overwrite the
+  Higgsfield `c0X` batch.
+- Verify per plan §8: anchor pixel-diff **≈0**, then `blend = 0` butt-join composite vs
+  `review/join-c08.jpg` / `join-c04.jpg`.
 - Update `EXPERIMENT_LOG.md`; move durable knowledge to `FINDINGS.md`; rewrite `NEXT.md`.
 
 ### Forbidden this turn
 
-- Do **not** generate more Higgsfield whole-frame candidates (that route is understood).
-- Do **not** overwrite or delete baseline, exp001, c08, or c04.
-- Do **not** refactor the renderer, add Pixi/Three/R3F/GSAP/canvas runtime, or UI polish.
-- Do **not** lock plate/seam/socket widths.
-- Do **not** claim a weld without showing it at `blend = 0`.
+- Do **not** mass-generate before the weld is verified (2–4 images first).
+- Do **not** promote into the selector yet (that is the following Codex turn) beyond, at
+  most, registering one verified winner for inspection — never overwrite baseline /
+  exp001 / c08 / c04.
+- Do **not** refactor the renderer or add UI polish.
+- Do **not** claim a weld without the `blend = 0` evidence.
 
 ### Required evaluation / stop condition
 
-- One mask-inpaint candidate inspected at `blend = 0` on both `dawn -> adapter` and
-  `adapter -> dusk`, with an explicit verdict on whether the **preserved anchors weld**
-  where Higgsfield could not.
-- `npm run build` passes if any code changed.
-- Stop after the inpaint candidate is inspected and logged. "Inpaint backend not
-  available locally" is a valid, loggable stop — in that case record the blocker and
-  the smallest setup needed, and do not fake a result.
+- 2–4 inpaint candidates with anchor pixel-diff ≈0 and a `blend = 0` verdict on both
+  joins, compared honestly against c08/c04.
+- If the weld is clean → hand the best to Codex for selector promotion and plan a
+  native-res Round 2. If anchors do **not** weld → it is almost certainly mask polarity
+  or a missing composite step (plan §4/§8a); fix and re-run.
+- "ComfyUI/torch not ready on the 5080" is a valid stop — record the blocker (likely the
+  Blackwell cu128 mismatch, plan §0) and the fix, do not fake a result.
 
-### Fallbacks if a true inpaint backend cannot be run this turn
+---
 
-1. **Prep-script fix first (cheaper):** swap the flat-grey prefill for an `edge-pad` /
-   mirror fill and de-emphasize the structure guide (both flagged in Turn 9), then
-   regenerate Higgsfield candidates — this reduces grey-echo failures but still will not
-   weld anchors.
-2. **Or** keep **c08** as the current best whole-frame candidate and hand the
-   pluggability question (does this method transfer to another boundary / to a Jovicheer
-   event scene) to a later turn.
+## Then
 
-> Honest north star check: the goal is a *repeatable adapter method*, not one pretty
-> dawn→dusk image. The mask-inpaint test is the cleanest next probe of whether
-> anchor-preserved generation is the missing piece.
+A clean weld turns the open question from "can we generate a transition" to "is this
+method *repeatable* for an arbitrary pair" — the next probes become: native-res quality
+pass, prep-prefill/structure-guide tuning (Turn 9 notes), and testing a second boundary
+or a Jovicheer event-scene insert. One boundary per turn.

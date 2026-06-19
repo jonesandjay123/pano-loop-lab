@@ -6,6 +6,33 @@
 
 ---
 
+## Turn 12 — 2026-06-19 — Mask-inpaint backend feasibility scout (no generation)
+- **Role:** Scout (Opus)
+- **Boundary:** `dawn-valley -> dusk-ridge` (tooling/feasibility only)
+- **Question:** can we run a true mask-inpaint backend (anchor-preserve + center
+  regenerate) to beat the Higgsfield whole-frame PARTIAL verdict?
+- **Environment scanned (this Mac):** Apple **M2, 8 GB RAM**, arm64, ~29 GiB free.
+  **No** A1111 / ComfyUI / InvokeAI / Fooocus / DiffusionBee anywhere; **no** torch /
+  diffusers / MLX; **no** checkpoints/safetensors; no SD ports listening. Miniconda is
+  installed; HF + PyPI reachable. → **This box is unfit** for local SDXL/Flux inpaint
+  (8 GB RAM + 3168×1344 target). No generation was attempted here.
+- **Decision:** Jones has a **Windows PC with RTX 5080 (16 GB, Blackwell)** — that is the
+  generation box. This turn produced an executable plan instead of running anything.
+- **Deliverable:** `comfyui-inpaint-plan.md` in the exp002 working dir — full ComfyUI
+  mask-inpaint spec: Blackwell torch caveat (needs cu128), model tiers (start SDXL
+  `…-inpainting-0.1`; Tier A Juggernaut/RealVisXL + `comfyui-inpaint-nodes`; Tier C Flux
+  Fill fp8), round-1 size **1536×640** then native, params (denoise 1.0 / 30 steps /
+  cfg 6.5 / batch 4), ControlNet OFF round 1, the critical **`ImageCompositeMasked`
+  anchor-restore** step that guarantees pixel-exact anchors, the artifact/metadata
+  contract, and the verification protocol (anchor pixel-diff ≈0 + `blend = 0` butt-join
+  vs c08/c04).
+- **Key insight:** the prep artifacts already match ComfyUI's expected shape and the
+  mask polarity (white = regenerate) matches ComfyUI directly — no repo change needed.
+- **Verdict:** **READY-FOR-WINDOWS-COMFYUI** (repo ready; Windows box needs the standard
+  one-time ComfyUI + model setup). **No candidates generated** (scout only, as scoped).
+- **Next:** see `NEXT.md` — execute `comfyui-inpaint-plan.md` on the 5080, generate 2–4
+  test inpaints, verify the weld, then hand the best to Codex for selector promotion.
+
 ## Turn 11 — 2026-06-19 — Visual verdict: exp002 c08 / c04 at blend 0 & 16
 - **Role:** Reviewer (Opus)
 - **Boundary:** `dawn-valley -> dusk-ridge`
