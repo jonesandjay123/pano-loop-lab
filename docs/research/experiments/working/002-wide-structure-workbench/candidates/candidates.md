@@ -92,3 +92,64 @@ Output: `2k`, aspect `21:9`, `3168 x 1344`. Cost: 2 credits/image, 16 credits to
 This batch does NOT accept any adapter visually. Acceptance requires the next turn:
 promote c08 (+ c04) into the selector as new comparison variants (never overwriting
 baseline / exp001) and inspect both joins at `blend = 0` and `blend = 16`.
+
+---
+
+# ComfyUI inpaint batch 1 - SDXL diffusers inpaint, hard composite restore
+
+Generated: 2026-06-19 (Turn 13, Codex as Runner) on Jones's Windows PC.
+Backend: **ComfyUI 0.25.0**, RTX 5080, torch **2.11.0+cu128**, CUDA 12.8.
+Model: `diffusers/stable-diffusion-xl-1.0-inpainting-0.1`, fp16 diffusers subset
+downloaded to `ComfyUI/models/diffusers/sdxl-inpaint-0.1`.
+UNet SHA256: `6470840731E98CC16713DDF3AC7EE458C9FDBCB881A98C6727CD4A938F227D3F`.
+
+## Workflow / parameters
+
+- Workflow: `../workflows/inpaint-sdxl.json` (ComfyUI API prompt format).
+- Init image: `adapter-work-canvas.png`.
+- Mask: `adapter-mask.png` (white = regenerate, black = preserve), downscaled with
+  nearest-neighbor.
+- Resolution: `1536 x 640`.
+- ControlNet / structure guide: OFF.
+- Denoise: `1.0`.
+- Steps: `30`.
+- Sampler / scheduler: `dpmpp_2m` / `karras`.
+- CFG: `6.5`.
+- Composite anchor restore: yes, `ImageCompositeMasked` with the hard inpaint mask.
+- Prompt version: `prompt.txt` from this folder.
+- Negative prompt version: `negative-prompt.txt` from this folder.
+
+## Candidates
+
+| id | file | seed | anchor diff | visual verdict |
+|---|---|---:|---|---|
+| inpaint-sdxl-01 | `inpaint-sdxl-01.png` | `42424201` | PASS: preserved-mask max diff `0` | REJECT / diagnostic: heavy dark mountain mass; hard vertical value break into right anchor. |
+| inpaint-sdxl-02 | `inpaint-sdxl-02.png` | `42424202` | PASS: preserved-mask max diff `0` | PARTIAL / diagnostic: less extreme structure than 01, but still a hard right-side value break. |
+
+Anchor preservation report:
+`../review/inpaint-sdxl-anchor-diff.json`.
+
+Review composites:
+
+- `../review/inpaint-sdxl-01-internal-weld.jpg`
+- `../review/inpaint-sdxl-02-internal-weld.jpg`
+- `../review/inpaint-sdxl-01-external-left-join.jpg`
+- `../review/inpaint-sdxl-01-external-right-join.jpg`
+- `../review/inpaint-sdxl-02-external-left-join.jpg`
+- `../review/inpaint-sdxl-02-external-right-join.jpg`
+
+## Honest result
+
+The **anchor-preservation mechanism works**: both candidates have byte-identical RGB
+values wherever the downscaled hard mask is black (`changed_values = 0`, `max diff = 0`).
+This confirms ComfyUI + `ImageCompositeMasked` can protect the real anchor pixels.
+
+However, the first hard-composite workflow does **not** visually solve the adapter.
+Both candidates expose a strong internal vertical seam at the generated-center to
+right-anchor boundary; candidate 01 also introduces an oversized dark central mountain
+mass. Candidate 02 is the better diagnostic sample but is not selector-ready.
+
+Interpretation: the method's **pixel preservation** part is proven, but the **hard
+restore mask** likely creates an internal butt-join between generated pixels and the
+protected right anchor. Next probe should keep outer anchor pixels exact while using a
+feathered/graded composite restore only across the overmask band.

@@ -1,0 +1,186 @@
+{
+  "note": "ComfyUI API workflow for pano-loop-lab Turn 13 SDXL diffusers inpaint. Load via API /prompt, not visual UI graph.",
+  "model": "diffusers/stable-diffusion-xl-1.0-inpainting-0.1 fp16 subset in ComfyUI/models/diffusers/sdxl-inpaint-0.1",
+  "params": {
+    "resolution": "1536x640",
+    "steps": 30,
+    "cfg": 6.5,
+    "sampler": "dpmpp_2m",
+    "scheduler": "karras",
+    "denoise": 1.0,
+    "controlnet": "off",
+    "composite_anchor_restore": true
+  },
+  "prompt": {
+    "1": {
+      "class_type": "DiffusersLoader",
+      "inputs": {
+        "model_path": "sdxl-inpaint-0.1"
+      }
+    },
+    "2": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "1",
+          1
+        ],
+        "text": "Pair-specific panoramic adapter for dawn-valley to dusk-ridge.\nUse the left anchor as the actual right edge of dawn-valley and the right anchor as the actual left edge of dusk-ridge.\nGenerate a wide natural transition world between them: open dawn valley atmosphere, low mist basin, distant layered ridges, soft haze, coherent horizon, dusk ridge gradually emerging on the right.\nKeep the left endpoint airy and low-contrast; do not introduce a large dark mountain mass immediately on the left edge.\nPreserve the anchor crops where the mask is black and regenerate the white center band plus slight overmask area.\nThe result should feel like one continuous panoramic journey, not two wallpapers taped together.\n"
+      }
+    },
+    "3": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "1",
+          1
+        ],
+        "text": "large black mountain on the left edge, hard structure jump, abrupt horizon step, lake hitting mountain, pasted collage, split-screen image, vertical seam line, transparent area, empty blank center, sharp black silhouette at dawn-valley boundary, mismatched perspective, text, watermark, people, buildings, vehicles\n"
+      }
+    },
+    "4": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "adapter-work-canvas.png"
+      }
+    },
+    "5": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "adapter-mask.png"
+      }
+    },
+    "6": {
+      "class_type": "ImageScale",
+      "inputs": {
+        "image": [
+          "4",
+          0
+        ],
+        "upscale_method": "lanczos",
+        "width": 1536,
+        "height": 640,
+        "crop": "disabled"
+      }
+    },
+    "7": {
+      "class_type": "ImageScale",
+      "inputs": {
+        "image": [
+          "5",
+          0
+        ],
+        "upscale_method": "nearest-exact",
+        "width": 1536,
+        "height": 640,
+        "crop": "disabled"
+      }
+    },
+    "8": {
+      "class_type": "ImageToMask",
+      "inputs": {
+        "image": [
+          "7",
+          0
+        ],
+        "channel": "red"
+      }
+    },
+    "9": {
+      "class_type": "InpaintModelConditioning",
+      "inputs": {
+        "positive": [
+          "2",
+          0
+        ],
+        "negative": [
+          "3",
+          0
+        ],
+        "vae": [
+          "1",
+          2
+        ],
+        "pixels": [
+          "6",
+          0
+        ],
+        "mask": [
+          "8",
+          0
+        ],
+        "noise_mask": true
+      }
+    },
+    "10": {
+      "class_type": "KSampler",
+      "inputs": {
+        "model": [
+          "1",
+          0
+        ],
+        "positive": [
+          "9",
+          0
+        ],
+        "negative": [
+          "9",
+          1
+        ],
+        "latent_image": [
+          "9",
+          2
+        ],
+        "seed": 42424201,
+        "steps": 30,
+        "cfg": 6.5,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "denoise": 1.0
+      }
+    },
+    "11": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "10",
+          0
+        ],
+        "vae": [
+          "1",
+          2
+        ]
+      }
+    },
+    "12": {
+      "class_type": "ImageCompositeMasked",
+      "inputs": {
+        "destination": [
+          "6",
+          0
+        ],
+        "source": [
+          "11",
+          0
+        ],
+        "x": 0,
+        "y": 0,
+        "resize_source": false,
+        "mask": [
+          "8",
+          0
+        ]
+      }
+    },
+    "13": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "12",
+          0
+        ],
+        "filename_prefix": "pano_loop_lab/inpaint-sdxl-01"
+      }
+    }
+  }
+}

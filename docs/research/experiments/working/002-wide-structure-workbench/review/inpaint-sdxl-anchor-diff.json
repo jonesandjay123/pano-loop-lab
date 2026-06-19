@@ -1,0 +1,34 @@
+[
+  {
+    "file": "inpaint-sdxl-01.png",
+    "size": [
+      1536,
+      640
+    ],
+    "preserved_pixels": 530560,
+    "preserved_changed_values": 0,
+    "preserved_max_abs_diff": 0,
+    "preserved_mean_abs_diff": 0.0,
+    "regen_pixels": 452480,
+    "regen_max_abs_diff_vs_prefill": 249,
+    "regen_mean_abs_diff_vs_prefill": 46.67486739745403,
+    "left_internal_boundary_x": 416,
+    "right_internal_boundary_x": 1123
+  },
+  {
+    "file": "inpaint-sdxl-02.png",
+    "size": [
+      1536,
+      640
+    ],
+    "preserved_pixels": 530560,
+    "preserved_changed_values": 0,
+    "preserved_max_abs_diff": 0,
+    "preserved_mean_abs_diff": 0.0,
+    "regen_pixels": 452480,
+    "regen_max_abs_diff_vs_prefill": 173,
+    "regen_mean_abs_diff_vs_prefill": 44.59803379891561,
+    "left_internal_boundary_x": 416,
+    "right_internal_boundary_x": 1123
+  }
+]

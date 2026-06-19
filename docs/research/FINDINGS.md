@@ -79,6 +79,18 @@
   structure-ON runs failed). _Source: EXPERIMENT_LOG.md Turns 9 & 11;
   `.../002-wide-structure-workbench/candidates/candidates.md` and `review/join-*.jpg`._
 
+- ? **ComfyUI hard-mask inpaint proves anchor preservation, but not the visual weld yet.**
+  Turn 13 ran SDXL diffusers inpaint locally on the RTX 5080 through ComfyUI. The
+  `ImageCompositeMasked` restore step preserved every black-mask anchor pixel exactly
+  at round-1 size (`changed_values = 0`, `max_abs_diff = 0`) for both candidates, so
+  mask polarity and the local backend are validated. But using the same hard mask for
+  final composite created a visible internal vertical break where the generated center
+  meets the protected right anchor; the candidates are diagnostic only and should not be
+  promoted. Next test should keep the outer anchor edges exact while feathering/gradient
+  compositing only across the overmask band. _Source: EXPERIMENT_LOG.md Turn 13;
+  `.../002-wide-structure-workbench/review/inpaint-sdxl-anchor-diff.json` and
+  `inpaint-sdxl-*-internal-weld.jpg`._
+
 ## Open hypotheses (not yet tested in the loop)
 
 - **H1 — Pair-specific adapter generation** (primary candidate). Generate a dedicated

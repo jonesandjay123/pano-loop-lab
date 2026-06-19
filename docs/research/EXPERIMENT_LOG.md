@@ -6,6 +6,52 @@
 
 ---
 
+## Turn 13 - 2026-06-19 - ComfyUI SDXL mask-inpaint batch 1 on RTX 5080
+- **Role:** Runner
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Question:** can local ComfyUI inpaint preserve real anchor pixels and produce a
+  cleaner `blend = 0` weld than Higgsfield whole-frame c08/c04?
+- **Environment:** Jones's Windows PC, ComfyUI 0.25.0, RTX 5080 detected, torch
+  `2.11.0+cu128`, CUDA 12.8. ComfyUI launched successfully at
+  `http://127.0.0.1:8188`.
+- **Setup done:** `ComfyUI/models/checkpoints` had no SDXL inpaint checkpoint. Downloaded
+  the official fp16 diffusers subset for
+  `diffusers/stable-diffusion-xl-1.0-inpainting-0.1` into
+  `ComfyUI/models/diffusers/sdxl-inpaint-0.1`. ComfyUI's `DiffusersLoader` saw it as
+  `sdxl-inpaint-0.1`.
+- **Workflow:** `docs/research/experiments/working/002-wide-structure-workbench/workflows/inpaint-sdxl.json`
+  (ComfyUI API prompt format): load diffusers inpaint model, load work canvas and mask,
+  downscale both to `1536 x 640` (mask nearest-neighbor), `InpaintModelConditioning`,
+  `KSampler`, `VAEDecode`, then `ImageCompositeMasked` using the hard mask to restore
+  black/preserved anchor pixels.
+- **Parameters:** steps `30`, sampler/scheduler `dpmpp_2m` / `karras`, CFG `6.5`,
+  denoise `1.0`, ControlNet OFF, seeds `42424201` and `42424202`.
+- **Candidates written:**
+  - `docs/research/experiments/working/002-wide-structure-workbench/candidates/inpaint-sdxl-01.png`
+  - `docs/research/experiments/working/002-wide-structure-workbench/candidates/inpaint-sdxl-02.png`
+- **Verification artifacts written:**
+  - `docs/research/experiments/working/002-wide-structure-workbench/review/inpaint-sdxl-anchor-diff.json`
+  - `docs/research/experiments/working/002-wide-structure-workbench/review/inpaint-sdxl-01-internal-weld.jpg`
+  - `docs/research/experiments/working/002-wide-structure-workbench/review/inpaint-sdxl-02-internal-weld.jpg`
+  - external edge sanity joins for both candidates under the same `review/` folder.
+- **Anchor pixel check:** PASS for both candidates. In the downscaled black-mask preserve
+  region, `changed_values = 0`, `max_abs_diff = 0`, `mean_abs_diff = 0.0`. This proves
+  the composite-restore step is wired with the correct mask polarity.
+- **Visual check:** FAIL / PARTIAL. The hard composite preserves anchor pixels exactly,
+  but both candidates show a hard internal vertical value break where the generated
+  center meets the protected right anchor. `inpaint-sdxl-01` also creates an oversized
+  dark central mountain mass. `inpaint-sdxl-02` is less structurally extreme but still
+  not a clean weld and is not selector-ready.
+- **Turn verdict:** **PARTIAL diagnostic.** ComfyUI mask-inpaint is technically ready and
+  anchor preservation is proven. The first hard-mask composite recipe is not visually
+  accepted; the next probe should test a feathered/graded composite restore across the
+  overmask band while keeping the outer anchor edges pixel-exact.
+- **Build:** initial `npm run build` failed because dependencies were not installed
+  (`tsc` missing). Ran `npm ci`, then `npm run build` passed. `npm ci` reported existing
+  audit warnings (1 moderate, 1 high); no dependency fixes were attempted.
+- **Next:** see `NEXT.md` - do one narrow ComfyUI rerun/recomposite test for soft
+  composite restore, not selector promotion.
+
 ## Turn 12 — 2026-06-19 — Mask-inpaint backend feasibility scout (no generation)
 - **Role:** Scout (Opus)
 - **Boundary:** `dawn-valley -> dusk-ridge` (tooling/feasibility only)

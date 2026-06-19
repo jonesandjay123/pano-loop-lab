@@ -1,63 +1,65 @@
-# NEXT.md — the goal + stop condition for the NEXT turn only
+# NEXT.md - the goal + stop condition for the NEXT turn only
 
-> This is the **brake** for the next session. It is small, hard, and stoppable on
-> purpose. One turn answers **one** question.
+> This is the **brake** for the next session. One turn answers **one** question.
 
 ---
 
-## Next turn = Run the ComfyUI mask-inpaint test on the RTX 5080 (Windows)
+## Next turn = Test soft composite restore for the ComfyUI inpaint workflow
 
 ### Goal
 
-Execute `experiments/working/002-wide-structure-workbench/comfyui-inpaint-plan.md` on
-Jones's Windows + RTX 5080 box. Produce the first **anchor-preserved** dawn→dusk adapter
-and prove whether it welds at `blend = 0` where Higgsfield whole-frame (c08/c04, verdict
-PARTIAL) could not.
+On the same Windows + RTX 5080 ComfyUI setup, answer one narrow question:
 
-This turn runs on the Windows box, not this Mac (M2/8 GB is unfit — see Turn 12).
+> Did the first ComfyUI batch fail because the final `ImageCompositeMasked` used a
+> hard mask, creating an internal butt-join between generated pixels and the protected
+> right anchor?
+
+Keep the same boundary: `dawn-valley -> dusk-ridge`.
 
 ### Why this is next
 
-Turn 11 showed the only thing missing is **anchor preservation**: keep the real plate
-crops, regenerate only the center band. ComfyUI inpaint + the `ImageCompositeMasked`
-restore step makes the adapter's edges byte-identical to the plate edges → a `blend = 0`
-weld becomes possible. The prep artifacts are already in the right shape.
+Turn 13 proved the important technical piece: hard black-mask regions are
+pixel-preserved exactly (`max_abs_diff = 0`). But both candidates show a hard vertical
+break at the generated-center to right-anchor boundary. That is likely a compositing
+recipe problem, not proof that mask-inpaint is the wrong method.
+
+The next smallest test is to keep the **outer anchor edges** exact while feathering or
+grading only the **overmask band** before the final composite restore.
 
 ### Allowed changes
 
-- Follow the plan: SDXL inpaint (Tier B first), round-1 **1536×640**, batch **2–4**,
-  ControlNet OFF, params per §5.
-- Save outputs to `candidates/inpaint-sdxl-0X.png` and the workflow to
-  `workflows/inpaint-sdxl.json`; **append** to `candidates.md`. Do not overwrite the
-  Higgsfield `c0X` batch.
-- Verify per plan §8: anchor pixel-diff **≈0**, then `blend = 0` butt-join composite vs
-  `review/join-c08.jpg` / `join-c04.jpg`.
-- Update `EXPERIMENT_LOG.md`; move durable knowledge to `FINDINGS.md`; rewrite `NEXT.md`.
+- Use the existing Turn 13 setup, model, prompts, and seeds as much as possible:
+  `sdxl-inpaint-0.1`, `1536 x 640`, steps `30`, CFG `6.5`, `dpmpp_2m` / `karras`,
+  denoise `1.0`, ControlNet OFF.
+- Create exactly one soft-restore workflow variant, for example:
+  - sampler mask stays the existing hard `adapter-mask.png`;
+  - final composite mask is feathered/graded across the overmask band;
+  - the far-left and far-right outer anchor edge zones remain hard-preserved and must
+    still pixel-diff `0`.
+- Produce **2** candidates only, e.g.
+  `candidates/inpaint-sdxl-soft-01.png` and `inpaint-sdxl-soft-02.png`.
+- Save the workflow under `workflows/inpaint-sdxl-soft-restore.json`.
+- Add verification artifacts under `review/`, including:
+  - outer-anchor pixel diff (`max_abs_diff = 0` required in the protected outer zones);
+  - internal weld review composites against Turn 13 hard-mask candidates.
+- Append results to `candidates/candidates.md`, update `EXPERIMENT_LOG.md`, update
+  `FINDINGS.md` only if there is durable knowledge, and rewrite this `NEXT.md`.
 
 ### Forbidden this turn
 
-- Do **not** mass-generate before the weld is verified (2–4 images first).
-- Do **not** promote into the selector yet (that is the following Codex turn) beyond, at
-  most, registering one verified winner for inspection — never overwrite baseline /
-  exp001 / c08 / c04.
-- Do **not** refactor the renderer or add UI polish.
-- Do **not** claim a weld without the `blend = 0` evidence.
+- Do **not** promote any inpaint candidate into the runtime selector.
+- Do **not** switch models, add ControlNet, test Flux, or go native-res yet.
+- Do **not** generate more than 2 soft-restore candidates.
+- Do **not** refactor renderer/UI or change `src/pano/panoRing.ts`.
+- Do **not** claim success unless the review images show the internal vertical break is
+  materially reduced at `blend = 0` while outer anchor pixels still diff `0`.
 
 ### Required evaluation / stop condition
 
-- 2–4 inpaint candidates with anchor pixel-diff ≈0 and a `blend = 0` verdict on both
-  joins, compared honestly against c08/c04.
-- If the weld is clean → hand the best to Codex for selector promotion and plan a
-  native-res Round 2. If anchors do **not** weld → it is almost certainly mask polarity
-  or a missing composite step (plan §4/§8a); fix and re-run.
-- "ComfyUI/torch not ready on the 5080" is a valid stop — record the blocker (likely the
-  Blackwell cu128 mismatch, plan §0) and the fix, do not fake a result.
-
----
-
-## Then
-
-A clean weld turns the open question from "can we generate a transition" to "is this
-method *repeatable* for an arbitrary pair" — the next probes become: native-res quality
-pass, prep-prefill/structure-guide tuning (Turn 9 notes), and testing a second boundary
-or a Jovicheer event-scene insert. One boundary per turn.
+- If soft restore removes the internal vertical break while keeping outer anchor edges
+  exact, mark the method **PROMISING** and plan a native/full-res quality pass.
+- If the break remains, mark the soft-restore hypothesis **REJECTED** and plan the next
+  single variable: mask width / prompt constraint / ControlNet Tile or Depth, one at a
+  time.
+- If ComfyUI/model/tooling breaks, record the blocker honestly and stop. A tooling
+  blocker is a valid turn result.
