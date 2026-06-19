@@ -6,6 +6,54 @@
 
 ---
 
+## Turn 8 — 2026-06-18 — Review of Adapter Workbench prep script
+- **Role:** Reviewer (Opus, cross-checking Codex's Turn 7 runner work)
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Question:** is the no-backend prep artifact contract correct, reproducible, and
+  ready to feed a candidate-generation turn — without having touched the renderer or
+  any backend?
+- **Verdict:** ✅ **READY / PASS.** No blockers.
+- **What was checked:**
+  - **Scope:** `scripts/adapter-prep.mjs` only reads `public/panos/*.jpg` and writes
+    under `docs/research/experiments/working/002-wide-structure-workbench/`. It does
+    **not** touch the renderer, `public/panos/adapters/`, or any backend. No scope
+    creep.
+  - **Reproducibility:** re-running the prep command regenerates byte-identical
+    images; only `manifest.json` `createdAt` changes (timestamp). Working tree
+    restored to the committed manifest after verification.
+  - **Crops (visual + code):** `dawn-valley-right-crop.jpg` is the right edge of the
+    dawn plate, `dusk-ridge-left-crop.jpg` is the left edge of the dusk plate. Both
+    `1045 x 1344`. Direction is correct (`from -> right`, `to -> left`), not flipped.
+  - **Work canvas:** `3168 x 1344`; two real edge crops on the outside, opaque
+    edge-color gradient through a `1078px` center band. No transparent/blank hole.
+  - **Mask:** outer anchors black (preserve), broad white center (regenerate), soft
+    feather overmasking ~`190px` into each anchor. `manifest.maskStrategy` documents
+    `white = regenerate, black = preserve`.
+  - **Structure guide:** low-frequency only — warm dawn left, misty basin center,
+    dusk ridge mass emerging bottom-right. Intentionally not detailed; reads as a
+    placeholder, not a final image.
+  - **Prompt / negative:** explicitly target the Loop 2 / `exp001` failure mode
+    (no large dark mountain / value mass on the left edge, no hard structure jump,
+    no abrupt horizon step, no lake-hitting-mountain, no pasted-collage seam).
+  - **Manifest:** carries boundary, source paths, dimensions, crop pixels, source
+    image info, mask + prefill strategy, edge colors, structure-guide note, prompt
+    file paths — enough to repeat the prep or hand it to a backend/manual route.
+  - **Dependency:** `sharp` is a single, narrow **devDependency** (build/runtime
+    bundle unaffected).
+  - **Build:** `npm run build` passed (tsc + vite, TS clean).
+- **Should-fix (non-blocking, future turn):** `promptText()` interpolates only the
+  first line; lines 2-5 and the negative prompt hardcode `dawn-valley` / `dusk-ridge`
+  and this pair's dark-mass failure mode. Correct and desirable for this pair-specific
+  boundary, but the generically-named `adapter:prep` script would emit dawn-specific
+  text if reused for another pair. Generalize when the workbench is extended beyond
+  dawn-to-dusk — do not weaken the current pair-specific prompt to do it.
+- **Runtime / assets changed:** none by this review. No backend calls. No candidates
+  under `public/panos/adapters/`.
+- **Result:** prep contract accepted. This still does **not** evaluate visual adapter
+  quality — that is the next turn's job.
+- **Next:** see `NEXT.md` — authorize one route to generate 4-8 `dawn-valley -> dusk-ridge`
+  candidates from these artifacts, then register + inspect at `blend = 0` / `blend = 16`.
+
 ## Turn 7 — 2026-06-18 — Adapter Workbench prep script
 - **Role:** Engineering Runner / Archivist
 - **Boundary:** `dawn-valley -> dusk-ridge`

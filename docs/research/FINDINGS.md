@@ -50,6 +50,16 @@
   existing React/CSS renderer intact. _Source: EXPERIMENT_LOG.md Turn 6 and
   `adapter-workbench-source-dive.md`._
 
+- ✅ **The no-backend prep contract is implemented and reviewed-READY.**
+  `npm run adapter:prep` deterministically produces edge crops, a wide work canvas
+  (opaque center, no hole), an explicit preserve/regenerate mask with anchor
+  overmask, a low-frequency structure guide, prompt/negative-prompt files, and a
+  manifest — reproducible to the byte except for the manifest timestamp. This is a
+  **tooling** finding only: it does **not** evaluate adapter visual quality. Known
+  limitation: the prompt text is hardcoded to the dawn-to-dusk pair and must be
+  generalized before the workbench is reused for another boundary. _Source:
+  EXPERIMENT_LOG.md Turns 7 (runner) and 8 (review)._
+
 ## Open hypotheses (not yet tested in the loop)
 
 - **H1 — Pair-specific adapter generation** (primary candidate). Generate a dedicated
