@@ -6,6 +6,43 @@
 
 ---
 
+## Turn 9 — 2026-06-18 — Higgsfield candidate batch (dawn-valley → dusk-ridge)
+- **Role:** Runner (Opus, generating from the reviewed prep artifacts)
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Hypothesis (H1):** feeding the reviewed work canvas (+ optional structure guide)
+  and the pair-specific prompt to a generation backend yields a believable transition
+  world that avoids the exp001 left-edge dark-mass failure.
+- **Backend:** Higgsfield MCP, model **nano_banana_2** (requested `nano_banana_pro`;
+  MCP ran it as `nano_banana_2` — recorded as-run), `2k`, `21:9`, `3168x1344`.
+  8 images, 2 credits each = **16 credits** (824.7 → ~808.7).
+- **What was done:**
+  - Uploaded `adapter-work-canvas.png` + `structure-guide.png` as `image` references.
+  - Generated 8 candidates across 2 axes: structure-guide ON/OFF × prompt
+    original/left-preserve-strong (2 seeds each). Saved to
+    `experiments/working/002-wide-structure-workbench/candidates/` with a full
+    `candidates.md` metadata + verdict table.
+- **Honest backend limitations (fallbacks recorded in candidates.md):**
+  - Higgsfield image models have **no inpaint-mask input** → `adapter-mask.png` could
+    not be used; generation is whole-frame image-to-image, so anchors are **repainted,
+    not pixel-preserved**. Variant **axis 2 (mask width) was not executable** and was
+    dropped (would need A1111/ComfyUI).
+  - No separate negative-prompt field → `negative-prompt.txt` inlined as `Avoid: ...`.
+  - No seed exposed by the MCP.
+- **Results:** 4 strong (c02, c04, c05, c08), 1 weak (c07), 3 failed (c01 grey
+  letterbox, c03 grey center column, c06 structure-guide echo). The **exp001
+  large-dark-mass-on-left failure did NOT recur** in any good candidate; left-preserve
+  prompt visibly airier on the left. Grey artifacts are stochastic echoes of the flat
+  grey prefill. Structure-guide ON was the riskier axis (2 of 4 failed).
+- **Preliminary selection:** promote **c08** (struct-off + left-preserve) and **c04**
+  (struct-off + original) next turn; alternates c02/c05.
+- **Runtime / assets changed:** none. No renderer changes, no selector changes.
+  **No candidate promoted into `public/panos/adapters/`** (per scope — promotion is
+  next turn).
+- **Result:** ✅ first candidate batch produced + logged. This does **not** accept any
+  adapter visually — the real test (`blend = 0` weld against the plates) is next turn,
+  and anchor mismatch is expected because anchors were repainted.
+- **Next:** see `NEXT.md` — promote c08 (+ c04) into the selector and inspect.
+
 ## Turn 8 — 2026-06-18 — Review of Adapter Workbench prep script
 - **Role:** Reviewer (Opus, cross-checking Codex's Turn 7 runner work)
 - **Boundary:** `dawn-valley -> dusk-ridge`

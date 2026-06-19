@@ -60,6 +60,20 @@
   generalized before the workbench is reused for another boundary. _Source:
   EXPERIMENT_LOG.md Turns 7 (runner) and 8 (review)._
 
+- 🟡 **Higgsfield can generate plausible dawn→dusk transition worlds, but cannot
+  mask-preserve anchors.** Turn 9 ran `nano_banana_2` image-to-image on the work
+  canvas (+ optional structure guide); 4 of 8 candidates were clean, coherent
+  edge-to-edge panoramas and **none of the good ones reproduced the exp001 left-edge
+  dark-mass failure**. BUT Higgsfield image models accept only `image` references with
+  **no inpaint-mask parameter**, so generation repaints the whole frame and does not
+  pixel-preserve the anchor crops. Therefore visual acceptance is **still unproven** —
+  whether a candidate welds to the real plates must be judged at `blend = 0` next turn.
+  Two secondary observations worth carrying: (a) the flat grey edge-color prefill in
+  the work canvas **leaks** into some seeds as grey bars/columns; (b) passing the
+  **structure guide as a reference is risky** (2 of 4 structure-ON runs failed,
+  including one that echoed the guide as abstract blobs). _Source: EXPERIMENT_LOG.md
+  Turn 9 and `experiments/working/002-wide-structure-workbench/candidates/candidates.md`._
+
 ## Open hypotheses (not yet tested in the loop)
 
 - **H1 — Pair-specific adapter generation** (primary candidate). Generate a dedicated
