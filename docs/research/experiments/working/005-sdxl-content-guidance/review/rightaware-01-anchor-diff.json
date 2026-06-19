@@ -1,0 +1,15 @@
+{
+  "source": "docs\\research\\experiments\\working\\005-sdxl-content-guidance\\candidates\\rightaware-01-raw.png",
+  "canvas": "docs\\research\\experiments\\working\\002-wide-structure-workbench\\adapter-work-canvas.png",
+  "mask": "docs\\research\\experiments\\working\\002-wide-structure-workbench\\adapter-mask.png",
+  "out": "docs\\research\\experiments\\working\\005-sdxl-content-guidance\\candidates\\rightaware-01-soft64.png",
+  "size": [
+    1536,
+    640
+  ],
+  "feather": 64,
+  "left_boundary_x": 416,
+  "right_boundary_x": 1123,
+  "outer_left_anchor_max_abs_diff": 0,
+  "outer_right_anchor_max_abs_diff": 0
+}

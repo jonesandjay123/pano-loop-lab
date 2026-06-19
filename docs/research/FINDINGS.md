@@ -103,6 +103,18 @@
   `.../004-soft-composite-restore/candidates/candidates.md` and
   `review/compare-softcomp-vs-hard-c08-c04.jpg`._
 
+- ❌ **Right-aware prompting alone does not fix official SDXL inpaint's dusk-side
+  transition.** Turn 15 changed only the positive prompt, explicitly asking the right
+  third to cool into blue-violet dusk ridges and avoid warm walls / central dark mass.
+  The run regenerated two new SDXL inpaint raws and restored them with the proven 64px
+  soft composite. Outer anchors stayed exact (`max_abs_diff = 0` both sides), but the
+  generated center still remained warm/heavy before meeting the cool dusk anchor.
+  `rightaware-02` is the best diagnostic sample, but not a selector candidate. Prompt
+  text alone is therefore insufficient for this baseline; next probe should change mask
+  geometry or add a single structure/color guidance mechanism. _Source:
+  EXPERIMENT_LOG.md Turn 15 and
+  `.../005-sdxl-content-guidance/candidates/candidates.md`._
+
 ## Open hypotheses (not yet tested in the loop)
 
 - **H1 — Pair-specific adapter generation** (primary candidate). Generate a dedicated

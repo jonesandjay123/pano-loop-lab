@@ -1,0 +1,16 @@
+[
+  {
+    "id": "rightaware-01",
+    "seed": 5252001,
+    "prompt_id": "1d3c6cee-d181-45aa-a6fd-f6702ea7327e",
+    "comfy_output": "C:\\Users\\jones\\Downloads\\ComfyUI_windows_portable\\ComfyUI\\output\\pano_loop_lab\\rightaware-01-raw_00001_.png",
+    "repo_raw": "C:\\Users\\jones\\Downloads\\code\\pano-loop-lab\\docs\\research\\experiments\\working\\005-sdxl-content-guidance\\candidates\\rightaware-01-raw.png"
+  },
+  {
+    "id": "rightaware-02",
+    "seed": 5252002,
+    "prompt_id": "191d3614-2945-42ef-a322-570ba9f47c2a",
+    "comfy_output": "C:\\Users\\jones\\Downloads\\ComfyUI_windows_portable\\ComfyUI\\output\\pano_loop_lab\\rightaware-02-raw_00001_.png",
+    "repo_raw": "C:\\Users\\jones\\Downloads\\code\\pano-loop-lab\\docs\\research\\experiments\\working\\005-sdxl-content-guidance\\candidates\\rightaware-02-raw.png"
+  }
+]

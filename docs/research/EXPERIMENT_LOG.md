@@ -6,6 +6,54 @@
 
 ---
 
+## Turn 15 - 2026-06-19 - SDXL right-aware prompt content-guidance probe
+- **Role:** Runner
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Question:** if the proven 64px soft composite keeps outer anchors exact, can a more
+  right-aware prompt make the official SDXL inpaint center become a believable
+  dusk-facing bridge?
+- **Branch hygiene before this turn:** started on `main` at `abf491a`; working tree was
+  clean. Verified `exp/mask-inpaint-comfyui` and `exp/soft-composite-restore` were
+  merged into `main`, then safely deleted both local stale branches with
+  `git branch -d` (no remote branch deletion, no force, no rebase).
+- **Experiment branch:** `exp/sdxl-content-guidance`.
+- **Reproducibility repair:** added `scripts/soft-composite-restore.py`, a deterministic
+  Pillow script that composites generated inpaint pixels over the original work canvas
+  with three zones: outer anchors hard-preserved, smoothstep feather transition, and
+  generated center. It writes optional JSON reports proving outer-anchor max diff.
+- **ComfyUI generation:** yes, regenerated 2 new raw images with the same official SDXL
+  inpaint baseline (`sdxl-inpaint-0.1`), not reused from Turn 13/14. ComfyUI was launched
+  on the Windows RTX 5080 and verified via `object_info`.
+- **Only variable changed:** positive prompt. Added
+  `docs/research/experiments/working/005-sdxl-content-guidance/right-aware-prompt.txt`
+  to explicitly ask the right third to cool into blue-violet dusk ridges, avoid warm
+  vertical walls, avoid central dark mountain mass, and avoid a warm right-edge peak.
+- **Parameters held constant:** `1536 x 640`, steps `30`, CFG `6.5`, `dpmpp_2m` /
+  `karras`, denoise `1.0`, ControlNet OFF, same `adapter-work-canvas.png`,
+  `adapter-mask.png`, and `negative-prompt.txt`.
+- **Candidates written:**
+  - raw: `rightaware-01-raw.png`, seed `5252001`.
+  - raw: `rightaware-02-raw.png`, seed `5252002`.
+  - soft composite: `rightaware-01-soft64.png`, `rightaware-02-soft64.png`.
+- **Verification:** both soft64 outputs passed outer-anchor exactness:
+  - `rightaware-01`: outer-left `0`, outer-right `0`.
+  - `rightaware-02`: outer-left `0`, outer-right `0`.
+  Review artifacts include per-candidate butt-joins, internal weld reviews, and
+  `compare-rightaware-vs-hard-softcomp-c08-c04.jpg`.
+- **Visual result:** right-aware prompt did not solve the content-guidance problem.
+  `rightaware-02` adds more distant-ridge language and is the best of the pair, but the
+  generated center/right band stays warm/grey/brown before meeting the blue-violet
+  `dusk-ridge` anchor. `rightaware-01` still has a large central dark mountain. Neither
+  clearly improves on Turn 14 `softcomp-02`; neither matches Higgsfield c08/c04 as a
+  standalone transition world.
+- **Turn verdict:** **REJECT / diagnostic.** The exact-anchor + soft-composite mechanics
+  remain valid, but prompt-only right-awareness is insufficient for this official SDXL
+  inpaint baseline. Do not promote selector. The next single variable should be mask
+  geometry / right-side context, or only after that a guidance mechanism.
+- **Build:** `npm run build` passed.
+- **Next:** see `NEXT.md` - test a right-biased/wider inpaint mask while keeping the
+  same model, prompt family, and 64px soft restore.
+
 ## Turn 14 - 2026-06-19 - Soft composite restore diagnostic
 - **Role:** Runner
 - **Boundary:** `dawn-valley -> dusk-ridge`
