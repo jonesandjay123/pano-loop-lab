@@ -6,7 +6,11 @@ import type {
   SegmentVisuals,
 } from "./panoTypes";
 
-export type DawnDuskAdapterOptionId = "baseline" | "exp001-edge-anchored-v1";
+export type DawnDuskAdapterOptionId =
+  | "baseline"
+  | "exp001-edge-anchored-v1"
+  | "exp002-c08-struct-off-leftpreserve"
+  | "exp002-c04-struct-off-orig";
 
 export interface DawnDuskAdapterOption {
   id: DawnDuskAdapterOptionId;
@@ -27,6 +31,20 @@ export const DAWN_DUSK_ADAPTER_OPTIONS: DawnDuskAdapterOption[] = [
     label: "exp001 edge-anchored",
     imageUrl: "/panos/adapters/dawn-valley__dusk-ridge/exp001-edge-anchored-v1.jpg",
     notes: "Loop 2 edge-anchored adapter candidate; verdict INCONCLUSIVE.",
+  },
+  {
+    id: "exp002-c08-struct-off-leftpreserve",
+    label: "exp002 c08 left-preserve",
+    imageUrl: "/panos/adapters/dawn-valley__dusk-ridge/exp002-c08-struct-off-leftpreserve.png",
+    notes:
+      "Loop 9 Higgsfield whole-frame image-to-image candidate c08; promoted for honest blend=0 inspection.",
+  },
+  {
+    id: "exp002-c04-struct-off-orig",
+    label: "exp002 c04 original",
+    imageUrl: "/panos/adapters/dawn-valley__dusk-ridge/exp002-c04-struct-off-orig.png",
+    notes:
+      "Loop 9 Higgsfield whole-frame image-to-image candidate c04; promoted for honest blend=0 inspection.",
   },
 ];
 

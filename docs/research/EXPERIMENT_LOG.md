@@ -6,6 +6,45 @@
 
 ---
 
+## Turn 10 — 2026-06-19 — exp002 selector promotion only
+- **Role:** Engineering Runner / Archivist
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Hypothesis:** promotion-only tooling step. Registering Opus's top two Turn 9
+  candidates as selectable runtime variants will let the next reviewer inspect them
+  honestly without manual file swaps.
+- **What was done:**
+  - Copied the two recommended candidates from the workbench batch into the runtime
+    adapter path:
+    - `docs/research/experiments/working/002-wide-structure-workbench/candidates/c08-struct-off-leftpreserve.png`
+      -> `public/panos/adapters/dawn-valley__dusk-ridge/exp002-c08-struct-off-leftpreserve.png`
+    - `docs/research/experiments/working/002-wide-structure-workbench/candidates/c04-struct-off-orig.png`
+      -> `public/panos/adapters/dawn-valley__dusk-ridge/exp002-c04-struct-off-orig.png`
+  - Added both promoted files to the existing dawn-to-dusk adapter selector registry
+    in `src/pano/panoRing.ts`:
+    - `exp002 c08 left-preserve`
+    - `exp002 c04 original`
+  - Kept existing selector options unchanged:
+    - `baseline`
+    - `exp001 edge-anchored`
+- **Scope notes:**
+  - No renderer architecture changed.
+  - No UI polish was added.
+  - No blend / inspect behavior changed.
+  - No backend was called and no new candidates were generated.
+  - No visual verdict was made this turn.
+- **Important honesty note for next reviewer:** these exp002 candidates came from
+  Higgsfield whole-frame image-to-image. Higgsfield did not apply
+  `adapter-mask.png`, so the anchors are repainted rather than pixel-preserved.
+  `blend = 0` inspection against the real neighboring plates is still required.
+- **Verification:**
+  - Confirmed the source candidate images are `3168 x 1344`.
+  - `npm run build` passed.
+- **Result:** ✅ selector promotion complete. c08 and c04 are now selectable next to
+  baseline and exp001 for the next visual-verdict turn.
+- **Next:** see `NEXT.md` — inspect c08/c04 against baseline and exp001 at
+  `blend = 0` and `blend = 16`, judging both `dawn -> adapter` and
+  `adapter -> dusk` honestly.
+
 ## Turn 9 — 2026-06-18 — Higgsfield candidate batch (dawn-valley → dusk-ridge)
 - **Role:** Runner (Opus, generating from the reviewed prep artifacts)
 - **Boundary:** `dawn-valley -> dusk-ridge`

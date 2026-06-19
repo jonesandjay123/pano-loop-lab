@@ -5,70 +5,81 @@
 
 ---
 
-## Next turn = Promote exp002 candidate(s) into the selector + honest inspect
+## Next turn = Visual verdict for promoted exp002 candidates
 
 ### Goal
 
-Turn 9 generated a first Higgsfield candidate batch for `dawn-valley -> dusk-ridge`
-(8 images under `experiments/working/002-wide-structure-workbench/candidates/`, with
-verdicts in `candidates.md`). Now promote the top candidate(s) into the adapter
-comparison selector and **inspect honestly** to decide whether any actually welds.
+Review the promoted `dawn-valley -> dusk-ridge` selector variants:
 
-This is a renderer/registration turn — a natural hand-off to **Codex**.
+```text
+exp002 c08 left-preserve
+exp002 c04 original
+```
+
+Decide whether either candidate is genuinely better than the existing `baseline`
+and `exp001 edge-anchored` options when inspected in the runtime lab.
 
 ### Why this is next
 
-The candidates look like good standalone panoramas, but Higgsfield ran whole-frame
-image-to-image with **no mask**, so the anchors were **repainted, not pixel-preserved**.
-Whether a candidate truly joins the real plates is unproven until inspected at
-`blend = 0` (the honest butt-join). That inspection is the actual H1 test.
+Turn 10 only promoted c08/c04 into the existing selector. It did **not** judge visual
+quality.
+
+Turn 9's Higgsfield batch produced plausible standalone panoramas, but Higgsfield
+had **no mask inpaint input**. The candidates are whole-frame image-to-image
+outputs; their anchor regions are repainted, not pixel-preserved. A thumbnail or
+standalone image is not enough. The real verdict must come from the join against
+the actual neighboring plates at `blend = 0`.
 
 ### Allowed changes
 
-- Promote **c08** (`candidates/c08-struct-off-leftpreserve.png`) and optionally **c04**
-  (`candidates/c04-struct-off-orig.png`) into the renderer as **new selectable
-  comparison variants** under:
-
-  ```text
-  public/panos/adapters/dawn-valley__dusk-ridge/
-    exp002-c08-struct-off-leftpreserve.jpg
-    exp002-c04-struct-off-orig.jpg
-  ```
-
-  Register them in the existing adapter selector/registry **alongside** the baseline
-  and `exp001-edge-anchored-v1` — never overwrite either.
-- Inspect both joins — `dawn-valley -> adapter` and `adapter -> dusk-ridge` — at
-  `blend = 0` and `blend = 16`, and record the verdict.
-- Update `EXPERIMENT_LOG.md`; move any durable conclusion to `FINDINGS.md`; rewrite
-  `NEXT.md` for the turn after.
+- Use the existing runtime selector to compare exactly these options:
+  - `baseline`
+  - `exp001 edge-anchored`
+  - `exp002 c08 left-preserve`
+  - `exp002 c04 original`
+- Inspect both joins for c08 and c04:
+  - `dawn-valley -> adapter`
+  - `adapter -> dusk-ridge`
+- Inspect each candidate at:
+  - `blend = 0` for the honest butt-join;
+  - `blend = 16` to understand how much feathering helps.
+- Record a verdict in `EXPERIMENT_LOG.md`:
+  - ACCEPT, REJECT, or INCONCLUSIVE for c08;
+  - ACCEPT, REJECT, or INCONCLUSIVE for c04;
+  - whether either is actually better than baseline / exp001 at each endpoint.
+- Update `FINDINGS.md` only if the inspection creates durable knowledge.
+- Rewrite `NEXT.md` for the following turn.
 
 ### Forbidden this turn
 
-- Do **not** overwrite or delete the baseline or `exp001`.
-- Do **not** generate new candidates (that was this turn) or call a backend.
-- Do **not** refactor the renderer, add Pixi/Three/R3F/GSAP/canvas runtime, or do UI
-  polish.
-- Do **not** lock plate/seam/socket widths.
-- Do **not** claim the adapter problem is solved on a pretty thumbnail — the
-  `blend = 0` join is the verdict, not the standalone image.
+- Do **not** generate new candidates.
+- Do **not** call Higgsfield, A1111, ComfyUI, or any backend.
+- Do **not** add the other six Turn 9 candidates to the selector.
+- Do **not** change runtime renderer architecture.
+- Do **not** add UI polish.
+- Do **not** change blend / inspect behavior.
+- Do **not** overwrite or remove `baseline`, `exp001`, c08, or c04.
+- Do **not** claim the adapter problem is solved unless the `blend = 0` joins
+  genuinely support that claim.
 
 ### Required evaluation / stop condition
 
-- c08 (+ optionally c04) selectable next to baseline and exp001 without code swaps.
-- A clear written verdict per join at `blend = 0` / `blend = 16`: does the repainted
-  anchor actually meet the real plate, or is there a visible seam / tonal / structural
-  break?
-- `npm run build` passes.
-- Stop after promotion + inspection + log. "All candidates fail at blend = 0" is a
-  valid, loggable result.
+- A clear visual-verdict log for c08 and c04.
+- The verdict must explicitly discuss both endpoints:
+  - `dawn -> adapter`
+  - `adapter -> dusk`
+- The verdict must explicitly separate `blend = 0` truth from `blend = 16` feathered
+  plausibility.
+- The verdict must acknowledge that Higgsfield did not mask-preserve anchors.
+- `npm run build` should pass if any code/docs are changed.
+- Stop after the visual verdict and research-log update.
 
 ---
 
 ## Then
 
-If a candidate welds acceptably, the following turn can (a) feed the accepted
-direction back into the prep script (e.g. swap the flat-grey prefill for edge-pad to
-kill the grey-echo failures, and de-emphasize the structure-guide), or (b) test the
-workbench on a second boundary to see whether the method transfers. One boundary per
-turn. If nothing welds, the next turn reconsiders whether a true inpaint backend
-(A1111/ComfyUI) is needed to preserve anchors, since Higgsfield cannot mask.
+If c08 or c04 is accepted or strongly promising, the following turn can decide the
+smallest next method step: improve prep prefill, test another boundary, or try a true
+inpaint backend for pixel-preserved anchors. If both fail at `blend = 0`, the next
+turn should consider whether A1111/ComfyUI-style mask inpainting is required before
+more Higgsfield whole-frame candidates are useful.
