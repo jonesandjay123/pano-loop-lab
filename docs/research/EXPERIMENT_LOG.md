@@ -6,6 +6,53 @@
 
 ---
 
+## Turn 14 - 2026-06-19 - Soft composite restore diagnostic
+- **Role:** Runner
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Question:** did Turn 13 fail mainly because the final hard `ImageCompositeMasked`
+  restore created an internal butt-join, and can a feathered deterministic composite
+  remove that artifact while keeping the outer plate-facing anchors pixel-exact?
+- **Branch hygiene before this turn:** `f55e755` was inspected on
+  `exp/mask-inpaint-comfyui`; working tree was clean, `npm run build` passed, and the
+  commit contained only docs, candidates, review images, JSON verification, and a small
+  workflow file. No ComfyUI model/cache/output junk was present. The branch was
+  fast-forward merged into `main` and pushed to `origin/main` (`ac8ff72..f55e755`).
+- **Experiment branch:** `exp/soft-composite-restore`.
+- **Method:** no model switch and no selector/runtime changes. Used the Turn 13 SDXL
+  inpaint outputs as source pixels and applied deterministic Pillow compositing at
+  `1536 x 640`. The alpha mask has three zones:
+  - outer anchors: alpha `0`, copied exactly from resized `adapter-work-canvas.png`;
+  - feather zones: smoothstep alpha ramp inside the original hard mask boundaries;
+  - generated center: alpha `1`, using Turn 13 generated pixels.
+- **Candidates written under** `docs/research/experiments/working/004-soft-composite-restore/`:
+  - `softcomp-01.png`: seed `42424202`, feather `32px`.
+  - `softcomp-02.png`: seed `42424202`, feather `64px`.
+  - `softcomp-03.png`: seed `42424202`, feather `96px`.
+  - `softcomp-04.png`: seed `42424201`, feather `64px`.
+- **Verification:** all four candidates passed outer-anchor exactness:
+  `outer_left_anchor_max_abs_diff = 0` and `outer_right_anchor_max_abs_diff = 0`.
+  Review artifacts include `join-softcomp-*.jpg`, per-side external joins,
+  `softcomp-*-internal-weld.jpg`, `softcomp-anchor-diff.json`, and
+  `compare-softcomp-vs-hard-c08-c04.jpg`.
+- **Visual result:** soft composite materially reduces the specific Turn 13 hard-restore
+  artifact, especially the bright vertical break at the right generated/anchor boundary.
+  `softcomp-02` (64px) is the best balance; `softcomp-03` (96px) is slightly smoother
+  but begins to flatten the transition; `softcomp-01` is a little too narrow;
+  `softcomp-04` is rejected because it inherits the oversized dark mountain from seed
+  `42424201`.
+- **Comparison to c08/c04:** the softcomp outputs are more mechanically reliable at the
+  outer pixel weld because the plate-facing anchors are exact, but less convincing than
+  Higgsfield c08/c04 as standalone transition worlds. The remaining failure is not the
+  final composite mask alone; the SDXL-generated center stays too warm/heavy and does
+  not become a convincing dusk-facing bridge before it meets the right anchor.
+- **Turn verdict:** **PARTIAL diagnostic / no promotion.** Soft restore solves the
+  hard-composite artifact enough to keep, but this batch is not selector-ready. The next
+  variable should target inpaint content/color guidance while keeping the proven soft
+  composite and outer-anchor exactness.
+- **Build:** `npm run build` passed.
+- **Next:** see `NEXT.md` - one small SDXL inpaint content-guidance probe; no model
+  switch, no selector promotion, no renderer changes.
+
 ## Turn 13 - 2026-06-19 - ComfyUI SDXL mask-inpaint batch 1 on RTX 5080
 - **Role:** Runner
 - **Boundary:** `dawn-valley -> dusk-ridge`

@@ -4,62 +4,58 @@
 
 ---
 
-## Next turn = Test soft composite restore for the ComfyUI inpaint workflow
+## Next turn = SDXL inpaint content-guidance probe with proven soft restore
 
 ### Goal
 
-On the same Windows + RTX 5080 ComfyUI setup, answer one narrow question:
+Keep the same boundary (`dawn-valley -> dusk-ridge`) and answer one narrow question:
 
-> Did the first ComfyUI batch fail because the final `ImageCompositeMasked` used a
-> hard mask, creating an internal butt-join between generated pixels and the protected
-> right anchor?
-
-Keep the same boundary: `dawn-valley -> dusk-ridge`.
+> If the outer anchors stay pixel-exact and the final restore uses the proven 64px
+> soft composite, can a more right-aware SDXL inpaint prompt/mask recipe make the
+> generated center become a believable dusk-facing bridge?
 
 ### Why this is next
 
-Turn 13 proved the important technical piece: hard black-mask regions are
-pixel-preserved exactly (`max_abs_diff = 0`). But both candidates show a hard vertical
-break at the generated-center to right-anchor boundary. That is likely a compositing
-recipe problem, not proof that mask-inpaint is the wrong method.
-
-The next smallest test is to keep the **outer anchor edges** exact while feathering or
-grading only the **overmask band** before the final composite restore.
+Turn 14 showed that soft composite restore reduces the hard vertical artifact from
+Turn 13 while preserving outer anchors exactly. The remaining failure is content:
+the generated center stays too warm/heavy and does not transition into the cool dusk
+anchor. Do not switch models yet; first test whether the baseline SDXL inpaint can be
+guided better under the same mechanics.
 
 ### Allowed changes
 
-- Use the existing Turn 13 setup, model, prompts, and seeds as much as possible:
-  `sdxl-inpaint-0.1`, `1536 x 640`, steps `30`, CFG `6.5`, `dpmpp_2m` / `karras`,
-  denoise `1.0`, ControlNet OFF.
-- Create exactly one soft-restore workflow variant, for example:
-  - sampler mask stays the existing hard `adapter-mask.png`;
-  - final composite mask is feathered/graded across the overmask band;
-  - the far-left and far-right outer anchor edge zones remain hard-preserved and must
-    still pixel-diff `0`.
-- Produce **2** candidates only, e.g.
-  `candidates/inpaint-sdxl-soft-01.png` and `inpaint-sdxl-soft-02.png`.
-- Save the workflow under `workflows/inpaint-sdxl-soft-restore.json`.
-- Add verification artifacts under `review/`, including:
-  - outer-anchor pixel diff (`max_abs_diff = 0` required in the protected outer zones);
-  - internal weld review composites against Turn 13 hard-mask candidates.
-- Append results to `candidates/candidates.md`, update `EXPERIMENT_LOG.md`, update
-  `FINDINGS.md` only if there is durable knowledge, and rewrite this `NEXT.md`.
+- Use the same model and environment: ComfyUI, `sdxl-inpaint-0.1`, `1536 x 640`,
+  steps `30`, CFG `6.5`, `dpmpp_2m` / `karras`, denoise `1.0`, ControlNet OFF.
+- Keep the Turn 14 soft restore recipe, with `64px` feather as the default final
+  composite.
+- Change only one content-guidance variable, such as:
+  - a right-aware prompt that explicitly cools the generated center as it approaches
+    the dusk anchor, avoids warm vertical walls, and asks for low mist / receding
+    blue-violet ridges on the right; or
+  - a minimally adjusted inpaint mask that gives the right overmask band more room
+    while preserving the outermost right anchor exactly.
+- Produce **2** candidates only in a new working folder, e.g.
+  `docs/research/experiments/working/005-sdxl-content-guidance/`.
+- Verify:
+  - outer-left and outer-right anchor diff must remain `0`;
+  - internal weld review versus `softcomp-02` and Turn 13 hard restore;
+  - visual comparison against Higgsfield c08/c04.
+- Update `EXPERIMENT_LOG.md`, `NEXT.md`, and `FINDINGS.md` only if durable knowledge
+  emerges.
 
 ### Forbidden this turn
 
-- Do **not** promote any inpaint candidate into the runtime selector.
-- Do **not** switch models, add ControlNet, test Flux, or go native-res yet.
-- Do **not** generate more than 2 soft-restore candidates.
-- Do **not** refactor renderer/UI or change `src/pano/panoRing.ts`.
-- Do **not** claim success unless the review images show the internal vertical break is
-  materially reduced at `blend = 0` while outer anchor pixels still diff `0`.
+- Do **not** switch to JuggernautXL, RealVisXL, Flux, Fooocus patch, or ControlNet.
+- Do **not** promote any candidate into the selector.
+- Do **not** change runtime renderer, selector, or `src/pano/panoRing.ts`.
+- Do **not** generate more than 2 candidates.
+- Do **not** go native-res yet.
 
 ### Required evaluation / stop condition
 
-- If soft restore removes the internal vertical break while keeping outer anchor edges
-  exact, mark the method **PROMISING** and plan a native/full-res quality pass.
-- If the break remains, mark the soft-restore hypothesis **REJECTED** and plan the next
-  single variable: mask width / prompt constraint / ControlNet Tile or Depth, one at a
-  time.
-- If ComfyUI/model/tooling breaks, record the blocker honestly and stop. A tooling
-  blocker is a valid turn result.
+- If content guidance makes the center/right transition materially more dusk-facing
+  while preserving exact outer anchors, mark the method **PROMISING** and plan a
+  selector-promotion review turn.
+- If it still fails, record whether the blocker appears to be SDXL model quality,
+  mask geometry, or the source plate's non-socket-friendly dark right edge, then plan
+  exactly one next variable.
