@@ -6,6 +6,55 @@
 
 ---
 
+## Turn 11 — 2026-06-19 — Visual verdict: exp002 c08 / c04 at blend 0 & 16
+- **Role:** Reviewer (Opus)
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Question:** do the promoted whole-frame Higgsfield candidates (c08, c04) actually
+  weld to the real plates, or just look nice as standalone images?
+- **Method:** (1) runtime seam lab — selected each option, `blend = 0` (raw) and
+  `blend = 16`, inspected boundary 0 (`dawn -> adapter`) and boundary 1
+  (`adapter -> dusk`), auto-scroll paused; (2) pixel-exact **butt-join composites**
+  (each adapter's left/right edge strip placed against the real plate edge it must
+  meet) saved under `.../002-wide-structure-workbench/review/join-*.jpg`. The
+  composite is what `blend = 0` reveals, measured rather than eyeballed.
+- **Standing limitation (confirmed, not worked around):** Higgsfield has **no mask
+  inpaint**, so c08/c04 are whole-frame image-to-image — **anchors are repainted, not
+  pixel-preserved**. So a clean `blend = 0` weld was never guaranteed; this turn tested
+  whether it happened anyway. It did not.
+- **Findings per join (`blend = 0`):**
+  - **dawn -> adapter:** `dawn-valley`'s real right edge is a **large dark ridge mass**.
+    Both new adapters are lighter/airier there, so the seam shows a **value + structure
+    step**. c04 (more ridge structure on its left) is **milder**; c08 (airiest left) is
+    the **largest** step. Note: this is the *opposite* polarity of the exp001 failure —
+    no new dark mass is introduced; instead the airy left **under-matches** the dark
+    plate edge. The exp001 "adapter adds a dark mass" failure did **not** recur.
+  - **adapter -> dusk:** cool/purple side. **c08 welds well** (cool tone + layered
+    ridges continue into `dusk-ridge`). **c04 keeps a warm sunlit peak** on its right
+    edge that **clashes** with the cool dusk plate. `baseline`'s dusk-side join is also
+    strong (it was tuned as a tonal bridge).
+  - **`blend = 16`:** feather/overlap hides most of the **tonal** step on the dawn side
+    and softens c04's warm clash, but does **not** weld structure — consistent with the
+    established "CSS is auxiliary" finding.
+- **Per-candidate verdict:**
+  - `baseline`: **PARTIAL** — soft tonal matte; strong dusk side, structureless dawn side.
+  - `exp001 edge-anchored`: **PARTIAL / INCONCLUSIVE** — unchanged from prior loops.
+  - `exp002 c08`: **PARTIAL** — best `adapter -> dusk` weld of the new pair; `dawn ->
+    adapter` value/structure step from the airy left. **Current best whole-frame candidate.**
+  - `exp002 c04`: **PARTIAL** — better `dawn -> adapter` structure than c08, but a
+    warm-peak/cool-dusk clash on the right.
+- **Turn verdict:** **PARTIAL.** No candidate cleanly welds **both** joins at
+  `blend = 0`. The candidates improve standalone world-feel and avoid re-introducing a
+  dark mass, but whole-frame img2img cannot pixel-weld to the real plates.
+- **Best to keep / refinement base:** **c08** (cleanest dusk weld; airy left is the more
+  socket-friendly direction, and its weakness is partly a property of `dawn-valley`'s
+  atypically dark right edge → an H2 socket-edge issue, not an adapter defect). c04 is a
+  strong alternate if the dawn-side structure matters more.
+- **Changed:** docs only + `review/join-*.jpg` composites. No renderer/selector/candidate
+  changes. No backend called. `npm run build` passed.
+- **Next:** see `NEXT.md` — the honest next method step is a **true mask-inpaint backend
+  (A1111 / ComfyUI)** that preserves the anchors and regenerates only the center band,
+  since Higgsfield whole-frame cannot weld.
+
 ## Turn 10 — 2026-06-19 — exp002 selector promotion only
 - **Role:** Engineering Runner / Archivist
 - **Boundary:** `dawn-valley -> dusk-ridge`

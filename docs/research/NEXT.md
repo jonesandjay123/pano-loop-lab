@@ -5,81 +5,67 @@
 
 ---
 
-## Next turn = Visual verdict for promoted exp002 candidates
+## Next turn = Stand up a mask-inpaint backend for one anchor-preserved adapter
 
 ### Goal
 
-Review the promoted `dawn-valley -> dusk-ridge` selector variants:
+Turn 11's visual verdict was **PARTIAL**: Higgsfield whole-frame image-to-image makes
+nice standalone panoramas but does **not** pixel-weld at `blend = 0`, because it has no
+mask and repaints the anchors. Test the smallest **true mask-inpaint** route on the
+single boundary `dawn-valley -> dusk-ridge`, using the existing prep artifacts that
+were built for exactly this — **preserve the anchors, regenerate only the center band**.
 
 ```text
-exp002 c08 left-preserve
-exp002 c04 original
+adapter-work-canvas.png  +  adapter-mask.png  (white = regenerate, black = preserve)
 ```
-
-Decide whether either candidate is genuinely better than the existing `baseline`
-and `exp001 edge-anchored` options when inspected in the runtime lab.
 
 ### Why this is next
 
-Turn 10 only promoted c08/c04 into the existing selector. It did **not** judge visual
-quality.
-
-Turn 9's Higgsfield batch produced plausible standalone panoramas, but Higgsfield
-had **no mask inpaint input**. The candidates are whole-frame image-to-image
-outputs; their anchor regions are repainted, not pixel-preserved. A thumbnail or
-standalone image is not enough. The real verdict must come from the join against
-the actual neighboring plates at `blend = 0`.
+This is the first turn that can produce a candidate whose left/right edges are the
+**real plate pixels**, so a `blend = 0` weld is even possible. Higgsfield cannot do
+this; an inpainting backend (A1111 `img2img` inpaint, or ComfyUI) can. The prep
+contract (Turn 7, reviewed Turn 8) already emits the canvas + mask in the right shape.
 
 ### Allowed changes
 
-- Use the existing runtime selector to compare exactly these options:
-  - `baseline`
-  - `exp001 edge-anchored`
-  - `exp002 c08 left-preserve`
-  - `exp002 c04 original`
-- Inspect both joins for c08 and c04:
-  - `dawn-valley -> adapter`
-  - `adapter -> dusk-ridge`
-- Inspect each candidate at:
-  - `blend = 0` for the honest butt-join;
-  - `blend = 16` to understand how much feathering helps.
-- Record a verdict in `EXPERIMENT_LOG.md`:
-  - ACCEPT, REJECT, or INCONCLUSIVE for c08;
-  - ACCEPT, REJECT, or INCONCLUSIVE for c04;
-  - whether either is actually better than baseline / exp001 at each endpoint.
-- Update `FINDINGS.md` only if the inspection creates durable knowledge.
-- Rewrite `NEXT.md` for the following turn.
+- Choose **one** local inpaint backend (A1111 inpaint API or a minimal ComfyUI graph).
+  Feed `adapter-work-canvas.png` as the init image and `adapter-mask.png` as the inpaint
+  mask, with `prompt.txt` / `negative-prompt.txt`. Generate a small batch (2-4).
+- Save raw results under the workbench `candidates/` folder with an `inpaint-` prefix
+  and extend `candidates.md` (do not overwrite the Higgsfield batch records).
+- Promote at most 1 inpaint candidate into the selector as a **new** comparison option
+  (never overwrite baseline / exp001 / c08 / c04). Inspect both joins at `blend = 0`
+  and `blend = 16` and log whether anchors now actually weld.
+- Update `EXPERIMENT_LOG.md`; move durable knowledge to `FINDINGS.md`; rewrite `NEXT.md`.
 
 ### Forbidden this turn
 
-- Do **not** generate new candidates.
-- Do **not** call Higgsfield, A1111, ComfyUI, or any backend.
-- Do **not** add the other six Turn 9 candidates to the selector.
-- Do **not** change runtime renderer architecture.
-- Do **not** add UI polish.
-- Do **not** change blend / inspect behavior.
-- Do **not** overwrite or remove `baseline`, `exp001`, c08, or c04.
-- Do **not** claim the adapter problem is solved unless the `blend = 0` joins
-  genuinely support that claim.
+- Do **not** generate more Higgsfield whole-frame candidates (that route is understood).
+- Do **not** overwrite or delete baseline, exp001, c08, or c04.
+- Do **not** refactor the renderer, add Pixi/Three/R3F/GSAP/canvas runtime, or UI polish.
+- Do **not** lock plate/seam/socket widths.
+- Do **not** claim a weld without showing it at `blend = 0`.
 
 ### Required evaluation / stop condition
 
-- A clear visual-verdict log for c08 and c04.
-- The verdict must explicitly discuss both endpoints:
-  - `dawn -> adapter`
-  - `adapter -> dusk`
-- The verdict must explicitly separate `blend = 0` truth from `blend = 16` feathered
-  plausibility.
-- The verdict must acknowledge that Higgsfield did not mask-preserve anchors.
-- `npm run build` should pass if any code/docs are changed.
-- Stop after the visual verdict and research-log update.
+- One mask-inpaint candidate inspected at `blend = 0` on both `dawn -> adapter` and
+  `adapter -> dusk`, with an explicit verdict on whether the **preserved anchors weld**
+  where Higgsfield could not.
+- `npm run build` passes if any code changed.
+- Stop after the inpaint candidate is inspected and logged. "Inpaint backend not
+  available locally" is a valid, loggable stop — in that case record the blocker and
+  the smallest setup needed, and do not fake a result.
 
----
+### Fallbacks if a true inpaint backend cannot be run this turn
 
-## Then
+1. **Prep-script fix first (cheaper):** swap the flat-grey prefill for an `edge-pad` /
+   mirror fill and de-emphasize the structure guide (both flagged in Turn 9), then
+   regenerate Higgsfield candidates — this reduces grey-echo failures but still will not
+   weld anchors.
+2. **Or** keep **c08** as the current best whole-frame candidate and hand the
+   pluggability question (does this method transfer to another boundary / to a Jovicheer
+   event scene) to a later turn.
 
-If c08 or c04 is accepted or strongly promising, the following turn can decide the
-smallest next method step: improve prep prefill, test another boundary, or try a true
-inpaint backend for pixel-preserved anchors. If both fail at `blend = 0`, the next
-turn should consider whether A1111/ComfyUI-style mask inpainting is required before
-more Higgsfield whole-frame candidates are useful.
+> Honest north star check: the goal is a *repeatable adapter method*, not one pretty
+> dawn→dusk image. The mask-inpaint test is the cleanest next probe of whether
+> anchor-preserved generation is the missing piece.
