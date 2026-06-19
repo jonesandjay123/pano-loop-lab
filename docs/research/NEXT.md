@@ -5,62 +5,59 @@
 
 ---
 
-## Next turn = Adapter Workbench Prep Script
+## Next turn = Review Adapter Workbench Prep Artifacts
 
 ### Goal
 
-Implement the smallest no-backend Adapter Workbench preparation script for one
-boundary:
+Review the generated no-backend Adapter Workbench artifacts for one boundary:
 
 ```text
 dawn-valley -> dusk-ridge
 ```
 
-The script should make the generation setup reproducible, but it must not call an
-image-generation API yet.
+The review should decide whether the artifact contract is ready to feed a manual
+or backend generation route in a later turn. It must not generate final adapter
+candidates yet.
 
 ### Why this is next
 
-The loop renderer and comparison selector are adequate. The missing engineering
-unit is now a repeatable artifact contract for adapter generation:
+The prep script now creates the intended file contract:
 
 ```text
 left crop + right crop + wide work canvas + mask + optional structure guide
 + prompt config -> candidate batch -> selector registration -> inspect
 ```
 
-Jones prefers a pipeline that can generate multiple candidates and select the
-best, not a brittle one-shot perfect generation attempt.
+Before spending generation credits or wiring a backend, the artifacts need a
+skeptical review: are the crops correct, is the mask usable, is the prompt aligned
+with the known failure mode, and is the manifest complete enough for repeatable
+candidate generation?
 
 ### Allowed changes
 
-- Add a local script, likely under `scripts/`, for example:
+- Run the prep command again and confirm it recreates the expected files:
 
   ```bash
   npm run adapter:prep -- --from dawn-valley --to dusk-ridge --id exp002-wide-structure-workbench-v1
   ```
 
-- Add a package script entry if needed.
-- Create deterministic workbench artifacts under:
+- Inspect the artifacts under:
 
   ```text
   docs/research/experiments/working/002-wide-structure-workbench/
   ```
 
-- The generated artifacts should include:
-  - `manifest.json`
-  - `prompt.txt`
-  - `negative-prompt.txt`
-  - `dawn-valley-right-crop.jpg`
-  - `dusk-ridge-left-crop.jpg`
-  - `adapter-work-canvas.png`
-  - `adapter-mask.png`
-  - `structure-guide.png`
-
-- Use existing image tooling if available in the repo/toolchain. If adding a new
-  dependency is truly needed, keep it narrow and justify it in the log.
-- Update `EXPERIMENT_LOG.md` with what the script produced.
-- Update `FINDINGS.md` only if the implementation sharpens a durable finding.
+- Check whether:
+  - edge crops are the intended sides of the intended source plates;
+  - `adapter-work-canvas.png` has no transparent/blank hole;
+  - `adapter-mask.png` clearly preserves outer anchors and regenerates the center
+    with slight anchor overmask;
+  - `structure-guide.png` is good enough as a contract placeholder;
+  - `prompt.txt` / `negative-prompt.txt` address the known dawn-to-dusk failure
+    mode without overfitting;
+  - `manifest.json` contains enough information for a later backend/manual route.
+- Update `EXPERIMENT_LOG.md` with the review verdict.
+- Update `FINDINGS.md` only if the review produces durable knowledge.
 - Rewrite `NEXT.md` for the following turn.
 
 ### Forbidden this turn
@@ -75,16 +72,17 @@ best, not a brittle one-shot perfect generation attempt.
 
 ### Required evaluation / stop condition
 
-- Running the prep command should create the expected files for
-  `dawn-valley -> dusk-ridge`.
-- The workbench artifacts should be inspectable as ordinary image files.
-- `npm run build` should pass if runtime/package files changed.
-- Stop after the prep artifact contract is implemented and logged.
+- Produce a clear READY / NEEDS-REVISION verdict for the prep artifacts.
+- If READY, the next `NEXT.md` may authorize one manual/backend route to generate
+  4-8 candidates from these artifacts.
+- If NEEDS-REVISION, the next `NEXT.md` should specify the smallest prep-script or
+  artifact fix.
+- Stop after the review and log update.
 
 ---
 
 ## Then
 
-After the prep script exists, the next turn can choose one backend/manual route to
+After the prep artifacts pass review, choose exactly one backend/manual route to
 generate 4-8 candidates from the workbench artifacts, promote the best candidate(s)
 into the adapter selector, and inspect with `blend = 0` and `blend = 16`.

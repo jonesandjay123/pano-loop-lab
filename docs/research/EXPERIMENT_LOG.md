@@ -6,6 +6,57 @@
 
 ---
 
+## Turn 7 — 2026-06-18 — Adapter Workbench prep script
+- **Role:** Engineering Runner / Archivist
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Hypothesis:** a deterministic no-backend prep contract can make the next
+  adapter-generation step reproducible without changing the renderer or calling a
+  generation service.
+- **What was done:**
+  - Added `scripts/adapter-prep.mjs`.
+  - Added the package command:
+    `npm run adapter:prep -- --from dawn-valley --to dusk-ridge --id exp002-wide-structure-workbench-v1`.
+  - Generated the working directory:
+    `docs/research/experiments/working/002-wide-structure-workbench/`.
+  - Produced these artifacts:
+    - `manifest.json`
+    - `prompt.txt`
+    - `negative-prompt.txt`
+    - `dawn-valley-right-crop.jpg`
+    - `dusk-ridge-left-crop.jpg`
+    - `adapter-work-canvas.png`
+    - `adapter-mask.png`
+    - `structure-guide.png`
+- **Implementation details:**
+  - Work canvas defaults to the existing adapter size: `3168 x 1344`.
+  - Left and right anchors each use about 33% of the work canvas width
+    (`1045px` each), leaving a broad center transition band (`1078px`).
+  - Source scenes are height-normalized to `1344px`; the script extracts the right
+    crop from `dawn-valley` and the left crop from `dusk-ridge`.
+  - `adapter-work-canvas.png` places the two real edge crops on the outside and
+    fills the center with a non-transparent edge-color gradient.
+  - `adapter-mask.png` records `white = regenerate, black = preserve`; it protects
+    the outer anchors while overmasking slightly into both anchor regions.
+  - `structure-guide.png` is intentionally minimal: low-frequency fog basin,
+    distant ridge continuity, and dusk ridge mass emerging gradually on the right.
+  - The prompt/negative prompt are specific to `dawn-valley -> dusk-ridge` and
+    explicitly avoid the Loop 2 failure mode: a large dark mountain/value mass at
+    the left endpoint.
+- **Dependency note:** added narrow devDependency `sharp` because the repo had no
+  existing image tooling for deterministic JPEG/PNG resize, crop, composite, mask,
+  and metadata-safe artifact generation from a Node script.
+- **Verification:**
+  - `npm run adapter:prep -- --from dawn-valley --to dusk-ridge --id exp002-wide-structure-workbench-v1` passed.
+  - `sips` confirmed crop artifacts are `1045 x 1344`; canvas, mask, and guide are
+    `3168 x 1344`.
+  - `npm run build` passed.
+- **Runtime / assets changed:** no runtime renderer changes. No backend calls. No
+  final adapter candidates were created under `public/panos/adapters/`.
+- **Result:** ✅ prep contract implemented. This does not evaluate visual adapter
+  quality and does not solve the adapter-generation problem.
+- **Next:** see `NEXT.md` — review the prep artifacts before choosing a manual or
+  backend route for generating 4-8 candidates.
+
 ## Turn 6 — 2026-06-18 — Adapter Workbench source dive
 - **Role:** Engineering Scout / Archivist
 - **Boundary:** `dawn-valley -> dusk-ridge` as the motivating case, but no visual

@@ -1,0 +1,96 @@
+{
+  "id": "exp002-wide-structure-workbench-v1",
+  "boundary": {
+    "from": "dawn-valley",
+    "to": "dusk-ridge"
+  },
+  "createdAt": "2026-06-19T01:14:41.038Z",
+  "sourcePaths": {
+    "from": "public/panos/dawn-valley.jpg",
+    "to": "public/panos/dusk-ridge.jpg"
+  },
+  "outputPaths": {
+    "manifest": "docs/research/experiments/working/002-wide-structure-workbench/manifest.json",
+    "prompt": "docs/research/experiments/working/002-wide-structure-workbench/prompt.txt",
+    "negativePrompt": "docs/research/experiments/working/002-wide-structure-workbench/negative-prompt.txt",
+    "fromRightCrop": "docs/research/experiments/working/002-wide-structure-workbench/dawn-valley-right-crop.jpg",
+    "toLeftCrop": "docs/research/experiments/working/002-wide-structure-workbench/dusk-ridge-left-crop.jpg",
+    "adapterWorkCanvas": "docs/research/experiments/working/002-wide-structure-workbench/adapter-work-canvas.png",
+    "adapterMask": "docs/research/experiments/working/002-wide-structure-workbench/adapter-mask.png",
+    "structureGuide": "docs/research/experiments/working/002-wide-structure-workbench/structure-guide.png"
+  },
+  "dimensions": {
+    "width": 3168,
+    "height": 1344,
+    "aspectRatio": "21:9"
+  },
+  "cropPercent": {
+    "leftAnchorOfWorkCanvas": 0.33,
+    "rightAnchorOfWorkCanvas": 0.33,
+    "transitionBandOfWorkCanvas": 0.3402777777777778,
+    "overmaskIntoEachAnchor": 0.06
+  },
+  "cropPixels": {
+    "anchorWidth": 1045,
+    "middleWidth": 1078,
+    "overmaskWidth": 190,
+    "fromRightCrop": {
+      "left": 2123,
+      "top": 0,
+      "width": 1045,
+      "height": 1344
+    },
+    "toLeftCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 1045,
+      "height": 1344
+    }
+  },
+  "sourceImageInfo": {
+    "from": {
+      "sourceWidth": 3168,
+      "sourceHeight": 1344,
+      "resizedWidth": 3168,
+      "resizedHeight": 1344
+    },
+    "to": {
+      "sourceWidth": 2688,
+      "sourceHeight": 1520,
+      "resizedWidth": 2377,
+      "resizedHeight": 1344
+    }
+  },
+  "maskStrategy": {
+    "name": "center-band-with-anchor-overmask",
+    "meaning": "white = regenerate, black = preserve",
+    "description": "Outer anchor edges are protected, the broad center band is regenerate, and the white region slightly enters each anchor to give an inpainting backend room to blend."
+  },
+  "prefillStrategy": {
+    "name": "edge-color-gradient",
+    "description": "The unknown center is initialized with a non-transparent horizontal gradient between the average colors of the two crop-facing edges.",
+    "leftEdgeColor": {
+      "r": 126,
+      "g": 108,
+      "b": 81
+    },
+    "rightEdgeColor": {
+      "r": 48,
+      "g": 49,
+      "b": 109
+    }
+  },
+  "structureGuide": {
+    "path": "docs/research/experiments/working/002-wide-structure-workbench/structure-guide.png",
+    "description": "Minimal low-frequency guide: open mist basin through the center, distant ridge continuity, and dusk ridge mass emerging gradually on the right."
+  },
+  "promptFilePaths": {
+    "prompt": "docs/research/experiments/working/002-wide-structure-workbench/prompt.txt",
+    "negativePrompt": "docs/research/experiments/working/002-wide-structure-workbench/negative-prompt.txt"
+  },
+  "notes": [
+    "No generation backend was called by this prep script.",
+    "No final adapter candidate was written to public/panos/adapters.",
+    "The left endpoint prompt explicitly avoids the Loop 2 failure mode: a large dark mountain/value mass entering immediately from dawn-valley."
+  ]
+}
