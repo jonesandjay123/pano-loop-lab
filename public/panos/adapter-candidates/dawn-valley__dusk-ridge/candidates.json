@@ -17,7 +17,7 @@
     "resolution": "2k",
     "note": "Higgsfield did not expose a true mask-inpaint parameter here. These are whole-frame reference generations using the AXB work canvas and mask as input images; anchors are not pixel-guaranteed."
   },
-  "activeForReview": "hf-nb2-axb-02",
+  "activeForReview": null,
   "candidates": [
     {
       "id": "hf-nb2-axb-01",
@@ -25,8 +25,9 @@
       "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3Ezgyhbv8y4CxJb3e24kixg8JjT/hf_20260620_210111_7800701b-8256-435c-b70c-38d84b09a62f.png",
       "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png",
       "researchCopy": "docs/research/experiments/working/007-dawn-dusk-candidates/candidates/hf-nb2-axb-01.png",
-      "status": "generated",
-      "notes": "Darker, smoother valley-to-dusk transition; keeps visible AXB-like anchors at the outer edges."
+      "status": "rejected",
+      "notes": "Darker, smoother valley-to-dusk transition; keeps visible AXB-like anchors at the outer edges.",
+      "reviewNotes": "External dawn/dusk joins benefit from copied edge anchors, but the internal anchor-to-X boundary forms visible orange/blue vertical bands. Not selector-ready."
     },
     {
       "id": "hf-nb2-axb-02",
@@ -34,8 +35,11 @@
       "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3Ezgyhbv8y4CxJb3e24kixg8JjT/hf_20260620_210223_56316c99-c63c-479b-a615-f6bfacf0bbb4.png",
       "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-02.png",
       "researchCopy": "docs/research/experiments/working/007-dawn-dusk-candidates/candidates/hf-nb2-axb-02.png",
-      "status": "generated",
-      "notes": "Brighter, lower-contrast atmospheric bridge. Marked active-for-review in the dashboard, not accepted as final."
+      "status": "rejected",
+      "notes": "Brighter, lower-contrast atmospheric bridge. Marked active-for-review in the dashboard, not accepted as final.",
+      "reviewNotes": "Softer and lower contrast than 01, but still has obvious internal warm-to-blue banding and no pixel-preserved anchors. Not selector-ready."
     }
-  ]
+  ],
+  "reviewedAt": "2026-06-20T21:12:00Z",
+  "reviewVerdict": "REJECT both as final adapter candidates; keep as diagnostics."
 }

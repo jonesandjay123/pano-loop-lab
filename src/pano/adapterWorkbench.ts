@@ -2,7 +2,7 @@ export interface AdapterCandidate {
   id: string;
   label: string;
   imageUrl: string;
-  status: "generated" | "accepted" | "rejected" | "legacy";
+  status: "generated" | "partial" | "accepted" | "rejected" | "legacy";
   notes: string;
 }
 
@@ -64,23 +64,23 @@ export const ADAPTER_WORKBENCH_PAIRS: AdapterWorkbenchPair[] = [
     toId: "dusk-ridge",
     label: "Dawn Valley -> Dusk Ridge",
     ...pairUrls("dawn-valley", "dusk-ridge"),
-    activeCandidateId: "hf-nb2-axb-02",
+    activeCandidateId: null,
     candidates: [
       {
         id: "hf-nb2-axb-01",
         label: "HF NB2 AXB 01",
         imageUrl: candidateUrl("dawn-valley", "dusk-ridge", "hf-nb2-axb-01.png"),
-        status: "generated",
+        status: "rejected",
         notes:
-          "Nano Banana 2 reference candidate from AXB canvas + mask. Whole-frame reference generation; anchors are not guaranteed pixel-preserved.",
+          "Rejected for final use: external anchors help the outer joins, but the generated X keeps a hard internal anchor-to-X band.",
       },
       {
         id: "hf-nb2-axb-02",
         label: "HF NB2 AXB 02",
         imageUrl: candidateUrl("dawn-valley", "dusk-ridge", "hf-nb2-axb-02.png"),
-        status: "generated",
+        status: "rejected",
         notes:
-          "Softer atmospheric Nano Banana 2 reference candidate. Current dashboard active for review only; not accepted as final.",
+          "Rejected for final use: softer than 01, but still has obvious internal warm-to-blue bands and is not pixel-preserved.",
       },
     ],
     geometry: DEFAULT_GEOMETRY,

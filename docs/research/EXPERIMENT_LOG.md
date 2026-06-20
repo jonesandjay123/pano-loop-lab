@@ -6,6 +6,41 @@
 
 ---
 
+## Turn 19 - 2026-06-20 - Review first AXB candidates at blend-0 equivalents
+- **Role:** Reviewer / Archivist
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Question:** do `hf-nb2-axb-01` or `hf-nb2-axb-02` improve the real joins enough
+  to keep one as active-for-review?
+- **Method:** no new generation. Created deterministic review artifacts under
+  `docs/research/experiments/working/008-dawn-dusk-candidate-review/review/`:
+  - external butt-joins for baseline, exp002 c08/c04, and both HF candidates;
+  - `compare-external-joins.png`;
+  - internal anchor/X boundary crops for both HF candidates;
+  - `anchor-diff.json` comparing HF outer 224px anchors against the real plate crops.
+- **Anchor diff:** the HF candidates are not pixel-preserved:
+  - `hf-nb2-axb-01`: left mean diff `2.821`, right mean diff `10.668`;
+  - `hf-nb2-axb-02`: left mean diff `2.729`, right mean diff `4.168`.
+- **Visual result:** both HF candidates improve the immediate outer joins mostly by
+  carrying the AXB anchor strips into the generated image. But both introduce a new
+  visible internal vertical discontinuity where the copied anchor strip meets the
+  generated X region. `hf-nb2-axb-02` is softer and less severe than `01`, but still
+  has obvious warm-to-blue banding. This is not a clean adapter weld.
+- **Comparison:** exp002 c08/c04 remain better as standalone transition worlds, while
+  the HF AXB candidates are better diagnostic proof that anchor duplication can make
+  the outer butt-join look closer. Neither solves both the external join and internal
+  anchor-to-X transition.
+- **Verdict:**
+  - `baseline`: **PARTIAL** (known tonal matte, structural mismatch remains).
+  - `exp002-c08`: **PARTIAL** (best standalone dusk-side world, weak dawn side).
+  - `exp002-c04`: **PARTIAL** (more dawn-side structure, warm/cool clash on dusk side).
+  - `hf-nb2-axb-01`: **REJECT** as final; keep diagnostic only.
+  - `hf-nb2-axb-02`: **REJECT** as final; keep diagnostic only.
+- **Dashboard update:** both HF candidates are marked `rejected`; no active candidate is
+  selected for `dawn-valley -> dusk-ridge`.
+- **Next:** stop using whole-frame reference generation as the final AXB method. The
+  next variable should be true mask-inpaint / crop-X-only generation, or a deterministic
+  postprocess that extracts only the generated X and composites exact anchors back in.
+
 ## Turn 18 - 2026-06-20 - First dawn-to-dusk AXB candidate batch
 - **Role:** Runner / Engineering Runner
 - **Boundary:** `dawn-valley -> dusk-ridge`

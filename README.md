@@ -121,8 +121,9 @@ First candidate batch:
 - 2 Nano Banana 2 reference candidates under
   `public/panos/adapter-candidates/dawn-valley__dusk-ridge/`
 - These are whole-frame reference generations from the AXB canvas + mask, not
-  strict mask-inpaint outputs. Use `blend = 0` in the seam lab before treating one as
-  accepted.
+  strict mask-inpaint outputs.
+- Turn 19 review rejected both as final adapters: they improve the outer joins by
+  carrying anchor strips, but create visible internal anchor-to-X bands.
 
 ## Project structure
 

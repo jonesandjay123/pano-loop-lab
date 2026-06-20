@@ -53,14 +53,14 @@ export const DAWN_DUSK_ADAPTER_OPTIONS: DawnDuskAdapterOption[] = [
     label: "HF NB2 AXB 01",
     imageUrl: "/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png",
     notes:
-      "Turn 18 Nano Banana 2 reference candidate from AXB canvas + mask. Whole-frame generation; anchors are not pixel-guaranteed.",
+      "Turn 18 Nano Banana 2 reference candidate from AXB canvas + mask. Rejected as final in Turn 19 because internal anchor-to-X bands are visible.",
   },
   {
     id: "hf-nb2-axb-02",
     label: "HF NB2 AXB 02",
     imageUrl: "/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-02.png",
     notes:
-      "Turn 18 softer Nano Banana 2 reference candidate from AXB canvas + mask. Dashboard active for review, not visually accepted yet.",
+      "Turn 18 softer Nano Banana 2 reference candidate from AXB canvas + mask. Rejected as final in Turn 19; kept for comparison only.",
   },
 ];
 

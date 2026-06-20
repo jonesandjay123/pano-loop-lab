@@ -133,6 +133,16 @@
   are not pixel-guaranteed and the candidates must be judged as whole-frame reference
   generations. _Source: EXPERIMENT_LOG.md Turn 18._
 
+- ❌ **Whole-frame AXB reference candidates are not enough; they move the seam inside
+  the adapter.** Turn 19 reviewed `hf-nb2-axb-01` and `hf-nb2-axb-02` with
+  deterministic butt-join composites and internal boundary crops. The candidates make
+  the immediate external plate joins look closer because they carry copied A/B anchor
+  strips, but both leave visible vertical bands where those anchors meet generated X.
+  This rejects whole-frame reference generation as the final AXB method. The next
+  viable direction is true mask-inpaint or a pipeline that extracts/composites only X
+  while restoring exact anchors. _Source: EXPERIMENT_LOG.md Turn 19 and
+  `.../008-dawn-dusk-candidate-review/review/compare-external-joins.png`._
+
 ## Open hypotheses (not yet tested in the loop)
 
 - **H1 — Pair-specific adapter generation** (primary candidate). Generate a dedicated

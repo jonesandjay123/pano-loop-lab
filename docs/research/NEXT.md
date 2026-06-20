@@ -4,54 +4,50 @@
 
 ---
 
-## Next turn = review first AXB candidates at blend 0
+## Next turn = X-only composite contract
 
 ### Goal
 
-Review the two generated `dawn-valley -> dusk-ridge` AXB candidates honestly:
+Fix the failure exposed by Turn 19:
 
-> Do `hf-nb2-axb-01` or `hf-nb2-axb-02` improve the real dawn->adapter and
-> adapter->dusk joins at `blend = 0`, enough to keep one as the active review
-> candidate?
+> Can we treat generated AXB outputs as **X-only material**, extract the center X
+> region, and deterministically composite it between exact original anchors so the
+> outer plate-facing pixels are guaranteed while the internal anchor/X band is
+> minimized?
 
-### Current base
+### Why this is next
 
-Dashboard:
+Turn 19 showed that whole-frame AXB reference candidates make the outer joins look
+closer mainly by copying A/B anchor strips, but they move the visible seam inside the
+adapter at the anchor-to-X boundary. The next smallest engineering variable is not more
+generation; it is a deterministic postprocess contract:
 
-`/#adapter-workbench`
-
-Candidate files:
-
-- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png`
-- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-02.png`
-
-Both candidates are also available in the seam lab's `dawn->dusk` selector.
-
-Important limitation:
-
-These were generated with Higgsfield `nano_banana_2` from the AXB canvas + mask as
-reference images. Higgsfield did **not** expose true mask-inpaint in this route, so
-anchors are not pixel-guaranteed.
+1. start from an AXB candidate;
+2. discard or downweight its generated/copy-painted anchor strips;
+3. keep only its center X material;
+4. composite exact original anchors + X with a controlled soft restore band;
+5. measure outer anchor diff = 0.
 
 ### Allowed changes
 
-- Inspect only `dawn-valley -> dusk-ridge`.
-- Use the seam lab and/or generated butt-join review composites.
-- Update candidate status/notes if the review is clear.
-- If one candidate is clearly best, mark it as active-for-review, not final accepted.
-- Keep all baseline and old adapter options.
+- Implement a small deterministic script for `dawn-valley -> dusk-ridge` only.
+- Inputs may be the existing `hf-nb2-axb-01/02` candidates plus the AXB prep
+  workbench.
+- Output recomposited review candidates under a new working folder.
+- Verify exact outer anchors with a JSON diff report.
+- Register recomposited candidates in the dashboard only if the mechanics work.
 
 ### Forbidden this turn
 
-- Do **not** generate more images.
-- Do **not** delete or overwrite any candidate.
-- Do **not** claim pixel preservation for these whole-frame reference candidates.
+- Do **not** generate new AI images.
+- Do **not** delete or overwrite existing candidates.
+- Do **not** claim visual acceptance without `blend = 0` review.
 - Do **not** change global sizing or renderer architecture.
 - Do **not** add backend, routing libraries, Three.js, R3F, GSAP, or canvas.
 
 ### Required evaluation / stop condition
 
-- Compare `hf-nb2-axb-01`, `hf-nb2-axb-02`, baseline, and prior exp002 candidates at
-  `blend = 0`.
-- Record whether each candidate is ACCEPT / REJECT / PARTIAL / INCONCLUSIVE.
+- Produce at most 2 recomposited candidates, one from each HF source candidate.
+- Prove outer-left and outer-right anchor diff are `0`.
+- Inspect whether the internal anchor/X band is reduced versus the raw HF candidates.
 - Run `npm run build`.
