@@ -125,6 +125,14 @@
   EXPERIMENT_LOG.md Turn 15 and
   `.../005-sdxl-content-guidance/candidates/candidates.md`._
 
+- 🟡 **AXB reference generation can populate candidate batches, but still needs
+  `blend = 0` review.** Turn 18 used Higgsfield `nano_banana_2` with the AXB work
+  canvas and mask as reference images to generate two dawn-to-dusk candidates. This
+  proves the dashboard/candidate batch path is usable, but not visual acceptance:
+  Higgsfield did not expose a true mask-inpaint parameter for this route, so anchors
+  are not pixel-guaranteed and the candidates must be judged as whole-frame reference
+  generations. _Source: EXPERIMENT_LOG.md Turn 18._
+
 ## Open hypotheses (not yet tested in the loop)
 
 - **H1 — Pair-specific adapter generation** (primary candidate). Generate a dedicated

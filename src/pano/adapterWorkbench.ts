@@ -30,6 +30,7 @@ export interface AdapterWorkbenchPair {
 }
 
 const PREP_ROOT = "/panos/adapter-prep";
+const CANDIDATE_ROOT = "/panos/adapter-candidates";
 
 function pairUrls(fromId: string, toId: string) {
   const pairRoot = `${PREP_ROOT}/${fromId}__${toId}`;
@@ -42,6 +43,10 @@ function pairUrls(fromId: string, toId: string) {
     promptUrl: `${pairRoot}/prompt.txt`,
     negativePromptUrl: `${pairRoot}/negative-prompt.txt`,
   };
+}
+
+function candidateUrl(fromId: string, toId: string, fileName: string) {
+  return `${CANDIDATE_ROOT}/${fromId}__${toId}/${fileName}`;
 }
 
 const DEFAULT_GEOMETRY = {
@@ -59,8 +64,25 @@ export const ADAPTER_WORKBENCH_PAIRS: AdapterWorkbenchPair[] = [
     toId: "dusk-ridge",
     label: "Dawn Valley -> Dusk Ridge",
     ...pairUrls("dawn-valley", "dusk-ridge"),
-    activeCandidateId: null,
-    candidates: [],
+    activeCandidateId: "hf-nb2-axb-02",
+    candidates: [
+      {
+        id: "hf-nb2-axb-01",
+        label: "HF NB2 AXB 01",
+        imageUrl: candidateUrl("dawn-valley", "dusk-ridge", "hf-nb2-axb-01.png"),
+        status: "generated",
+        notes:
+          "Nano Banana 2 reference candidate from AXB canvas + mask. Whole-frame reference generation; anchors are not guaranteed pixel-preserved.",
+      },
+      {
+        id: "hf-nb2-axb-02",
+        label: "HF NB2 AXB 02",
+        imageUrl: candidateUrl("dawn-valley", "dusk-ridge", "hf-nb2-axb-02.png"),
+        status: "generated",
+        notes:
+          "Softer atmospheric Nano Banana 2 reference candidate. Current dashboard active for review only; not accepted as final.",
+      },
+    ],
     geometry: DEFAULT_GEOMETRY,
   },
   {

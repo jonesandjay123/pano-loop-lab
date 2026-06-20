@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-20** (Turn 17 — AXB dashboard, no AI-filled candidates yet).
+> Last updated: **2026-06-20** (Turn 18 — first AXB candidate batch).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -74,9 +74,19 @@ It currently supports:
 - opening manifest/prompt files;
 - showing the active adapter state and candidate count.
 
-It does **not** yet generate images, import generated candidates, or apply a selected
-candidate into the pano loop. Candidate lists are intentionally empty until real
-AI-filled X outputs are produced.
+It now shows two `dawn-valley -> dusk-ridge` candidate images and can switch which
+candidate is active-for-review in the dashboard. It does **not** persist dashboard
+selection across reloads and does **not** declare a candidate accepted.
+
+First candidate batch:
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png`
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-02.png`
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/candidates.json`
+
+These candidates were generated with Higgsfield `nano_banana_2` from the AXB work
+canvas + mask as reference images. Higgsfield did not expose a true mask-inpaint
+parameter in this route, so these are **whole-frame reference candidates**; anchors
+are not pixel-guaranteed.
 
 ## Known truth from the inspection lab
 CSS overlap + feather hides most **tonal / hard-line** mismatch on these soft
@@ -93,4 +103,6 @@ revisited only **after** a generation/transition method works. See HANDOFF.md §
 - AXB prep pipeline exists and can generate current-loop prep assets with
   `npm run adapter:prep -- --all`.
 - AXB dashboard exists at `/#adapter-workbench`.
+- First dawn-to-dusk candidate batch exists and is selectable for review in both the
+  dashboard and the seam lab's dawn->dusk selector.
 - No Codex automations / scheduled jobs configured.

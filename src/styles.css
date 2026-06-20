@@ -533,13 +533,61 @@ body {
   gap: 8px;
 }
 
-.candidate-list button {
-  min-height: 34px;
+.candidate-card {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.candidate-card.is-active {
+  border-color: rgba(104, 199, 255, 0.62);
+  background: rgba(80, 158, 204, 0.14);
+}
+
+.candidate-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #07080c;
+}
+
+.candidate-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.candidate-title-row strong {
+  color: #f7f8fa;
+  font-size: 13px;
+}
+
+.candidate-title-row span {
+  color: #9da6af;
+  font-size: 12px;
+}
+
+.candidate-card p {
+  margin: 6px 0 8px;
+  color: #aeb6bf;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.candidate-card button {
+  width: 100%;
+  min-height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.065);
   color: #edf0f2;
   font: inherit;
+  cursor: pointer;
 }
 
 @media (max-width: 1000px) {

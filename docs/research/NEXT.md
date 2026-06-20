@@ -4,69 +4,54 @@
 
 ---
 
-## Next turn = generate/import first AXB candidate batch
+## Next turn = review first AXB candidates at blend 0
 
 ### Goal
 
-Use the AXB dashboard and prep assets to produce the first real candidate batch for
-one boundary:
+Review the two generated `dawn-valley -> dusk-ridge` AXB candidates honestly:
 
-> For `dawn-valley -> dusk-ridge`, generate or import a small set of AI-filled X
-> outputs, register them as candidates, and make them selectable in the workbench
-> without deleting any baseline.
-
-This follows the new working direction from `new_plan.md`: generate many `A X B`
-candidate outputs, then choose which one becomes the active `A->B` transition.
+> Do `hf-nb2-axb-01` or `hf-nb2-axb-02` improve the real dawn->adapter and
+> adapter->dusk joins at `blend = 0`, enough to keep one as the active review
+> candidate?
 
 ### Current base
 
-Turn 16 created deterministic AXB prep assets for the full current loop under:
-
-`docs/research/experiments/working/006-axb-prep/`
-
-Turn 17 added an in-app dashboard at:
+Dashboard:
 
 `/#adapter-workbench`
 
-The dashboard reads browser-served copies under:
+Candidate files:
 
-`public/panos/adapter-prep/`
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png`
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-02.png`
 
-Each pair has:
-- `adapter-work-canvas.png`
-- `adapter-mask.png`
-- left/right anchor crops
-- prompt files
-- `manifest.json`
+Both candidates are also available in the seam lab's `dawn->dusk` selector.
 
-Default geometry:
-- `3136 x 1344`
-- `A : X : B = 1 : 12 : 1`
-- anchors `224px` each
-- X region `2688px`
-- mask black = preserve, white = edit/regenerate
+Important limitation:
+
+These were generated with Higgsfield `nano_banana_2` from the AXB canvas + mask as
+reference images. Higgsfield did **not** expose true mask-inpaint in this route, so
+anchors are not pixel-guaranteed.
 
 ### Allowed changes
 
-- Use one boundary only: `dawn-valley -> dusk-ridge`.
-- Generate or import a small candidate set only if a generation backend/tool is
-  explicitly available in the session.
-- If generation is not available, implement the import/registration path only and stop.
-- Register candidates without replacing baselines.
-- Keep the existing pano renderer intact unless reading the candidate registry requires
-  a very small, explicit selector change.
-- Keep baselines and all old adapter variants.
+- Inspect only `dawn-valley -> dusk-ridge`.
+- Use the seam lab and/or generated butt-join review composites.
+- Update candidate status/notes if the review is clear.
+- If one candidate is clearly best, mark it as active-for-review, not final accepted.
+- Keep all baseline and old adapter options.
 
 ### Forbidden this turn
 
-- Do **not** delete or overwrite existing adapters.
-- Do **not** generate more than 10 candidates.
-- Do **not** add Three.js / R3F / GSAP / canvas / backend / new libraries.
-- Do **not** lock global plate/seam/socket sizing beyond the AXB prep-canvas defaults.
+- Do **not** generate more images.
+- Do **not** delete or overwrite any candidate.
+- Do **not** claim pixel preservation for these whole-frame reference candidates.
+- Do **not** change global sizing or renderer architecture.
+- Do **not** add backend, routing libraries, Three.js, R3F, GSAP, or canvas.
 
 ### Required evaluation / stop condition
 
-- The repo should have real candidate files or a working import path for them.
-- The dashboard should show candidate thumbnails/counts for `dawn-valley -> dusk-ridge`.
-- It should be clear how one candidate becomes active.
+- Compare `hf-nb2-axb-01`, `hf-nb2-axb-02`, baseline, and prior exp002 candidates at
+  `blend = 0`.
+- Record whether each candidate is ACCEPT / REJECT / PARTIAL / INCONCLUSIVE.
 - Run `npm run build`.

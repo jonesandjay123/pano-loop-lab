@@ -33,10 +33,17 @@ function PairButton({
 export function AdapterWorkbench() {
   const [pairIndex, setPairIndex] = useState(0);
   const [previewMode, setPreviewMode] = useState<PreviewMode>("canvas");
+  const [activeCandidateByPair, setActiveCandidateByPair] = useState<Record<string, string | null>>(() =>
+    Object.fromEntries(
+      ADAPTER_WORKBENCH_PAIRS.map((item) => [`${item.fromId}__${item.toId}`, item.activeCandidateId]),
+    ),
+  );
   const pair = ADAPTER_WORKBENCH_PAIRS[pairIndex];
+  const pairKey = `${pair.fromId}__${pair.toId}`;
+  const activeCandidateId = activeCandidateByPair[pairKey] ?? null;
   const activeCandidate = useMemo(
-    () => pair.candidates.find((candidate) => candidate.id === pair.activeCandidateId) ?? null,
-    [pair],
+    () => pair.candidates.find((candidate) => candidate.id === activeCandidateId) ?? null,
+    [pair, activeCandidateId],
   );
 
   return (
@@ -156,9 +163,30 @@ export function AdapterWorkbench() {
                 ) : (
                   <div className="candidate-list">
                     {pair.candidates.map((candidate) => (
-                      <button key={candidate.id} type="button">
-                        {candidate.label}
-                      </button>
+                      <article
+                        key={candidate.id}
+                        className={`candidate-card${candidate.id === activeCandidateId ? " is-active" : ""}`}
+                      >
+                        <img src={candidate.imageUrl} alt={candidate.label} />
+                        <div>
+                          <div className="candidate-title-row">
+                            <strong>{candidate.label}</strong>
+                            <span>{candidate.status}</span>
+                          </div>
+                          <p>{candidate.notes}</p>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setActiveCandidateByPair((prev) => ({
+                                ...prev,
+                                [pairKey]: candidate.id,
+                              }))
+                            }
+                          >
+                            {candidate.id === activeCandidateId ? "Active for review" : "Use for review"}
+                          </button>
+                        </div>
+                      </article>
                     ))}
                   </div>
                 )}

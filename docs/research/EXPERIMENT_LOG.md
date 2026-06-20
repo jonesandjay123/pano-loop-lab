@@ -6,6 +6,37 @@
 
 ---
 
+## Turn 18 - 2026-06-20 - First dawn-to-dusk AXB candidate batch
+- **Role:** Runner / Engineering Runner
+- **Boundary:** `dawn-valley -> dusk-ridge`
+- **Question:** can the AXB dashboard show a real candidate batch and make active
+  selection meaningful for review?
+- **Generation backend:** Higgsfield CLI, account authenticated. `nano_banana_2`
+  (`Nano Banana Pro`) was used with the AXB work canvas and mask as reference images.
+- **Important limitation:** Higgsfield did not expose a true mask-inpaint parameter in
+  this route. These are **whole-frame reference generations**, not pixel-preserving
+  masked fills. Do not treat them as accepted welds without `blend = 0` review.
+- **Candidates generated:**
+  - `hf-nb2-axb-01`, job `7800701b-8256-435c-b70c-38d84b09a62f`, `3168 x 1344`.
+  - `hf-nb2-axb-02`, job `56316c99-c63c-479b-a615-f6bfacf0bbb4`, `3168 x 1344`.
+- **Files written:**
+  - runtime/dashboard copies under
+    `public/panos/adapter-candidates/dawn-valley__dusk-ridge/`;
+  - research copies under
+    `docs/research/experiments/working/007-dawn-dusk-candidates/`.
+- **Dashboard changes:** candidate thumbnails, status, notes, and a local
+  active-for-review selector were added. `hf-nb2-axb-02` is the initial
+  active-for-review candidate in the registry.
+- **Seam lab changes:** both candidates were added to the existing dawn-to-dusk adapter
+  selector so they can be inspected with `blend = 0`. The default runtime adapter was
+  not changed.
+- **Visual sanity check:** both candidates are valid panoramic images, not blanks.
+  `hf-nb2-axb-02` is brighter and lower contrast; `hf-nb2-axb-01` is darker and more
+  dusk-heavy. No acceptance verdict was made.
+- **Next:** review `hf-nb2-axb-01` and `hf-nb2-axb-02` in seam lab at `blend = 0`
+  against the real plates; either promote one, reject both, or move to a true
+  mask-inpaint backend/import path.
+
 ## Turn 17 - 2026-06-20 - AXB prep dashboard
 - **Role:** Engineering Runner / Archivist
 - **Boundary:** all current adjacent pairs for inspection; no generation verdict.

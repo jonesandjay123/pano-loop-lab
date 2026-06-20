@@ -10,7 +10,9 @@ export type DawnDuskAdapterOptionId =
   | "baseline"
   | "exp001-edge-anchored-v1"
   | "exp002-c08-struct-off-leftpreserve"
-  | "exp002-c04-struct-off-orig";
+  | "exp002-c04-struct-off-orig"
+  | "hf-nb2-axb-01"
+  | "hf-nb2-axb-02";
 
 export interface DawnDuskAdapterOption {
   id: DawnDuskAdapterOptionId;
@@ -45,6 +47,20 @@ export const DAWN_DUSK_ADAPTER_OPTIONS: DawnDuskAdapterOption[] = [
     imageUrl: "/panos/adapters/dawn-valley__dusk-ridge/exp002-c04-struct-off-orig.png",
     notes:
       "Loop 9 Higgsfield whole-frame image-to-image candidate c04; promoted for honest blend=0 inspection.",
+  },
+  {
+    id: "hf-nb2-axb-01",
+    label: "HF NB2 AXB 01",
+    imageUrl: "/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png",
+    notes:
+      "Turn 18 Nano Banana 2 reference candidate from AXB canvas + mask. Whole-frame generation; anchors are not pixel-guaranteed.",
+  },
+  {
+    id: "hf-nb2-axb-02",
+    label: "HF NB2 AXB 02",
+    imageUrl: "/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-02.png",
+    notes:
+      "Turn 18 softer Nano Banana 2 reference candidate from AXB canvas + mask. Dashboard active for review, not visually accepted yet.",
   },
 ];
 

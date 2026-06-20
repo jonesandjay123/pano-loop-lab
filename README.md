@@ -116,6 +116,14 @@ prompt files, and `manifest.json`.
 The in-app dashboard reads browser-served copies under `public/panos/adapter-prep/`
 so the work canvases and masks can be inspected without a backend.
 
+First candidate batch:
+- `dawn-valley -> dusk-ridge`
+- 2 Nano Banana 2 reference candidates under
+  `public/panos/adapter-candidates/dawn-valley__dusk-ridge/`
+- These are whole-frame reference generations from the AXB canvas + mask, not
+  strict mask-inpaint outputs. Use `blend = 0` in the seam lab before treating one as
+  accepted.
+
 ## Project structure
 
 ```
