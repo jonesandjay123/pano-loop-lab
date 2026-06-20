@@ -1,0 +1,90 @@
+{
+  "id": "axb-prep-v1",
+  "boundary": {
+    "from": "dusk-ridge",
+    "to": "moonlit-tidelands"
+  },
+  "createdAt": "2026-06-20T21:15:36.574Z",
+  "sourcePaths": {
+    "from": "public/panos/dusk-ridge.jpg",
+    "to": "public/panos/moonlit-tidelands.jpg"
+  },
+  "outputPaths": {
+    "manifest": "docs/research/experiments/working/009-axb-prefill-variants/black/dusk-ridge__moonlit-tidelands/manifest.json",
+    "prompt": "docs/research/experiments/working/009-axb-prefill-variants/black/dusk-ridge__moonlit-tidelands/prompt.txt",
+    "negativePrompt": "docs/research/experiments/working/009-axb-prefill-variants/black/dusk-ridge__moonlit-tidelands/negative-prompt.txt",
+    "fromRightAnchor": "docs/research/experiments/working/009-axb-prefill-variants/black/dusk-ridge__moonlit-tidelands/dusk-ridge-right-anchor.png",
+    "toLeftAnchor": "docs/research/experiments/working/009-axb-prefill-variants/black/dusk-ridge__moonlit-tidelands/moonlit-tidelands-left-anchor.png",
+    "adapterWorkCanvas": "docs/research/experiments/working/009-axb-prefill-variants/black/dusk-ridge__moonlit-tidelands/adapter-work-canvas.png",
+    "adapterMask": "docs/research/experiments/working/009-axb-prefill-variants/black/dusk-ridge__moonlit-tidelands/adapter-mask.png"
+  },
+  "dimensions": {
+    "width": 3136,
+    "height": 1344,
+    "aspectRatio": "3136:1344"
+  },
+  "layout": {
+    "ratio": "1:12:1",
+    "leftAnchorWidth": 224,
+    "xRegionWidth": 2688,
+    "rightAnchorWidth": 224,
+    "xRegionBounds": {
+      "left": 224,
+      "right": 2912,
+      "width": 2688
+    }
+  },
+  "maskStrategy": {
+    "name": "center-x-with-anchor-overmask",
+    "meaning": "white = editable/regenerate, black = preserve",
+    "overmaskPxIntoEachAnchor": 32,
+    "hardPreservePixelsPerOuterAnchor": 192
+  },
+  "prefillStrategy": {
+    "name": "solid-black",
+    "description": "The work canvas is opaque. X is initialized with low-information pixels; the separate mask defines what an inpainting backend may edit.",
+    "leftInnerEdgeColor": {
+      "r": 74,
+      "g": 65,
+      "b": 124
+    },
+    "rightInnerEdgeColor": {
+      "r": 27,
+      "g": 39,
+      "b": 65
+    }
+  },
+  "cropPixels": {
+    "fromRightAnchor": {
+      "left": 2153,
+      "top": 0,
+      "width": 224,
+      "height": 1344
+    },
+    "toLeftAnchor": {
+      "left": 0,
+      "top": 0,
+      "width": 224,
+      "height": 1344
+    }
+  },
+  "sourceImageInfo": {
+    "from": {
+      "sourceWidth": 2688,
+      "sourceHeight": 1520,
+      "resizedWidth": 2377,
+      "resizedHeight": 1344
+    },
+    "to": {
+      "sourceWidth": 2688,
+      "sourceHeight": 1520,
+      "resizedWidth": 2377,
+      "resizedHeight": 1344
+    }
+  },
+  "notes": [
+    "No generation backend was called by this prep script.",
+    "No final adapter candidate was written to public/panos/adapters.",
+    "A/B anchors are narrow edge sockets; the X region is the actual transition adapter target."
+  ]
+}

@@ -6,11 +6,18 @@ export interface AdapterCandidate {
   notes: string;
 }
 
+export interface AdapterPrepVariant {
+  id: "gradient" | "white" | "black";
+  label: string;
+  workCanvasUrl: string;
+}
+
 export interface AdapterWorkbenchPair {
   fromId: string;
   toId: string;
   label: string;
   workCanvasUrl: string;
+  prepVariants: AdapterPrepVariant[];
   maskUrl: string;
   fromAnchorUrl: string;
   toAnchorUrl: string;
@@ -32,10 +39,21 @@ export interface AdapterWorkbenchPair {
 const PREP_ROOT = "/panos/adapter-prep";
 const CANDIDATE_ROOT = "/panos/adapter-candidates";
 
+const PREP_VARIANTS: Array<Pick<AdapterPrepVariant, "id" | "label"> & { root: string }> = [
+  { id: "gradient", label: "Gradient", root: "/panos/adapter-prep" },
+  { id: "white", label: "White", root: "/panos/adapter-prep-white" },
+  { id: "black", label: "Black", root: "/panos/adapter-prep-black" },
+];
+
 function pairUrls(fromId: string, toId: string) {
   const pairRoot = `${PREP_ROOT}/${fromId}__${toId}`;
   return {
     workCanvasUrl: `${pairRoot}/adapter-work-canvas.png`,
+    prepVariants: PREP_VARIANTS.map((variant) => ({
+      id: variant.id,
+      label: variant.label,
+      workCanvasUrl: `${variant.root}/${fromId}__${toId}/adapter-work-canvas.png`,
+    })),
     maskUrl: `${pairRoot}/adapter-mask.png`,
     fromAnchorUrl: `${pairRoot}/${fromId}-right-anchor.png`,
     toAnchorUrl: `${pairRoot}/${toId}-left-anchor.png`,

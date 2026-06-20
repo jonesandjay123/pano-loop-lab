@@ -6,6 +6,22 @@
 
 ---
 
+## Turn 20 - 2026-06-20 - AXB prefill variants and download controls
+- **Role:** Engineering Runner
+- **Boundary:** all current adjacent pairs for prep export.
+- **Question:** can the AXB dashboard offer white/black X prefill alternatives and
+  direct downloads so the work canvas can be tested in GPT or another editor?
+- **Implementation:** generated additional deterministic prep assets with the existing
+  prep script:
+  - white X prefill under `public/panos/adapter-prep-white/`;
+  - black X prefill under `public/panos/adapter-prep-black/`;
+  - research copies under `docs/research/experiments/working/009-axb-prefill-variants/`.
+- **Dashboard changes:** added a `Gradient / White / Black` selector for the canvas
+  preview and download buttons for the currently selected work canvas plus the mask.
+- **Scope notes:** no AI generation was run and no candidate/adoption status changed.
+- **Next:** use the downloaded white/black/gradient canvas + mask in GPT or another
+  editor, then import the returned candidate through the dashboard/candidate registry.
+
 ## Turn 19 - 2026-06-20 - Review first AXB candidates at blend-0 equivalents
 - **Role:** Reviewer / Archivist
 - **Boundary:** `dawn-valley -> dusk-ridge`

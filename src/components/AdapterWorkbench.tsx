@@ -3,6 +3,7 @@ import { ADAPTER_WORKBENCH_PAIRS } from "../pano/adapterWorkbench";
 import type { AdapterWorkbenchPair } from "../pano/adapterWorkbench";
 
 type PreviewMode = "canvas" | "mask" | "anchors";
+type PrepVariantId = "gradient" | "white" | "black";
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
@@ -33,6 +34,7 @@ function PairButton({
 export function AdapterWorkbench() {
   const [pairIndex, setPairIndex] = useState(0);
   const [previewMode, setPreviewMode] = useState<PreviewMode>("canvas");
+  const [prepVariantId, setPrepVariantId] = useState<PrepVariantId>("gradient");
   const [activeCandidateByPair, setActiveCandidateByPair] = useState<Record<string, string | null>>(() =>
     Object.fromEntries(
       ADAPTER_WORKBENCH_PAIRS.map((item) => [`${item.fromId}__${item.toId}`, item.activeCandidateId]),
@@ -40,6 +42,8 @@ export function AdapterWorkbench() {
   );
   const pair = ADAPTER_WORKBENCH_PAIRS[pairIndex];
   const pairKey = `${pair.fromId}__${pair.toId}`;
+  const selectedPrepVariant =
+    pair.prepVariants.find((variant) => variant.id === prepVariantId) ?? pair.prepVariants[0];
   const activeCandidateId = activeCandidateByPair[pairKey] ?? null;
   const activeCandidate = useMemo(
     () => pair.candidates.find((candidate) => candidate.id === activeCandidateId) ?? null,
@@ -109,10 +113,26 @@ export function AdapterWorkbench() {
             </div>
           </div>
 
+          <div className="prefill-tabs" aria-label="Canvas prefill">
+            {pair.prepVariants.map((variant) => (
+              <button
+                key={variant.id}
+                type="button"
+                className={variant.id === selectedPrepVariant.id ? "is-active" : ""}
+                onClick={() => {
+                  setPreviewMode("canvas");
+                  setPrepVariantId(variant.id);
+                }}
+              >
+                {variant.label}
+              </button>
+            ))}
+          </div>
+
           <div className="workbench-grid">
             <section className="preview-panel" aria-label="Prep preview">
               {previewMode === "canvas" && (
-                <img src={pair.workCanvasUrl} alt={`${pair.label} AXB work canvas`} />
+                <img src={selectedPrepVariant.workCanvasUrl} alt={`${pair.label} ${selectedPrepVariant.label} AXB work canvas`} />
               )}
               {previewMode === "mask" && <img src={pair.maskUrl} alt={`${pair.label} adapter mask`} />}
               {previewMode === "anchors" && (
@@ -138,11 +158,11 @@ export function AdapterWorkbench() {
               <div className="details-block">
                 <div className="sidebar-heading">Files</div>
                 <div className="file-links">
-                  <a href={pair.workCanvasUrl} target="_blank" rel="noreferrer">
-                    work canvas
+                  <a href={selectedPrepVariant.workCanvasUrl} download={`${pair.fromId}__${pair.toId}-${selectedPrepVariant.id}-work-canvas.png`}>
+                    download canvas
                   </a>
-                  <a href={pair.maskUrl} target="_blank" rel="noreferrer">
-                    mask
+                  <a href={pair.maskUrl} download={`${pair.fromId}__${pair.toId}-adapter-mask.png`}>
+                    download mask
                   </a>
                   <a href={pair.manifestUrl} target="_blank" rel="noreferrer">
                     manifest

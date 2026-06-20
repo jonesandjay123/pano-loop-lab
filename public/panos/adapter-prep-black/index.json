@@ -1,0 +1,39 @@
+{
+  "id": "axb-prep-v1",
+  "createdAt": "2026-06-20T21:15:35.402Z",
+  "mode": "batch",
+  "scenes": [
+    "dawn-valley",
+    "dusk-ridge",
+    "moonlit-tidelands"
+  ],
+  "defaults": {
+    "width": 3136,
+    "height": 1344,
+    "ratio": "1:12:1",
+    "anchorWidth": 224,
+    "xRegionWidth": 2688,
+    "overmaskPx": 32,
+    "prefill": "black"
+  },
+  "workbenches": [
+    {
+      "from": "dawn-valley",
+      "to": "dusk-ridge",
+      "directory": "public/panos/adapter-prep-black/dawn-valley__dusk-ridge",
+      "manifest": "public/panos/adapter-prep-black/dawn-valley__dusk-ridge/manifest.json"
+    },
+    {
+      "from": "dusk-ridge",
+      "to": "moonlit-tidelands",
+      "directory": "public/panos/adapter-prep-black/dusk-ridge__moonlit-tidelands",
+      "manifest": "public/panos/adapter-prep-black/dusk-ridge__moonlit-tidelands/manifest.json"
+    },
+    {
+      "from": "moonlit-tidelands",
+      "to": "dawn-valley",
+      "directory": "public/panos/adapter-prep-black/moonlit-tidelands__dawn-valley",
+      "manifest": "public/panos/adapter-prep-black/moonlit-tidelands__dawn-valley/manifest.json"
+    }
+  ]
+}

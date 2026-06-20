@@ -411,7 +411,8 @@ body {
   gap: 6px;
 }
 
-.mode-tabs button {
+.mode-tabs button,
+.prefill-tabs button {
   min-height: 34px;
   padding: 0 11px;
   border: 1px solid rgba(255, 255, 255, 0.13);
@@ -422,9 +423,22 @@ body {
   cursor: pointer;
 }
 
-.mode-tabs button.is-active {
+.mode-tabs button.is-active,
+.prefill-tabs button.is-active {
   border-color: rgba(104, 199, 255, 0.65);
   background: rgba(80, 158, 204, 0.18);
+}
+
+.prefill-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.prefill-tabs button {
+  min-height: 30px;
+  font-size: 13px;
 }
 
 .workbench-grid {

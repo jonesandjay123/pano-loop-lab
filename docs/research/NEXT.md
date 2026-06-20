@@ -4,50 +4,52 @@
 
 ---
 
-## Next turn = X-only composite contract
+## Next turn = import GPT-filled AXB candidate
 
 ### Goal
 
-Fix the failure exposed by Turn 19:
+Use the dashboard-exported AXB inputs with an external image editor/model, then bring
+the returned result back into the repo:
 
-> Can we treat generated AXB outputs as **X-only material**, extract the center X
-> region, and deterministically composite it between exact original anchors so the
-> outer plate-facing pixels are guaranteed while the internal anchor/X band is
-> minimized?
+> Import one GPT-filled `dawn-valley -> dusk-ridge` AXB result, register it as a
+> candidate, and review whether it reduces the internal anchor-to-X band seen in the
+> Higgsfield candidates.
 
-### Why this is next
+### Current base
 
-Turn 19 showed that whole-frame AXB reference candidates make the outer joins look
-closer mainly by copying A/B anchor strips, but they move the visible seam inside the
-adapter at the anchor-to-X boundary. The next smallest engineering variable is not more
-generation; it is a deterministic postprocess contract:
+Dashboard:
 
-1. start from an AXB candidate;
-2. discard or downweight its generated/copy-painted anchor strips;
-3. keep only its center X material;
-4. composite exact original anchors + X with a controlled soft restore band;
-5. measure outer anchor diff = 0.
+`/#adapter-workbench`
+
+Available prep downloads:
+- gradient X canvas
+- white X canvas
+- black X canvas
+- mask
+
+Browser-served variant roots:
+- `public/panos/adapter-prep/`
+- `public/panos/adapter-prep-white/`
+- `public/panos/adapter-prep-black/`
 
 ### Allowed changes
 
-- Implement a small deterministic script for `dawn-valley -> dusk-ridge` only.
-- Inputs may be the existing `hf-nb2-axb-01/02` candidates plus the AXB prep
-  workbench.
-- Output recomposited review candidates under a new working folder.
-- Verify exact outer anchors with a JSON diff report.
-- Register recomposited candidates in the dashboard only if the mechanics work.
+- Import one externally generated image if the user provides it.
+- Register it under `public/panos/adapter-candidates/dawn-valley__dusk-ridge/`.
+- Add it to the dashboard and seam-lab selector for review.
+- Generate review composites if needed.
+- Keep all existing candidates and baselines.
 
 ### Forbidden this turn
 
-- Do **not** generate new AI images.
 - Do **not** delete or overwrite existing candidates.
-- Do **not** claim visual acceptance without `blend = 0` review.
+- Do **not** generate more Higgsfield whole-frame candidates.
+- Do **not** claim pixel preservation unless verified by exact diff.
 - Do **not** change global sizing or renderer architecture.
 - Do **not** add backend, routing libraries, Three.js, R3F, GSAP, or canvas.
 
 ### Required evaluation / stop condition
 
-- Produce at most 2 recomposited candidates, one from each HF source candidate.
-- Prove outer-left and outer-right anchor diff are `0`.
-- Inspect whether the internal anchor/X band is reduced versus the raw HF candidates.
+- The imported candidate appears in the dashboard.
+- The imported candidate appears in the seam-lab `dawn->dusk` selector.
 - Run `npm run build`.

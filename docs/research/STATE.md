@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-20** (Turn 19 — first AXB candidate review).
+> Last updated: **2026-06-20** (Turn 20 — AXB prefill variants + downloads).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -64,6 +64,11 @@ Browser-served copies for the dashboard live under:
 - `public/panos/adapter-prep/dusk-ridge__moonlit-tidelands/`
 - `public/panos/adapter-prep/moonlit-tidelands__dawn-valley/`
 
+Additional browser-served prefill variants:
+- gradient: `public/panos/adapter-prep/`
+- white: `public/panos/adapter-prep-white/`
+- black: `public/panos/adapter-prep-black/`
+
 ## Dashboard status
 
 An in-app workbench is available at `/#adapter-workbench`.
@@ -76,6 +81,8 @@ It currently supports:
 
 It now shows two `dawn-valley -> dusk-ridge` candidate images. Both have been reviewed
 and marked rejected for final use; no active candidate is selected for that pair.
+The dashboard can switch the prep canvas between gradient, white, and black X
+prefill variants, and provides download links for the selected work canvas and mask.
 
 First candidate batch:
 - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png`

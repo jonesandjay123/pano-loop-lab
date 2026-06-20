@@ -116,6 +116,15 @@ prompt files, and `manifest.json`.
 The in-app dashboard reads browser-served copies under `public/panos/adapter-prep/`
 so the work canvases and masks can be inspected without a backend.
 
+The dashboard also exposes white/black prefill variants for GPT or other external
+editing tests:
+- gradient: `public/panos/adapter-prep/`
+- white: `public/panos/adapter-prep-white/`
+- black: `public/panos/adapter-prep-black/`
+
+Use the `Download canvas` and `Download mask` buttons in `/#adapter-workbench` to
+export the current pair's input files.
+
 First candidate batch:
 - `dawn-valley -> dusk-ridge`
 - 2 Nano Banana 2 reference candidates under
