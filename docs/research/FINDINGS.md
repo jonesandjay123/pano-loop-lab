@@ -103,6 +103,15 @@
   should use soft anchor-adoption compositing while preserving the outer plate-facing
   pixels exactly. _Source: EXPERIMENT_LOG.md Turn 23._
 
+- 🟡 **Strict-X soft adoption can enforce exact anchors after GPT changes them.**
+  Turn 24 added a deterministic postprocess that copies original A/B anchors exactly
+  and blends only inside X. `soft64`, `soft128`, and `soft256` all report left/right
+  outer anchor max diff `0`. This confirms the repo can recover placement-safe anchors
+  even when GPT redraws the anchor regions. Visually, `soft256` is the smoothest of the
+  tested strict-X variants, but still needs seam-lab review before final acceptance.
+  _Source: EXPERIMENT_LOG.md Turn 24 and
+  `docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/compare-soft-adoption-internal-boundaries.png`._
+
 - ❌ **Higgsfield whole-frame image-to-image makes pretty standalone panoramas that do
   NOT pixel-weld at `blend = 0`.** Turn 9 produced clean coherent dawn→dusk panoramas
   with `nano_banana_2`, and **none reproduced the exp001 left-edge dark-mass failure**.

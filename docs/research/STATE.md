@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-20** (Turn 23 — GPT AXB import review).
+> Last updated: **2026-06-20** (Turn 24 — strict-X soft adoption).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -91,10 +91,11 @@ It currently supports:
 - opening manifest/prompt files;
 - showing the active adapter state and candidate count.
 
-It now shows four `dawn-valley -> dusk-ridge` candidate images. The first two
+It now shows seven `dawn-valley -> dusk-ridge` candidate images. The first two
 Higgsfield AXB candidates were reviewed and rejected for final use. The imported GPT
-candidate and its X-only exact-anchor derivative are marked `partial`; `gpt-axb-01` is
-active for review, but no candidate is accepted as final yet.
+candidate, its hard X-only derivative, and three strict-X soft-adoption variants are
+marked `partial`; `gpt-axb-01-soft256` is active for review, but no candidate is
+accepted as final yet.
 The dashboard can switch the prep canvas between gradient, white, and black X
 prefill variants, and provides download links for the selected work canvas and mask.
 
@@ -118,8 +119,16 @@ Imported GPT candidate status:
   zero: left max `194`, right max `100`.
 - `gpt-axb-01-xonly` has exact outer anchors, left/right max diff `0`, but hard
   anchor restoration creates visible internal anchor-to-X breaks.
-- Current verdict: **partial**, not accepted final. Next variable should be soft
-  anchor-adoption compositing.
+- Strict-X soft-adoption variants:
+  - `gpt-axb-01-soft64`;
+  - `gpt-axb-01-soft128`;
+  - `gpt-axb-01-soft256`.
+- These variants copy original A/B anchors exactly and only alter X-region pixels.
+  All report left/right outer anchor max diff `0`. `soft256` is visually smoothest and
+  active for review, but not accepted final.
+- Current verdict: **partial**, not accepted final. Next variable should be seam-lab /
+  motion review of `soft256`, then either promote it as the current best adapter or
+  move to a true mask-inpaint backend.
 
 First candidate batch:
 - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png`
@@ -146,6 +155,7 @@ revisited only **after** a generation/transition method works. See HANDOFF.md §
   templates/EXPERIMENT_TEMPLATE). `AGENTS.md` created at repo root.
 - AXB prep pipeline exists and can generate current-loop prep assets with
   `npm run adapter:prep -- --all`.
+- Strict-X soft adoption exists with `npm run adapter:soft-adopt`.
 - AXB dashboard exists at `/#adapter-workbench`.
 - First dawn-to-dusk candidate batch exists and remains selectable for comparison in
   both the dashboard and seam lab, but both candidates are rejected as final adapters.

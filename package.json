@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "adapter:prep": "node scripts/adapter-prep.mjs",
     "adapter:import": "node scripts/adapter-import.mjs",
+    "adapter:soft-adopt": "node scripts/adapter-soft-adopt.mjs",
     "adapter:candidates": "node scripts/adapter-candidates-generate.mjs",
     "preview": "vite preview"
   },

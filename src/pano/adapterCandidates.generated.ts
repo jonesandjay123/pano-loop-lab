@@ -28,6 +28,27 @@ export const ADAPTER_CANDIDATES_BY_PAIR = {
       "imageUrl": "/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-xonly.png",
       "status": "partial",
       "notes": "Outer plate-facing anchors are exact, but hard X-only compositing creates visible internal anchor-to-X discontinuities. Useful diagnostic, not accepted final adapter."
+    },
+    {
+      "id": "gpt-axb-01-soft64",
+      "label": "GPT AXB 01 soft64",
+      "imageUrl": "/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft64.png",
+      "status": "partial",
+      "notes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting."
+    },
+    {
+      "id": "gpt-axb-01-soft128",
+      "label": "GPT AXB 01 soft128",
+      "imageUrl": "/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft128.png",
+      "status": "partial",
+      "notes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting."
+    },
+    {
+      "id": "gpt-axb-01-soft256",
+      "label": "GPT AXB 01 soft256",
+      "imageUrl": "/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft256.png",
+      "status": "partial",
+      "notes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting."
     }
   ]
 } as const;

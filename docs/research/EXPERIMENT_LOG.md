@@ -6,6 +6,37 @@
 
 ---
 
+## Turn 24 - 2026-06-20 - Strict-X soft anchor adoption
+- **Role:** Engineering Runner / Reviewer / Archivist
+- **Boundary:** `dawn-valley -> dusk-ridge`.
+- **Question:** if GPT modifies the provided anchors, can the repo still use GPT's
+  good X transition while strictly preserving original A/B anchors?
+- **User correction:** direct GPT output cannot be trusted if the goal is strict
+  X-only editing. The real requirement is: A/B anchor pixels must remain unchanged;
+  only X may change.
+- **Implementation:** added deterministic postprocess script
+  `scripts/adapter-soft-adopt.mjs` and npm script `adapter:soft-adopt`.
+- **Method:** starting from `gpt-axb-01`, copy the original left/right prep anchors
+  exactly into the output, then blend only pixels inside the X region against the
+  GPT candidate near the anchor boundaries. No anchor pixels are changed.
+- **Variants written:**
+  - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft64.png`;
+  - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft128.png`;
+  - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft256.png`.
+- **Anchor diff:** all three variants report left/right outer anchor max diff `0` and
+  mean diff `0`.
+- **Review artifacts:** wrote external joins, internal boundary crops, and comparison
+  sheets under
+  `docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/`.
+- **Visual result:** `soft64` still reads too hard near the internal anchor/X
+  boundary. `soft128` is better. `soft256` is the smoothest strict-X version and is
+  now active for review, but it should still be inspected in the actual seam lab
+  before being accepted as final.
+- **Verdict:** **PARTIAL / promising.** The issue was real: GPT changed the anchors.
+  The repo can enforce strict anchor preservation after the fact, and only modify X.
+  The next decision is whether `soft256` is visually acceptable in motion / seam-lab
+  context, or whether a true mask-inpaint backend is still required.
+
 ## Turn 23 - 2026-06-20 - Import GPT AXB candidate and exact-anchor diagnostic
 - **Role:** Runner / Reviewer / Archivist
 - **Boundary:** `dawn-valley -> dusk-ridge`.

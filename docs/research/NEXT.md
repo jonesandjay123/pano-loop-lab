@@ -4,63 +4,58 @@
 
 ---
 
-## Next turn = soft anchor-adoption composite for GPT AXB 01
+## Next turn = review `gpt-axb-01-soft256` in the actual loop
 
 ### Goal
 
-Test whether the imported GPT candidate can be made placement-safe without losing its
-natural transition:
+Decide whether the strict-X soft-adoption result is good enough to become the current
+active dawn-to-dusk adapter for demo review:
 
-> Starting from `gpt-axb-01`, preserve the outer plate-facing A/B anchor pixels exactly,
-> but feather the inner anchor-to-X transition so the hard `gpt-axb-01-xonly` vertical
-> breaks are reduced.
+> Inspect `gpt-axb-01-soft256` in the seam lab / moving loop at `blend = 0`, then either
+> promote it as the current best review adapter or keep it partial and move to a true
+> mask-inpaint backend.
 
 ### Current base
 
-Candidate source:
-- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01.png`
+Best strict-X candidate:
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft256.png`
 
-Diagnostic hard composite:
-- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-xonly.png`
+Supporting variants:
+- `gpt-axb-01-soft64`
+- `gpt-axb-01-soft128`
+- `gpt-axb-01-xonly`
+- raw source `gpt-axb-01`
 
-Review report:
-- `docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/review/gpt-axb-01-review-report.json`
-
-Current geometry:
-- `3136 x 1344`
-- `A : X : B = 1 : 4 : 1`
-- anchors `523px` each
-- X region `2090px`
-- right anchor starts at `2613px`
+Review comparisons:
+- `docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/compare-soft-adoption-internal-boundaries.png`
+- `docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/compare-soft-adoption-external-joins.png`
 
 Known truth:
-- `gpt-axb-01` is visually the strongest standalone transition so far, but its outer
-  anchors are not exact.
-- `gpt-axb-01-xonly` has exact outer anchors, but hard anchor/X boundaries are visible.
+- GPT changed the provided A/B anchor pixels.
+- `gpt-axb-01-soft256` restores original anchors exactly: left/right outer max diff `0`.
+- Only X-region pixels are blended in the strict-X soft-adoption variants.
+- `soft256` is the smoothest static review candidate so far, but not yet accepted.
 
 ### Allowed changes
 
-- Add one deterministic postprocess script or one small scripted experiment if useful.
-- Create one or more soft-composite variants from `gpt-axb-01`, for example `soft64`
-  and/or `soft128`.
-- Preserve exact outer plate-facing anchor pixels and report diff.
-- Register resulting variants as candidates under
-  `public/panos/adapter-candidates/dawn-valley__dusk-ridge/`.
-- Create blend-0-equivalent external joins and internal boundary crops.
-- Update `candidates.json`, generated TS registry, and research docs.
+- Inspect existing candidates in the app.
+- Capture screenshots if useful.
+- Update candidate status / active selection based on the inspection.
+- If accepted for review, wire `gpt-axb-01-soft256` as the current dawn-to-dusk review
+  adapter option without deleting any baseline or older candidate.
+- Update research docs and candidate metadata.
 
 ### Forbidden this turn
 
 - Do **not** generate new AI images.
+- Do **not** add more postprocess variants unless `soft256` has a specific, inspectable
+  failure that a single parameter change would test.
 - Do **not** delete or overwrite existing candidates.
 - Do **not** change global sizing or renderer architecture.
 - Do **not** add backend, routing libraries, Three.js, R3F, GSAP, or canvas.
-- Do **not** accept a final adapter unless both external joins and internal boundaries
-  are inspectably better.
 
 ### Required evaluation / stop condition
 
-- At least one soft composite candidate is registered in dashboard and seam-lab selector.
-- Outer anchor diff is reported and must remain `0` for preserved zones.
-- Review artifacts compare `gpt-axb-01`, `gpt-axb-01-xonly`, and the soft variant.
+- Inspect `gpt-axb-01-soft256` at `blend = 0`.
+- Record whether the remaining issue is acceptable for demo review or still a blocker.
 - Run `npm run build`.
