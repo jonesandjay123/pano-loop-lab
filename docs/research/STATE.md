@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-16** (Loop 0 — scaffolding only, no runtime change).
+> Last updated: **2026-06-20** (Turn 16 — AXB prep pipeline, no generation backend).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -29,6 +29,36 @@ routing / backend. `npm run build` passes, TS clean.
 - All generated with **Higgsfield `nano_banana_2`, 21:9, 2k**, feeding the two
   adjacent plates as `medias` (role `image`).
 
+## Current method direction
+
+The active direction is now **AXB prep + candidate selection**:
+
+```
+[A right-edge anchor][editable X transition region][B left-edge anchor]
+```
+
+`scripts/adapter-prep.mjs` deterministically prepares one inpainting workbench for
+every adjacent ordered pair in the loop. This converts the hard adapter problem into
+a standard masked-fill input:
+
+- opaque `adapter-work-canvas.png`;
+- separate `adapter-mask.png` where black = preserve and white = edit/regenerate;
+- narrow A/B edge sockets, not large content blocks;
+- later candidate batches can be generated from these inputs and one candidate can be
+  chosen as the active adapter.
+
+Default AXB prep geometry:
+- `3136 x 1344`;
+- `A : X : B = 1 : 12 : 1`;
+- anchors `224px` each;
+- X transition region `2688px`;
+- `32px` overmask into each anchor.
+
+Generated current-loop prep folders:
+- `docs/research/experiments/working/006-axb-prep/dawn-valley__dusk-ridge/`
+- `docs/research/experiments/working/006-axb-prep/dusk-ridge__moonlit-tidelands/`
+- `docs/research/experiments/working/006-axb-prep/moonlit-tidelands__dawn-valley/`
+
 ## Known truth from the inspection lab
 CSS overlap + feather hides most **tonal / hard-line** mismatch on these soft
 atmospheric mattes (~70%). It does **NOT** fix **structural** mismatch (a lake
@@ -41,4 +71,6 @@ revisited only **after** a generation/transition method works. See HANDOFF.md §
 ## Loop infrastructure status
 - Memory: `docs/research/` created (STATE, FINDINGS, EXPERIMENT_LOG, NEXT, ROLES,
   templates/EXPERIMENT_TEMPLATE). `AGENTS.md` created at repo root.
-- No experiments run yet. No Codex automations / scheduled jobs configured.
+- AXB prep pipeline exists and can generate current-loop prep assets with
+  `npm run adapter:prep -- --all`.
+- No Codex automations / scheduled jobs configured.

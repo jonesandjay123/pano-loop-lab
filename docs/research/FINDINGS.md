@@ -55,10 +55,20 @@
   (opaque center, no hole), an explicit preserve/regenerate mask with anchor
   overmask, a low-frequency structure guide, prompt/negative-prompt files, and a
   manifest — reproducible to the byte except for the manifest timestamp. This is a
-  **tooling** finding only: it does **not** evaluate adapter visual quality. Known
-  limitation: the prompt text is hardcoded to the dawn-to-dusk pair and must be
-  generalized before the workbench is reused for another boundary. _Source:
+  **tooling** finding only: it does **not** evaluate adapter visual quality. The
+  original Turn 7/8 limitation was that prompt text was hardcoded to dawn-to-dusk;
+  that limitation is superseded by the Turn 16 all-pairs AXB CLI. _Source:
   EXPERIMENT_LOG.md Turns 7 (runner) and 8 (review)._
+
+- ✅ **The prep contract is now an all-pairs AXB pipeline with narrow sockets.**
+  Turn 16 updated `scripts/adapter-prep.mjs` from a dawn-to-dusk/single-pair helper
+  into a deterministic batch CLI that prepares one workbench per adjacent ordered pair.
+  The current default matches the latest method decision: `3136 x 1344`,
+  `A : X : B = 1 : 12 : 1`, `224px` anchors, `2688px` editable X region, opaque
+  gradient prefill, separate mask, and `32px` overmask into each anchor. This is a
+  tooling finding only: it prepares standard inpainting inputs and does not prove any
+  generated adapter visually works. _Source: EXPERIMENT_LOG.md Turn 16 and
+  `docs/research/experiments/working/006-axb-prep/index.json`._
 
 - ❌ **Higgsfield whole-frame image-to-image makes pretty standalone panoramas that do
   NOT pixel-weld at `blend = 0`.** Turn 9 produced clean coherent dawn→dusk panoramas

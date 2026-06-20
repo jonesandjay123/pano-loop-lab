@@ -57,6 +57,7 @@ haze; it is not resolved. That is the motivation for the next phase.
 npm install
 npm run dev      # opens into the auto-scrolling, drag-scrubbable ring
 npm run build    # type-check + production build (must pass)
+npm run adapter:prep -- --all
 npm run preview
 ```
 
@@ -65,6 +66,46 @@ In the debug panel:
 - **inspect** — center & hold one boundary for study (auto-pauses).
 - **boundary labels + lines** — show every contact line + its A▸B label.
 - **pause auto-scroll** — freeze the loop. Drag the background to scrub.
+
+## AXB adapter prep pipeline
+
+The current generation direction is to standardize every adjacent pair as one
+inpainting work canvas:
+
+```text
+[A right-edge anchor][editable X transition region][B left-edge anchor]
+```
+
+This is a deterministic prep step only. It does not call an image-generation backend
+and it does not promote any candidate into the runtime selector.
+
+Default prep settings:
+- output canvas: `3136 x 1344`
+- layout: `1:12:1`
+- anchors: `224px` each
+- editable X region: `2688px`
+- mask polarity: black = preserve, white = edit/regenerate
+- X prefill: opaque horizontal gradient from the two inner anchor edge colors
+- overmask: `32px` into each anchor so an inpainting backend can blend while still
+  leaving the outer anchor pixels available for exact restore
+
+Generate the current ring's `A→B`, `B→C`, and `C→A` prep assets:
+
+```bash
+npm run adapter:prep -- --all
+```
+
+Useful variants:
+
+```bash
+npm run adapter:prep -- --from dawn-valley --to dusk-ridge --out docs/research/experiments/working/manual-axb
+npm run adapter:prep -- --scenes dawn-valley,dusk-ridge,moonlit-tidelands --ratio 1:18:1
+npm run adapter:prep -- --all --prefill gray --overmask-px 24
+```
+
+Each pair writes a folder under `docs/research/experiments/working/006-axb-prep/`
+containing `adapter-work-canvas.png`, `adapter-mask.png`, both anchor crops,
+prompt files, and `manifest.json`.
 
 ## Project structure
 
@@ -109,8 +150,9 @@ Add a `PanoPlate` plus the two `PanoSeam`s connecting it to its new neighbours
 
 ```
 done   : continuous ring + N seams + overlap/feather + per-segment knobs + inspect lab
-next   : edge-locked OUTPAINT on ONE boundary (dawn → dusk), verify a real weld
-then   : scale the proven outpaint method to all N seams
+now    : AXB work-canvas prep for every adjacent pair
+next   : generate candidate batches from AXB canvases and choose active adapters
+then   : independent adapter dashboard for candidate generation/review/adoption
 later  : drag inertia, parallax depth bands, format/responsive passes
 ```
 

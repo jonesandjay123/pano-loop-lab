@@ -5,10 +5,14 @@ import process from "node:process";
 import sharp from "sharp";
 
 const REPO_ROOT = process.cwd();
-const DEFAULT_WIDTH = 3168;
+const DEFAULT_SCENES = ["dawn-valley", "dusk-ridge", "moonlit-tidelands"];
+const DEFAULT_WIDTH = 3136;
 const DEFAULT_HEIGHT = 1344;
-const ANCHOR_PERCENT = 0.33;
-const OVERMASK_PERCENT = 0.06;
+const DEFAULT_RATIO = "1:12:1";
+const DEFAULT_OVERMASK_PX = 32;
+const DEFAULT_PREFILL = "gradient";
+const DEFAULT_OUTPUT_ROOT = "docs/research/experiments/working/006-axb-prep";
+const PREFILL_MODES = new Set(["gradient", "black", "white", "gray"]);
 
 function parseArgs(argv) {
   const args = {};
@@ -30,34 +34,121 @@ function parseArgs(argv) {
     index += 1;
   }
 
-  for (const required of ["from", "to", "id"]) {
-    if (!args[required] || typeof args[required] !== "string") {
-      throw new Error(`Missing required --${required} argument.`);
-    }
+  const scenes = typeof args.scenes === "string" ? args.scenes.split(",").map((id) => id.trim()).filter(Boolean) : [];
+  const hasPair = typeof args.from === "string" || typeof args.to === "string";
+  const batchMode = args.all === true || scenes.length > 0 || !hasPair;
+
+  if (hasPair && (typeof args.from !== "string" || typeof args.to !== "string")) {
+    throw new Error("Use both --from and --to for single-pair prep, or use --all / --scenes for batch prep.");
+  }
+
+  if (batchMode && hasPair) {
+    throw new Error("Use either batch mode (--all / --scenes) or single-pair mode (--from / --to), not both.");
+  }
+
+  const width = parsePositiveInteger(args.width, DEFAULT_WIDTH, "--width");
+  const height = parsePositiveInteger(args.height, DEFAULT_HEIGHT, "--height");
+  const ratio = typeof args.ratio === "string" ? args.ratio : DEFAULT_RATIO;
+  const prefill = typeof args.prefill === "string" ? args.prefill : DEFAULT_PREFILL;
+  const overmaskPx = parseNonNegativeInteger(args["overmask-px"], DEFAULT_OVERMASK_PX, "--overmask-px");
+
+  if (!PREFILL_MODES.has(prefill)) {
+    throw new Error(`Invalid --prefill "${prefill}". Use one of: ${Array.from(PREFILL_MODES).join(", ")}.`);
+  }
+
+  const layout = resolveLayout(width, ratio);
+
+  if (overmaskPx > layout.anchorWidth) {
+    throw new Error(`--overmask-px (${overmaskPx}) cannot exceed anchor width (${layout.anchorWidth}).`);
   }
 
   return {
+    mode: batchMode ? "batch" : "pair",
     fromSceneId: args.from,
     toSceneId: args.to,
-    recipeId: args.id,
+    scenes: scenes.length > 0 ? scenes : DEFAULT_SCENES,
+    outputRoot: typeof args.out === "string" ? args.out : DEFAULT_OUTPUT_ROOT,
+    recipeId: typeof args.id === "string" ? args.id : "axb-prep-v1",
+    width,
+    height,
+    ratio,
+    prefill,
+    overmaskPx,
+    layout,
   };
 }
 
-function workbenchSlug(recipeId) {
-  const match = recipeId.match(/^exp(?<num>\d+)-(?<slug>.+?)(?:-v\d+)?$/);
-  if (!match?.groups) {
-    return recipeId;
+function parsePositiveInteger(value, fallback, label) {
+  if (value === undefined) {
+    return fallback;
+  }
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${label} must be a positive integer.`);
+  }
+  return parsed;
+}
+
+function parseNonNegativeInteger(value, fallback, label) {
+  if (value === undefined) {
+    return fallback;
+  }
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`${label} must be a non-negative integer.`);
+  }
+  return parsed;
+}
+
+function resolveLayout(width, ratioText) {
+  const parts = ratioText.split(":").map((part) => Number.parseFloat(part));
+  if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part) || part <= 0)) {
+    throw new Error(`Invalid --ratio "${ratioText}". Use a format like 1:12:1.`);
   }
 
-  return `${match.groups.num.padStart(3, "0")}-${match.groups.slug}`;
+  const [left, middle, right] = parts;
+  if (left !== right) {
+    throw new Error("This prep script currently expects symmetrical anchors, e.g. 1:12:1.");
+  }
+
+  const unit = width / (left + middle + right);
+  const anchorWidth = Math.round(unit * left);
+  const middleWidth = width - anchorWidth * 2;
+
+  if (anchorWidth <= 0 || middleWidth <= 0) {
+    throw new Error(`Ratio ${ratioText} does not leave positive anchor and X widths at ${width}px.`);
+  }
+
+  return {
+    leftRatio: left,
+    middleRatio: middle,
+    rightRatio: right,
+    anchorWidth,
+    middleWidth,
+  };
 }
 
 function repoRelative(filePath) {
   return path.relative(REPO_ROOT, filePath).split(path.sep).join("/");
 }
 
+function resolveRepoPath(filePath) {
+  return path.isAbsolute(filePath) ? filePath : path.join(REPO_ROOT, filePath);
+}
+
 function scenePath(sceneId) {
   return path.join(REPO_ROOT, "public", "panos", `${sceneId}.jpg`);
+}
+
+function pairsForScenes(scenes) {
+  if (scenes.length < 2) {
+    throw new Error("Batch prep needs at least two scene ids.");
+  }
+
+  return scenes.map((from, index) => ({
+    fromSceneId: from,
+    toSceneId: scenes[(index + 1) % scenes.length],
+  }));
 }
 
 async function normalizedSceneBuffer(inputPath, targetHeight) {
@@ -87,7 +178,7 @@ async function cropEdge(inputPath, side, targetHeight, cropWidth) {
   const left = side === "right" ? normalized.resizedWidth - cropWidth : 0;
   const buffer = await sharp(normalized.buffer)
     .extract({ left, top: 0, width: cropWidth, height: targetHeight })
-    .jpeg({ quality: 94 })
+    .png()
     .toBuffer();
 
   return {
@@ -102,11 +193,11 @@ async function cropEdge(inputPath, side, targetHeight, cropWidth) {
 
 async function edgeMean(buffer, side) {
   const metadata = await sharp(buffer).metadata();
-  const stripWidth = Math.min(16, metadata.width ?? 16);
-  const left = side === "right" ? (metadata.width ?? stripWidth) - stripWidth : 0;
-  const stats = await sharp(buffer)
-    .extract({ left, top: 0, width: stripWidth, height: metadata.height ?? DEFAULT_HEIGHT })
-    .stats();
+  const width = metadata.width ?? 16;
+  const height = metadata.height ?? DEFAULT_HEIGHT;
+  const stripWidth = Math.min(16, width);
+  const left = side === "right" ? width - stripWidth : 0;
+  const stats = await sharp(buffer).extract({ left, top: 0, width: stripWidth, height }).stats();
 
   const [r, g, b] = stats.channels.slice(0, 3).map((channel) => Math.round(channel.mean));
   return { r, g, b };
@@ -116,37 +207,52 @@ function rgb({ r, g, b }) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function workCanvasFillSvg(width, height, leftColor, rightColor, leftX, rightX) {
+function solidColorForMode(mode, leftColor, rightColor) {
+  if (mode === "black") return { r: 0, g: 0, b: 0 };
+  if (mode === "white") return { r: 255, g: 255, b: 255 };
+  if (mode === "gray") return { r: 128, g: 128, b: 128 };
+  return {
+    r: Math.round((leftColor.r + rightColor.r) / 2),
+    g: Math.round((leftColor.g + rightColor.g) / 2),
+    b: Math.round((leftColor.b + rightColor.b) / 2),
+  };
+}
+
+function workCanvasFillSvg(width, height, leftColor, rightColor, prefillMode) {
+  const midColor = solidColorForMode(prefillMode, leftColor, rightColor);
+  const fill =
+    prefillMode === "gradient"
+      ? `url(#transition)`
+      : rgb(midColor);
+
   return Buffer.from(`
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
   <defs>
     <linearGradient id="transition" x1="0" x2="1" y1="0" y2="0">
       <stop offset="0%" stop-color="${rgb(leftColor)}"/>
-      <stop offset="50%" stop-color="rgb(${Math.round((leftColor.r + rightColor.r) / 2)}, ${Math.round((leftColor.g + rightColor.g) / 2)}, ${Math.round((leftColor.b + rightColor.b) / 2)})"/>
+      <stop offset="50%" stop-color="${rgb(midColor)}"/>
       <stop offset="100%" stop-color="${rgb(rightColor)}"/>
     </linearGradient>
   </defs>
-  <rect width="${width}" height="${height}" fill="url(#transition)"/>
-  <rect x="0" y="0" width="${leftX}" height="${height}" fill="${rgb(leftColor)}"/>
-  <rect x="${rightX}" y="0" width="${width - rightX}" height="${height}" fill="${rgb(rightColor)}"/>
+  <rect width="${width}" height="${height}" fill="${fill}"/>
 </svg>`);
 }
 
-function maskSvg(width, height, anchorWidth, overmaskWidth) {
-  const leftBlackEnd = ((anchorWidth - overmaskWidth) / width) * 100;
+function maskSvg(width, height, anchorWidth, overmaskPx) {
+  const leftBlackEnd = ((anchorWidth - overmaskPx) / width) * 100;
   const leftWhiteStart = (anchorWidth / width) * 100;
   const rightWhiteEnd = ((width - anchorWidth) / width) * 100;
-  const rightBlackStart = ((width - anchorWidth + overmaskWidth) / width) * 100;
+  const rightBlackStart = ((width - anchorWidth + overmaskPx) / width) * 100;
 
   return Buffer.from(`
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
   <defs>
     <linearGradient id="mask" x1="0" x2="1" y1="0" y2="0">
       <stop offset="0%" stop-color="black"/>
-      <stop offset="${leftBlackEnd.toFixed(2)}%" stop-color="black"/>
-      <stop offset="${leftWhiteStart.toFixed(2)}%" stop-color="white"/>
-      <stop offset="${rightWhiteEnd.toFixed(2)}%" stop-color="white"/>
-      <stop offset="${rightBlackStart.toFixed(2)}%" stop-color="black"/>
+      <stop offset="${leftBlackEnd.toFixed(3)}%" stop-color="black"/>
+      <stop offset="${leftWhiteStart.toFixed(3)}%" stop-color="white"/>
+      <stop offset="${rightWhiteEnd.toFixed(3)}%" stop-color="white"/>
+      <stop offset="${rightBlackStart.toFixed(3)}%" stop-color="black"/>
       <stop offset="100%" stop-color="black"/>
     </linearGradient>
   </defs>
@@ -154,50 +260,21 @@ function maskSvg(width, height, anchorWidth, overmaskWidth) {
 </svg>`);
 }
 
-function structureGuideSvg(width, height) {
-  const horizonY = Math.round(height * 0.48);
-  const basinY = Math.round(height * 0.67);
-  const ridgeY = Math.round(height * 0.38);
-  const foregroundY = Math.round(height * 0.8);
-
-  return Buffer.from(`
-<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <defs>
-    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="0">
-      <stop offset="0%" stop-color="#d8d2bd"/>
-      <stop offset="55%" stop-color="#d9d6ce"/>
-      <stop offset="100%" stop-color="#9da0aa"/>
-    </linearGradient>
-    <linearGradient id="ground" x1="0" x2="1" y1="0" y2="0">
-      <stop offset="0%" stop-color="#8d8b73"/>
-      <stop offset="50%" stop-color="#bbb7a2"/>
-      <stop offset="100%" stop-color="#5e6570"/>
-    </linearGradient>
-  </defs>
-  <rect width="${width}" height="${height}" fill="url(#sky)"/>
-  <path d="M0 ${horizonY} C ${width * 0.16} ${horizonY - 60}, ${width * 0.3} ${horizonY + 40}, ${width * 0.44} ${horizonY + 10} S ${width * 0.68} ${horizonY - 30}, ${width} ${ridgeY}" fill="none" stroke="#747b80" stroke-width="26" opacity="0.55"/>
-  <path d="M0 ${foregroundY} C ${width * 0.18} ${foregroundY - 42}, ${width * 0.34} ${basinY + 24}, ${width * 0.5} ${basinY} S ${width * 0.76} ${basinY + 12}, ${width} ${foregroundY - 80} L ${width} ${height} L 0 ${height} Z" fill="url(#ground)" opacity="0.82"/>
-  <path d="M${width * 0.58} ${height} C ${width * 0.67} ${height * 0.58}, ${width * 0.82} ${height * 0.42}, ${width} ${height * 0.5} L ${width} ${height} Z" fill="#444d5a" opacity="0.44"/>
-  <ellipse cx="${width * 0.48}" cy="${basinY}" rx="${width * 0.28}" ry="${height * 0.18}" fill="#e4ded0" opacity="0.48"/>
-  <rect y="${Math.round(height * 0.56)}" width="${width}" height="${Math.round(height * 0.18)}" fill="#e2ded4" opacity="0.28"/>
-</svg>`);
-}
-
 function promptText(fromSceneId, toSceneId) {
-  return `Pair-specific panoramic adapter for ${fromSceneId} to ${toSceneId}.
-Use the left anchor as the actual right edge of dawn-valley and the right anchor as the actual left edge of dusk-ridge.
-Generate a wide natural transition world between them: open dawn valley atmosphere, low mist basin, distant layered ridges, soft haze, coherent horizon, dusk ridge gradually emerging on the right.
-Keep the left endpoint airy and low-contrast; do not introduce a large dark mountain mass immediately on the left edge.
-Preserve the anchor crops where the mask is black and regenerate the white center band plus slight overmask area.
+  return `Pair-specific panoramic transition adapter for ${fromSceneId} to ${toSceneId}.
+The provided work canvas is [left real edge anchor][editable X transition region][right real edge anchor].
+Only the X region and the slight white overmask blend zones should be regenerated by the inpainting backend.
+Use the left anchor as the exact outgoing edge of ${fromSceneId} and the right anchor as the exact incoming edge of ${toSceneId}.
+Generate a wide natural transition world between them with coherent horizon, compatible lighting, compatible scale, and no visible split-screen composition.
 The result should feel like one continuous panoramic journey, not two wallpapers taped together.`;
 }
 
 function negativePromptText() {
-  return `large black mountain on the left edge, hard structure jump, abrupt horizon step, lake hitting mountain, pasted collage, split-screen image, vertical seam line, transparent area, empty blank center, sharp black silhouette at dawn-valley boundary, mismatched perspective, text, watermark, people, buildings, vehicles`;
+  return `hard vertical seam line, split-screen image, pasted collage, abrupt horizon step, mismatched perspective, mismatched scale, black empty center, white empty center, transparent area, text, watermark, people, buildings, vehicles`;
 }
 
-async function main() {
-  const { fromSceneId, toSceneId, recipeId } = parseArgs(process.argv.slice(2));
+async function preparePair(options, pair) {
+  const { fromSceneId, toSceneId } = pair;
   const fromPath = scenePath(fromSceneId);
   const toPath = scenePath(toSceneId);
 
@@ -209,31 +286,19 @@ async function main() {
     throw new Error(`Missing source scene: ${repoRelative(toPath)}`);
   }
 
-  const outputDir = path.join(
-    REPO_ROOT,
-    "docs",
-    "research",
-    "experiments",
-    "working",
-    workbenchSlug(recipeId),
-  );
-
+  const outputRoot = resolveRepoPath(options.outputRoot);
+  const outputDir = path.join(outputRoot, `${fromSceneId}__${toSceneId}`);
   await mkdir(outputDir, { recursive: true });
 
-  const width = DEFAULT_WIDTH;
-  const height = DEFAULT_HEIGHT;
-  const anchorWidth = Math.round(width * ANCHOR_PERCENT);
-  const middleWidth = width - anchorWidth * 2;
-  const overmaskWidth = Math.round(width * OVERMASK_PERCENT);
-
+  const { width, height, layout, overmaskPx, prefill } = options;
+  const { anchorWidth, middleWidth } = layout;
   const fromCrop = await cropEdge(fromPath, "right", height, anchorWidth);
   const toCrop = await cropEdge(toPath, "left", height, anchorWidth);
 
-  const fromCropPath = path.join(outputDir, `${fromSceneId}-right-crop.jpg`);
-  const toCropPath = path.join(outputDir, `${toSceneId}-left-crop.jpg`);
+  const fromCropPath = path.join(outputDir, `${fromSceneId}-right-anchor.png`);
+  const toCropPath = path.join(outputDir, `${toSceneId}-left-anchor.png`);
   const workCanvasPath = path.join(outputDir, "adapter-work-canvas.png");
   const maskPath = path.join(outputDir, "adapter-mask.png");
-  const structureGuidePath = path.join(outputDir, "structure-guide.png");
   const promptPath = path.join(outputDir, "prompt.txt");
   const negativePromptPath = path.join(outputDir, "negative-prompt.txt");
   const manifestPath = path.join(outputDir, "manifest.json");
@@ -243,14 +308,11 @@ async function main() {
 
   const leftEdgeColor = await edgeMean(fromCrop.buffer, "right");
   const rightEdgeColor = await edgeMean(toCrop.buffer, "left");
-
-  const prefill = await sharp(
-    workCanvasFillSvg(width, height, leftEdgeColor, rightEdgeColor, anchorWidth, width - anchorWidth),
-  )
+  const prefillBuffer = await sharp(workCanvasFillSvg(width, height, leftEdgeColor, rightEdgeColor, prefill))
     .png()
     .toBuffer();
 
-  await sharp(prefill)
+  await sharp(prefillBuffer)
     .composite([
       { input: fromCrop.buffer, left: 0, top: 0 },
       { input: toCrop.buffer, left: width - anchorWidth, top: 0 },
@@ -258,28 +320,23 @@ async function main() {
     .png()
     .toFile(workCanvasPath);
 
-  await sharp(maskSvg(width, height, anchorWidth, overmaskWidth)).greyscale().png().toFile(maskPath);
-  await sharp(structureGuideSvg(width, height)).png().toFile(structureGuidePath);
+  await sharp(maskSvg(width, height, anchorWidth, overmaskPx)).greyscale().png().toFile(maskPath);
 
-  const prompt = promptText(fromSceneId, toSceneId);
-  const negativePrompt = negativePromptText();
-
-  await writeFile(promptPath, `${prompt}\n`);
-  await writeFile(negativePromptPath, `${negativePrompt}\n`);
+  await writeFile(promptPath, `${promptText(fromSceneId, toSceneId)}\n`);
+  await writeFile(negativePromptPath, `${negativePromptText()}\n`);
 
   const outputs = {
     manifest: manifestPath,
     prompt: promptPath,
     negativePrompt: negativePromptPath,
-    fromRightCrop: fromCropPath,
-    toLeftCrop: toCropPath,
+    fromRightAnchor: fromCropPath,
+    toLeftAnchor: toCropPath,
     adapterWorkCanvas: workCanvasPath,
     adapterMask: maskPath,
-    structureGuide: structureGuidePath,
   };
 
   const manifest = {
-    id: recipeId,
+    id: options.recipeId,
     boundary: {
       from: fromSceneId,
       to: toSceneId,
@@ -289,26 +346,39 @@ async function main() {
       from: repoRelative(fromPath),
       to: repoRelative(toPath),
     },
-    outputPaths: Object.fromEntries(
-      Object.entries(outputs).map(([key, value]) => [key, repoRelative(value)]),
-    ),
+    outputPaths: Object.fromEntries(Object.entries(outputs).map(([key, value]) => [key, repoRelative(value)])),
     dimensions: {
       width,
       height,
-      aspectRatio: "21:9",
+      aspectRatio: `${width}:${height}`,
     },
-    cropPercent: {
-      leftAnchorOfWorkCanvas: ANCHOR_PERCENT,
-      rightAnchorOfWorkCanvas: ANCHOR_PERCENT,
-      transitionBandOfWorkCanvas: middleWidth / width,
-      overmaskIntoEachAnchor: OVERMASK_PERCENT,
+    layout: {
+      ratio: options.ratio,
+      leftAnchorWidth: anchorWidth,
+      xRegionWidth: middleWidth,
+      rightAnchorWidth: anchorWidth,
+      xRegionBounds: {
+        left: anchorWidth,
+        right: width - anchorWidth,
+        width: middleWidth,
+      },
+    },
+    maskStrategy: {
+      name: "center-x-with-anchor-overmask",
+      meaning: "white = editable/regenerate, black = preserve",
+      overmaskPxIntoEachAnchor: overmaskPx,
+      hardPreservePixelsPerOuterAnchor: anchorWidth - overmaskPx,
+    },
+    prefillStrategy: {
+      name: prefill === "gradient" ? "edge-color-gradient" : `solid-${prefill}`,
+      description:
+        "The work canvas is opaque. X is initialized with low-information pixels; the separate mask defines what an inpainting backend may edit.",
+      leftInnerEdgeColor: leftEdgeColor,
+      rightInnerEdgeColor: rightEdgeColor,
     },
     cropPixels: {
-      anchorWidth,
-      middleWidth,
-      overmaskWidth,
-      fromRightCrop: fromCrop.crop,
-      toLeftCrop: toCrop.crop,
+      fromRightAnchor: fromCrop.crop,
+      toLeftAnchor: toCrop.crop,
     },
     sourceImageInfo: {
       from: {
@@ -324,40 +394,66 @@ async function main() {
         resizedHeight: toCrop.resizedHeight,
       },
     },
-    maskStrategy: {
-      name: "center-band-with-anchor-overmask",
-      meaning: "white = regenerate, black = preserve",
-      description:
-        "Outer anchor edges are protected, the broad center band is regenerate, and the white region slightly enters each anchor to give an inpainting backend room to blend.",
-    },
-    prefillStrategy: {
-      name: "edge-color-gradient",
-      description:
-        "The unknown center is initialized with a non-transparent horizontal gradient between the average colors of the two crop-facing edges.",
-      leftEdgeColor,
-      rightEdgeColor,
-    },
-    structureGuide: {
-      path: repoRelative(structureGuidePath),
-      description:
-        "Minimal low-frequency guide: open mist basin through the center, distant ridge continuity, and dusk ridge mass emerging gradually on the right.",
-    },
-    promptFilePaths: {
-      prompt: repoRelative(promptPath),
-      negativePrompt: repoRelative(negativePromptPath),
-    },
     notes: [
       "No generation backend was called by this prep script.",
       "No final adapter candidate was written to public/panos/adapters.",
-      "The left endpoint prompt explicitly avoids the Loop 2 failure mode: a large dark mountain/value mass entering immediately from dawn-valley.",
+      "A/B anchors are narrow edge sockets; the X region is the actual transition adapter target.",
     ],
   };
 
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  return { outputDir, manifestPath, pair };
+}
 
-  console.log(`Prepared adapter workbench: ${repoRelative(outputDir)}`);
-  for (const outputPath of Object.values(outputs)) {
-    console.log(`- ${repoRelative(outputPath)}`);
+async function writeBatchIndex(options, results) {
+  const outputRoot = resolveRepoPath(options.outputRoot);
+  await mkdir(outputRoot, { recursive: true });
+
+  const indexPath = path.join(outputRoot, "index.json");
+  const index = {
+    id: options.recipeId,
+    createdAt: new Date().toISOString(),
+    mode: options.mode,
+    scenes: options.scenes,
+    defaults: {
+      width: options.width,
+      height: options.height,
+      ratio: options.ratio,
+      anchorWidth: options.layout.anchorWidth,
+      xRegionWidth: options.layout.middleWidth,
+      overmaskPx: options.overmaskPx,
+      prefill: options.prefill,
+    },
+    workbenches: results.map((result) => ({
+      from: result.pair.fromSceneId,
+      to: result.pair.toSceneId,
+      directory: repoRelative(result.outputDir),
+      manifest: repoRelative(result.manifestPath),
+    })),
+  };
+
+  await writeFile(indexPath, `${JSON.stringify(index, null, 2)}\n`);
+  return indexPath;
+}
+
+async function main() {
+  const options = parseArgs(process.argv.slice(2));
+  const pairs =
+    options.mode === "pair"
+      ? [{ fromSceneId: options.fromSceneId, toSceneId: options.toSceneId }]
+      : pairsForScenes(options.scenes);
+
+  const results = [];
+  for (const pair of pairs) {
+    results.push(await preparePair(options, pair));
+  }
+
+  const indexPath = await writeBatchIndex(options, results);
+
+  console.log(`Prepared ${results.length} AXB workbench${results.length === 1 ? "" : "es"} under ${repoRelative(resolveRepoPath(options.outputRoot))}`);
+  console.log(`- ${repoRelative(indexPath)}`);
+  for (const result of results) {
+    console.log(`- ${repoRelative(result.outputDir)}`);
   }
 }
 

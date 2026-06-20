@@ -6,6 +6,46 @@
 
 ---
 
+## Turn 16 - 2026-06-20 - AXB prep pipeline for all current loop pairs
+- **Role:** Engineering Runner / Archivist
+- **Boundary:** all current adjacent pairs:
+  - `dawn-valley -> dusk-ridge`
+  - `dusk-ridge -> moonlit-tidelands`
+  - `moonlit-tidelands -> dawn-valley`
+- **Question:** can the repo deterministically prepare one standard AXB inpainting
+  input for every adjacent pair, using narrow A/B edge anchors and a dominant editable
+  X region?
+- **User priority update:** treat `new_plan.md` as the latest goal. The immediate
+  direction is no longer the old SDXL right-biased mask geometry probe; it is the AXB
+  prep/candidate-selection workflow, followed by an independent dashboard for
+  generating, reviewing, and adopting candidate adapters.
+- **Implementation:** rewrote `scripts/adapter-prep.mjs` into a batch-capable CLI.
+  It now supports:
+  - default batch mode for the current ordered loop via `npm run adapter:prep -- --all`;
+  - arbitrary ordered loops via `--scenes a,b,c`;
+  - single-pair prep via `--from A --to B`;
+  - configurable `--width`, `--height`, `--ratio`, `--prefill`, `--overmask-px`,
+    and `--out`.
+- **Default geometry:** `3136 x 1344`, `A : X : B = 1 : 12 : 1`, anchors `224px`
+  each, X region `2688px`, and `32px` overmask into each anchor.
+- **Output contract:** for each pair the script writes:
+  - `adapter-work-canvas.png` (opaque PNG);
+  - `adapter-mask.png` (black = preserve, white = edit/regenerate);
+  - right/left anchor crops;
+  - `prompt.txt`, `negative-prompt.txt`;
+  - `manifest.json`.
+  Batch mode also writes `index.json`.
+- **Artifacts written under:** `docs/research/experiments/working/006-axb-prep/`.
+- **Verification:** ran `npm run adapter:prep -- --all`; confirmed the dawn-to-dusk
+  work canvas and mask are `3136 x 1344` and both anchor crops are `224 x 1344`.
+- **Visual sanity check:** inspected the dawn-to-dusk work canvas and mask. The anchors
+  are narrow edge sockets, X dominates the image, and the mask has the expected
+  preserve/edit polarity with soft overmask edges.
+- **Scope notes:** no generation backend was called, no runtime adapter was promoted,
+  no renderer changed, and no baseline/candidate assets were deleted.
+- **Next:** see `NEXT.md` - define or implement the minimal candidate/adoption registry
+  and dashboard/design slice for choosing one active adapter from a batch.
+
 ## Turn 15 - 2026-06-19 - SDXL right-aware prompt content-guidance probe
 - **Role:** Runner
 - **Boundary:** `dawn-valley -> dusk-ridge`
