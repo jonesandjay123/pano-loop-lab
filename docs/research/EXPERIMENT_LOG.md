@@ -6,6 +6,46 @@
 
 ---
 
+## Turn 23 - 2026-06-20 - Import GPT AXB candidate and exact-anchor diagnostic
+- **Role:** Runner / Reviewer / Archivist
+- **Boundary:** `dawn-valley -> dusk-ridge`.
+- **Question:** does the user's GPT-filled `1:4:1` AXB result become a usable
+  candidate when imported into the repo, and does X-only exact-anchor adoption solve
+  the weld?
+- **Input:** `/Users/joneswang/Downloads/ChatGPT Image 2026年6月20日 下午06_08_09.png`,
+  source dimensions `1918 x 820`.
+- **Import:** ran `npm run adapter:import` with id `gpt-axb-01`. The import resized
+  the external image to the current prep geometry, `3136 x 1344`, and registered it
+  under:
+  - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01.png`;
+  - `docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/gpt-axb-01.png`.
+- **Derived diagnostic:** created `gpt-axb-01-xonly` by extracting only the GPT X
+  region and compositing exact original A/B anchors back in according to the prep
+  manifest:
+  - anchor width: `523px`;
+  - X region: `2090px`;
+  - right anchor starts at `2613px`.
+- **Anchor diff:** review report shows:
+  - `gpt-axb-01`: left max diff `194`, mean `18.777924`; right max diff `100`,
+    mean `9.611601`;
+  - `gpt-axb-01-xonly`: left/right max diff `0`, mean `0`.
+- **Review artifacts:** wrote blend-0-equivalent external joins and internal
+  anchor/X crops under
+  `docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/review/`.
+- **Visual result:** `gpt-axb-01` is the strongest standalone semantic transition so
+  far: it makes the warm dawn world naturally move into the cool dusk mountains. It is
+  not pixel-exact at the outer anchors, so it is not accepted as final. `gpt-axb-01-xonly`
+  proves exact outer anchor restoration is mechanically possible, but the hard
+  composite creates visible internal anchor-to-X discontinuities.
+- **Dashboard / selector:** both GPT candidates are registered through
+  `candidates.json` and the generated TS registry. `gpt-axb-01` is active for review;
+  both GPT candidates are marked `partial`, not accepted.
+- **Verdict:** **PARTIAL.** Keep the GPT raw candidate as the best visual review target,
+  keep the X-only version as an exact-anchor diagnostic, and test soft anchor adoption
+  next.
+- **Next:** create a soft anchor-adoption composite from `gpt-axb-01` that preserves
+  the outer plate-facing pixels exactly while feathering the transition into GPT X.
+
 ## Turn 22 - 2026-06-20 - Candidate import path
 - **Role:** Engineering Runner
 - **Boundary:** `dawn-valley -> dusk-ridge` import path, no new candidate image yet.

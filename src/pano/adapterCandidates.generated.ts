@@ -14,6 +14,20 @@ export const ADAPTER_CANDIDATES_BY_PAIR = {
       "imageUrl": "/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-02.png",
       "status": "rejected",
       "notes": "Softer and lower contrast than 01, but still has obvious internal warm-to-blue banding and no pixel-preserved anchors. Not selector-ready."
+    },
+    {
+      "id": "gpt-axb-01",
+      "label": "GPT AXB 01",
+      "imageUrl": "/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01.png",
+      "status": "partial",
+      "notes": "Strongest standalone semantic AXB transition so far, with a natural warm-to-cool mountain bridge. Not accepted as final because outer anchors are not pixel-exact after GPT generation and resize."
+    },
+    {
+      "id": "gpt-axb-01-xonly",
+      "label": "GPT AXB 01 X-only",
+      "imageUrl": "/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-xonly.png",
+      "status": "partial",
+      "notes": "Outer plate-facing anchors are exact, but hard X-only compositing creates visible internal anchor-to-X discontinuities. Useful diagnostic, not accepted final adapter."
     }
   ]
 } as const;

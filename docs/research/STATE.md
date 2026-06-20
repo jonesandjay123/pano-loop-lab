@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-20** (Turn 22 — candidate import path).
+> Last updated: **2026-06-20** (Turn 23 — GPT AXB import review).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -91,8 +91,10 @@ It currently supports:
 - opening manifest/prompt files;
 - showing the active adapter state and candidate count.
 
-It now shows two `dawn-valley -> dusk-ridge` candidate images. Both have been reviewed
-and marked rejected for final use; no active candidate is selected for that pair.
+It now shows four `dawn-valley -> dusk-ridge` candidate images. The first two
+Higgsfield AXB candidates were reviewed and rejected for final use. The imported GPT
+candidate and its X-only exact-anchor derivative are marked `partial`; `gpt-axb-01` is
+active for review, but no candidate is accepted as final yet.
 The dashboard can switch the prep canvas between gradient, white, and black X
 prefill variants, and provides download links for the selected work canvas and mask.
 
@@ -103,6 +105,21 @@ Candidate import path:
 - updates `candidates.json`;
 - regenerates `src/pano/adapterCandidates.generated.ts`;
 - dashboard and seam-lab selector read from the generated registry.
+
+Imported GPT candidate status:
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01.png`
+  came from the user's external GPT image, resized from `1918 x 820` to the current
+  `3136 x 1344` prep dimensions.
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-xonly.png`
+  extracts only GPT's X region and hard-composites exact original A/B anchors back in.
+- Review report:
+  `docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/review/gpt-axb-01-review-report.json`.
+- `gpt-axb-01` is the best visual semantic transition so far, but anchor diff is not
+  zero: left max `194`, right max `100`.
+- `gpt-axb-01-xonly` has exact outer anchors, left/right max diff `0`, but hard
+  anchor restoration creates visible internal anchor-to-X breaks.
+- Current verdict: **partial**, not accepted final. Next variable should be soft
+  anchor-adoption compositing.
 
 First candidate batch:
 - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png`

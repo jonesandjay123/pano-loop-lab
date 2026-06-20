@@ -1,0 +1,51 @@
+{
+  "createdAt": "2026-06-20T22:12:28.475Z",
+  "boundary": {
+    "from": "dawn-valley",
+    "to": "dusk-ridge"
+  },
+  "dimensions": {
+    "width": 3136,
+    "height": 1344
+  },
+  "layout": {
+    "anchorWidth": 523,
+    "xStart": 523,
+    "xRegionWidth": 2090,
+    "rightAnchorStart": 2613,
+    "joinReviewWidth": 523
+  },
+  "outerAnchorDiff": {
+    "gpt-axb-01": {
+      "left": {
+        "maxAbsDiff": 194,
+        "meanAbsDiff": 18.777924
+      },
+      "right": {
+        "maxAbsDiff": 100,
+        "meanAbsDiff": 9.611601
+      }
+    },
+    "gpt-axb-01-xonly": {
+      "left": {
+        "maxAbsDiff": 0,
+        "meanAbsDiff": 0
+      },
+      "right": {
+        "maxAbsDiff": 0,
+        "meanAbsDiff": 0
+      }
+    }
+  },
+  "visualReviewFiles": [
+    "gpt-axb-01-external-left-join.png",
+    "gpt-axb-01-external-right-join.png",
+    "gpt-axb-01-internal-left-anchor-x.png",
+    "gpt-axb-01-internal-right-x-anchor.png",
+    "gpt-axb-01-xonly-external-left-join.png",
+    "gpt-axb-01-xonly-external-right-join.png",
+    "gpt-axb-01-xonly-internal-left-anchor-x.png",
+    "gpt-axb-01-xonly-internal-right-x-anchor.png"
+  ],
+  "verdict": "GPT raw is the strongest standalone semantic AXB candidate so far, but its anchors are not exact. X-only restores exact outer anchors but introduces visible hard internal anchor-to-X transitions; keep both for review, do not accept as final."
+}

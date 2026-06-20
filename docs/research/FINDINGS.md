@@ -87,6 +87,22 @@
   imports do not require hand-editing multiple TypeScript files. _Source:
   EXPERIMENT_LOG.md Turn 22._
 
+- 🟡 **GPT-filled 1:4:1 AXB produces the strongest semantic transition so far, but
+  still needs anchor adoption.** Turn 23 imported the user's GPT result as
+  `gpt-axb-01`. Visually it is the best warm-to-cool mountain bridge so far, but its
+  outer anchors are not pixel-exact after generation/resize (left max diff `194`,
+  right max diff `100`). This makes it a strong candidate source, not a final adapter.
+  _Source: EXPERIMENT_LOG.md Turn 23 and
+  `docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/review/gpt-axb-01-review-report.json`._
+
+- 🟡 **Hard X-only anchor restoration is mechanically exact but visually too abrupt.**
+  Turn 23 created `gpt-axb-01-xonly` by extracting only GPT's X region and compositing
+  the original A/B anchors back in. The outer plate-facing anchor diff is exactly zero
+  on both sides, proving the placement contract can restore exact anchors. The visual
+  problem moves inside the adapter: hard anchor-to-X cuts are visible. The next test
+  should use soft anchor-adoption compositing while preserving the outer plate-facing
+  pixels exactly. _Source: EXPERIMENT_LOG.md Turn 23._
+
 - ❌ **Higgsfield whole-frame image-to-image makes pretty standalone panoramas that do
   NOT pixel-weld at `blend = 0`.** Turn 9 produced clean coherent dawn→dusk panoramas
   with `nano_banana_2`, and **none reproduced the exp001 left-edge dark-mass failure**.

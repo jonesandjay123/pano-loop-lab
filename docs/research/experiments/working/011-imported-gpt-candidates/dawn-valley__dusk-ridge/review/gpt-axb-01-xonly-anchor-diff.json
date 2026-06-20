@@ -1,0 +1,25 @@
+{
+  "id": "gpt-axb-01-xonly",
+  "sourceCandidate": "gpt-axb-01",
+  "method": "x-only extraction plus exact original anchor composite",
+  "dimensions": {
+    "width": 3136,
+    "height": 1344
+  },
+  "layout": {
+    "leftAnchorWidth": 523,
+    "xStart": 523,
+    "xRegionWidth": 2090,
+    "rightAnchorStart": 2613
+  },
+  "outerAnchorDiff": {
+    "left": {
+      "maxAbsDiff": 0,
+      "meanAbsDiff": 0
+    },
+    "right": {
+      "maxAbsDiff": 0,
+      "meanAbsDiff": 0
+    }
+  }
+}

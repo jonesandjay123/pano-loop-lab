@@ -4,54 +4,63 @@
 
 ---
 
-## Next turn = import the provided GPT-filled AXB image
+## Next turn = soft anchor-adoption composite for GPT AXB 01
 
 ### Goal
 
-Use the new import path on a real external result:
+Test whether the imported GPT candidate can be made placement-safe without losing its
+natural transition:
 
-> Given a GPT-filled `dawn-valley -> dusk-ridge` `1:4:1` AXB image path from the
-> user, import it as a candidate, verify it appears in the dashboard and seam-lab
-> selector, then decide whether to run X-only / hard-composited anchor adoption.
+> Starting from `gpt-axb-01`, preserve the outer plate-facing A/B anchor pixels exactly,
+> but feather the inner anchor-to-X transition so the hard `gpt-axb-01-xonly` vertical
+> breaks are reduced.
 
 ### Current base
 
-Import command shape:
+Candidate source:
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01.png`
 
-```bash
-npm run adapter:import -- \
-  --source /absolute/path/to/gpt-result.png \
-  --id gpt-axb-01 \
-  --label "GPT AXB 01"
-```
+Diagnostic hard composite:
+- `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-xonly.png`
 
-Primary prep geometry:
+Review report:
+- `docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/review/gpt-axb-01-review-report.json`
+
+Current geometry:
 - `3136 x 1344`
 - `A : X : B = 1 : 4 : 1`
 - anchors `523px` each
 - X region `2090px`
-- overlap width `523px`
+- right anchor starts at `2613px`
+
+Known truth:
+- `gpt-axb-01` is visually the strongest standalone transition so far, but its outer
+  anchors are not exact.
+- `gpt-axb-01-xonly` has exact outer anchors, but hard anchor/X boundaries are visible.
 
 ### Allowed changes
 
-- Import one externally generated image if the user provides it.
-- Register it under `public/panos/adapter-candidates/dawn-valley__dusk-ridge/`.
-- Add it to the generated candidate registry, dashboard, and seam-lab selector.
-- If useful, produce an X-only / hard-composited variant that restores exact original
-  anchors according to the `placementContract` in the prep manifest.
-- Keep all existing candidates and baselines.
+- Add one deterministic postprocess script or one small scripted experiment if useful.
+- Create one or more soft-composite variants from `gpt-axb-01`, for example `soft64`
+  and/or `soft128`.
+- Preserve exact outer plate-facing anchor pixels and report diff.
+- Register resulting variants as candidates under
+  `public/panos/adapter-candidates/dawn-valley__dusk-ridge/`.
+- Create blend-0-equivalent external joins and internal boundary crops.
+- Update `candidates.json`, generated TS registry, and research docs.
 
 ### Forbidden this turn
 
+- Do **not** generate new AI images.
 - Do **not** delete or overwrite existing candidates.
-- Do **not** generate more Higgsfield whole-frame candidates.
-- Do **not** claim pixel preservation unless verified by exact diff.
 - Do **not** change global sizing or renderer architecture.
 - Do **not** add backend, routing libraries, Three.js, R3F, GSAP, or canvas.
+- Do **not** accept a final adapter unless both external joins and internal boundaries
+  are inspectably better.
 
 ### Required evaluation / stop condition
 
-- The imported candidate appears in the dashboard.
-- The imported candidate appears in the seam-lab `dawn->dusk` selector.
-- If an exact-anchor composite is created, outer-anchor diff must be reported.
+- At least one soft composite candidate is registered in dashboard and seam-lab selector.
+- Outer anchor diff is reported and must remain `0` for preserved zones.
+- Review artifacts compare `gpt-axb-01`, `gpt-axb-01-xonly`, and the soft variant.
 - Run `npm run build`.

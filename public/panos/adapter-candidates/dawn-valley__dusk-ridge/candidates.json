@@ -17,7 +17,7 @@
     "resolution": "2k",
     "note": "Higgsfield did not expose a true mask-inpaint parameter here. These are whole-frame reference generations using the AXB work canvas and mask as input images; anchors are not pixel-guaranteed."
   },
-  "activeForReview": null,
+  "activeForReview": "gpt-axb-01",
   "candidates": [
     {
       "id": "hf-nb2-axb-01",
@@ -40,8 +40,40 @@
       "notes": "Brighter, lower-contrast atmospheric bridge. Marked active-for-review in the dashboard, not accepted as final.",
       "reviewNotes": "Softer and lower contrast than 01, but still has obvious internal warm-to-blue banding and no pixel-preserved anchors. Not selector-ready.",
       "label": "HF NB2 AXB 02"
+    },
+    {
+      "id": "gpt-axb-01",
+      "label": "GPT AXB 01",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01.png",
+      "researchCopy": "docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/gpt-axb-01.png",
+      "status": "partial",
+      "method": "external-gpt-image-edit",
+      "notes": "Imported GPT image edit from the 1:4:1 AXB workflow. Raw full-frame candidate; anchors are not assumed pixel-exact.",
+      "reviewNotes": "Strongest standalone semantic AXB transition so far, with a natural warm-to-cool mountain bridge. Not accepted as final because outer anchors are not pixel-exact after GPT generation and resize.",
+      "reviewReport": "docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/review/gpt-axb-01-review-report.json",
+      "sourceImport": {
+        "path": "../../ChatGPT Image 2026年6月20日 下午06_08_09.png",
+        "sourceWidth": 1918,
+        "sourceHeight": 820,
+        "importedWidth": 3136,
+        "importedHeight": 1344,
+        "resizedToPrepDimensions": true
+      }
+    },
+    {
+      "id": "gpt-axb-01-xonly",
+      "label": "GPT AXB 01 X-only",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-xonly.png",
+      "researchCopy": "docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/gpt-axb-01-xonly.png",
+      "status": "partial",
+      "method": "x-only-exact-anchor-composite",
+      "notes": "Derived from GPT AXB 01 by extracting only X and compositing exact original A/B anchors back in. Outer anchor diff verified at 0.",
+      "reviewNotes": "Outer plate-facing anchors are exact, but hard X-only compositing creates visible internal anchor-to-X discontinuities. Useful diagnostic, not accepted final adapter.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/review/gpt-axb-01-xonly-anchor-diff.json"
     }
   ],
-  "reviewedAt": "2026-06-20T21:12:00Z",
-  "reviewVerdict": "REJECT both as final adapter candidates; keep as diagnostics."
+  "reviewedAt": "2026-06-20T22:12:28.475Z",
+  "reviewVerdict": "PARTIAL. Keep GPT AXB 01 active for visual review; keep GPT AXB 01 X-only as exact-anchor diagnostic. Do not accept either as final until a soft anchor-adoption composite is tested.",
+  "updatedAt": "2026-06-20T22:09:39.913Z"
 }
