@@ -5,14 +5,9 @@ import type {
   RingSegment,
   SegmentVisuals,
 } from "./panoTypes";
+import { ADAPTER_CANDIDATES_BY_PAIR } from "./adapterCandidates.generated";
 
-export type DawnDuskAdapterOptionId =
-  | "baseline"
-  | "exp001-edge-anchored-v1"
-  | "exp002-c08-struct-off-leftpreserve"
-  | "exp002-c04-struct-off-orig"
-  | "hf-nb2-axb-01"
-  | "hf-nb2-axb-02";
+export type DawnDuskAdapterOptionId = string;
 
 export interface DawnDuskAdapterOption {
   id: DawnDuskAdapterOptionId;
@@ -20,6 +15,15 @@ export interface DawnDuskAdapterOption {
   imageUrl: string;
   notes: string;
 }
+
+const DAWN_DUSK_GENERATED_OPTIONS: DawnDuskAdapterOption[] = (
+  ADAPTER_CANDIDATES_BY_PAIR["dawn-valley__dusk-ridge"] ?? []
+).map((candidate) => ({
+  id: candidate.id,
+  label: candidate.label,
+  imageUrl: candidate.imageUrl,
+  notes: candidate.notes,
+}));
 
 export const DAWN_DUSK_ADAPTER_OPTIONS: DawnDuskAdapterOption[] = [
   {
@@ -48,20 +52,7 @@ export const DAWN_DUSK_ADAPTER_OPTIONS: DawnDuskAdapterOption[] = [
     notes:
       "Loop 9 Higgsfield whole-frame image-to-image candidate c04; promoted for honest blend=0 inspection.",
   },
-  {
-    id: "hf-nb2-axb-01",
-    label: "HF NB2 AXB 01",
-    imageUrl: "/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png",
-    notes:
-      "Turn 18 Nano Banana 2 reference candidate from AXB canvas + mask. Rejected as final in Turn 19 because internal anchor-to-X bands are visible.",
-  },
-  {
-    id: "hf-nb2-axb-02",
-    label: "HF NB2 AXB 02",
-    imageUrl: "/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-02.png",
-    notes:
-      "Turn 18 softer Nano Banana 2 reference candidate from AXB canvas + mask. Rejected as final in Turn 19; kept for comparison only.",
-  },
+  ...DAWN_DUSK_GENERATED_OPTIONS,
 ];
 
 export const DEFAULT_DAWN_DUSK_ADAPTER_OPTION_ID: DawnDuskAdapterOptionId = "exp001-edge-anchored-v1";

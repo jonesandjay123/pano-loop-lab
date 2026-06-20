@@ -8,6 +8,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "adapter:prep": "node scripts/adapter-prep.mjs",
+    "adapter:import": "node scripts/adapter-import.mjs",
+    "adapter:candidates": "node scripts/adapter-candidates-generate.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

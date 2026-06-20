@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-20** (Turn 21 — 1:4:1 primary AXB baseline).
+> Last updated: **2026-06-20** (Turn 22 — candidate import path).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -95,6 +95,14 @@ It now shows two `dawn-valley -> dusk-ridge` candidate images. Both have been re
 and marked rejected for final use; no active candidate is selected for that pair.
 The dashboard can switch the prep canvas between gradient, white, and black X
 prefill variants, and provides download links for the selected work canvas and mask.
+
+Candidate import path:
+- `npm run adapter:import -- --source /absolute/path/to/result.png --id gpt-axb-01`
+- imports into `public/panos/adapter-candidates/<from>__<to>/`;
+- mirrors into `docs/research/experiments/working/011-imported-gpt-candidates/`;
+- updates `candidates.json`;
+- regenerates `src/pano/adapterCandidates.generated.ts`;
+- dashboard and seam-lab selector read from the generated registry.
 
 First candidate batch:
 - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/hf-nb2-axb-01.png`

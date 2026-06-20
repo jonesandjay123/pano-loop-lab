@@ -1,3 +1,5 @@
+import { ADAPTER_CANDIDATES_BY_PAIR } from "./adapterCandidates.generated";
+
 export interface AdapterCandidate {
   id: string;
   label: string;
@@ -41,7 +43,6 @@ export interface AdapterWorkbenchPair {
 }
 
 const PREP_ROOT = "/panos/adapter-prep";
-const CANDIDATE_ROOT = "/panos/adapter-candidates";
 
 const PREP_VARIANTS: Array<Pick<AdapterPrepVariant, "id" | "label"> & { root: string }> = [
   { id: "gradient", label: "Gradient", root: "/panos/adapter-prep" },
@@ -67,8 +68,19 @@ function pairUrls(fromId: string, toId: string) {
   };
 }
 
-function candidateUrl(fromId: string, toId: string, fileName: string) {
-  return `${CANDIDATE_ROOT}/${fromId}__${toId}/${fileName}`;
+function candidatesForPair(fromId: string, toId: string): AdapterCandidate[] {
+  const key = `${fromId}__${toId}` as keyof typeof ADAPTER_CANDIDATES_BY_PAIR;
+  return ((ADAPTER_CANDIDATES_BY_PAIR[key] ?? []) as readonly AdapterCandidate[]).map((candidate) => ({
+    id: candidate.id,
+    label: candidate.label,
+    imageUrl: candidate.imageUrl,
+    status: candidate.status,
+    notes: candidate.notes,
+  }));
+}
+
+function activeCandidateForPair(fromId: string, toId: string) {
+  return candidatesForPair(fromId, toId).find((candidate) => candidate.status === "generated")?.id ?? null;
 }
 
 const DEFAULT_GEOMETRY = {
@@ -90,25 +102,8 @@ export const ADAPTER_WORKBENCH_PAIRS: AdapterWorkbenchPair[] = [
     toId: "dusk-ridge",
     label: "Dawn Valley -> Dusk Ridge",
     ...pairUrls("dawn-valley", "dusk-ridge"),
-    activeCandidateId: null,
-    candidates: [
-      {
-        id: "hf-nb2-axb-01",
-        label: "HF NB2 AXB 01",
-        imageUrl: candidateUrl("dawn-valley", "dusk-ridge", "hf-nb2-axb-01.png"),
-        status: "rejected",
-        notes:
-          "Rejected for final use: external anchors help the outer joins, but the generated X keeps a hard internal anchor-to-X band.",
-      },
-      {
-        id: "hf-nb2-axb-02",
-        label: "HF NB2 AXB 02",
-        imageUrl: candidateUrl("dawn-valley", "dusk-ridge", "hf-nb2-axb-02.png"),
-        status: "rejected",
-        notes:
-          "Rejected for final use: softer than 01, but still has obvious internal warm-to-blue bands and is not pixel-preserved.",
-      },
-    ],
+    activeCandidateId: activeCandidateForPair("dawn-valley", "dusk-ridge"),
+    candidates: candidatesForPair("dawn-valley", "dusk-ridge"),
     geometry: DEFAULT_GEOMETRY,
   },
   {
@@ -116,8 +111,8 @@ export const ADAPTER_WORKBENCH_PAIRS: AdapterWorkbenchPair[] = [
     toId: "moonlit-tidelands",
     label: "Dusk Ridge -> Moonlit Tidelands",
     ...pairUrls("dusk-ridge", "moonlit-tidelands"),
-    activeCandidateId: null,
-    candidates: [],
+    activeCandidateId: activeCandidateForPair("dusk-ridge", "moonlit-tidelands"),
+    candidates: candidatesForPair("dusk-ridge", "moonlit-tidelands"),
     geometry: DEFAULT_GEOMETRY,
   },
   {
@@ -125,8 +120,8 @@ export const ADAPTER_WORKBENCH_PAIRS: AdapterWorkbenchPair[] = [
     toId: "dawn-valley",
     label: "Moonlit Tidelands -> Dawn Valley",
     ...pairUrls("moonlit-tidelands", "dawn-valley"),
-    activeCandidateId: null,
-    candidates: [],
+    activeCandidateId: activeCandidateForPair("moonlit-tidelands", "dawn-valley"),
+    candidates: candidatesForPair("moonlit-tidelands", "dawn-valley"),
     geometry: DEFAULT_GEOMETRY,
   },
 ];

@@ -27,7 +27,8 @@
       "researchCopy": "docs/research/experiments/working/007-dawn-dusk-candidates/candidates/hf-nb2-axb-01.png",
       "status": "rejected",
       "notes": "Darker, smoother valley-to-dusk transition; keeps visible AXB-like anchors at the outer edges.",
-      "reviewNotes": "External dawn/dusk joins benefit from copied edge anchors, but the internal anchor-to-X boundary forms visible orange/blue vertical bands. Not selector-ready."
+      "reviewNotes": "External dawn/dusk joins benefit from copied edge anchors, but the internal anchor-to-X boundary forms visible orange/blue vertical bands. Not selector-ready.",
+      "label": "HF NB2 AXB 01"
     },
     {
       "id": "hf-nb2-axb-02",
@@ -37,7 +38,8 @@
       "researchCopy": "docs/research/experiments/working/007-dawn-dusk-candidates/candidates/hf-nb2-axb-02.png",
       "status": "rejected",
       "notes": "Brighter, lower-contrast atmospheric bridge. Marked active-for-review in the dashboard, not accepted as final.",
-      "reviewNotes": "Softer and lower contrast than 01, but still has obvious internal warm-to-blue banding and no pixel-preserved anchors. Not selector-ready."
+      "reviewNotes": "Softer and lower contrast than 01, but still has obvious internal warm-to-blue banding and no pixel-preserved anchors. Not selector-ready.",
+      "label": "HF NB2 AXB 02"
     }
   ],
   "reviewedAt": "2026-06-20T21:12:00Z",

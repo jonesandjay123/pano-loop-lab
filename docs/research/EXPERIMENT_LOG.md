@@ -6,6 +6,30 @@
 
 ---
 
+## Turn 22 - 2026-06-20 - Candidate import path
+- **Role:** Engineering Runner
+- **Boundary:** `dawn-valley -> dusk-ridge` import path, no new candidate image yet.
+- **Question:** can the repo import a GPT-filled AXB result without hand-editing
+  dashboard and seam-lab registries?
+- **Implementation:** added:
+  - `scripts/adapter-import.mjs`;
+  - `scripts/adapter-candidates-generate.mjs`;
+  - `npm run adapter:import`;
+  - `npm run adapter:candidates`;
+  - generated registry `src/pano/adapterCandidates.generated.ts`.
+- **Behavior:** `adapter:import` takes an external image path, candidate id, label, and
+  notes; resizes to the current prep manifest dimensions if needed; writes the runtime
+  copy under `public/panos/adapter-candidates/<from>__<to>/`; mirrors a research copy
+  under `docs/research/experiments/working/011-imported-gpt-candidates/`; updates
+  `candidates.json`; and regenerates the TS registry.
+- **UI wiring:** the AXB dashboard and the dawn-to-dusk seam-lab selector now read
+  generated candidates from the generated registry, so future imports show up without
+  manual TS edits.
+- **Scope notes:** no external GPT result was provided this turn, so no new real
+  candidate was imported and no visual verdict was made.
+- **Next:** user should provide the GPT-filled AXB image path, then run/import exactly
+  one candidate and review it.
+
 ## Turn 21 - 2026-06-20 - Promote 1:4:1 AXB baseline and width policy
 - **Role:** Engineering Runner / Archivist
 - **Boundary:** all current adjacent pairs for prep export.

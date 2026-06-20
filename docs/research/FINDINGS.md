@@ -80,6 +80,13 @@
   long as the normalized source is at least one anchor wide. _Source:
   EXPERIMENT_LOG.md Turn 21 and `public/panos/adapter-prep/index.json`._
 
+- ✅ **Candidate registry should be generated from JSON, not manually duplicated in TS.**
+  Turn 22 added an import path that updates `public/panos/adapter-candidates/.../candidates.json`
+  and regenerates `src/pano/adapterCandidates.generated.ts`. Both dashboard and seam-lab
+  selector now read generated candidate entries from that registry, so future GPT
+  imports do not require hand-editing multiple TypeScript files. _Source:
+  EXPERIMENT_LOG.md Turn 22._
+
 - ❌ **Higgsfield whole-frame image-to-image makes pretty standalone panoramas that do
   NOT pixel-weld at `blend = 0`.** Turn 9 produced clean coherent dawn→dusk panoramas
   with `nano_banana_2`, and **none reproduced the exp001 left-edge dark-mass failure**.

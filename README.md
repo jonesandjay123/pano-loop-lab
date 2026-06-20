@@ -138,6 +138,21 @@ editing tests:
 Use the `Download canvas` and `Download mask` buttons in `/#adapter-workbench` to
 export the current pair's input files.
 
+Import a GPT-filled AXB result after downloading/editing:
+
+```bash
+npm run adapter:import -- \
+  --source /absolute/path/to/gpt-result.png \
+  --id gpt-axb-01 \
+  --label "GPT AXB 01" \
+  --notes "Imported from GPT image edit using the 1:4:1 white canvas."
+```
+
+The import script resizes the image to the current prep dimensions if needed, writes
+it under `public/panos/adapter-candidates/<from>__<to>/`, updates
+`candidates.json`, regenerates `src/pano/adapterCandidates.generated.ts`, and makes
+the candidate visible in both the dashboard and the seam-lab selector.
+
 First candidate batch:
 - `dawn-valley -> dusk-ridge`
 - 2 Nano Banana 2 reference candidates under
