@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-20** (Turn 16 — AXB prep pipeline, no generation backend).
+> Last updated: **2026-06-20** (Turn 17 — AXB dashboard, no AI-filled candidates yet).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -59,6 +59,25 @@ Generated current-loop prep folders:
 - `docs/research/experiments/working/006-axb-prep/dusk-ridge__moonlit-tidelands/`
 - `docs/research/experiments/working/006-axb-prep/moonlit-tidelands__dawn-valley/`
 
+Browser-served copies for the dashboard live under:
+- `public/panos/adapter-prep/dawn-valley__dusk-ridge/`
+- `public/panos/adapter-prep/dusk-ridge__moonlit-tidelands/`
+- `public/panos/adapter-prep/moonlit-tidelands__dawn-valley/`
+
+## Dashboard status
+
+An in-app workbench is available at `/#adapter-workbench`.
+
+It currently supports:
+- pair switching for `A->B`, `B->C`, and `C->A`;
+- viewing `adapter-work-canvas.png`, `adapter-mask.png`, and anchor crops;
+- opening manifest/prompt files;
+- showing the active adapter state and candidate count.
+
+It does **not** yet generate images, import generated candidates, or apply a selected
+candidate into the pano loop. Candidate lists are intentionally empty until real
+AI-filled X outputs are produced.
+
 ## Known truth from the inspection lab
 CSS overlap + feather hides most **tonal / hard-line** mismatch on these soft
 atmospheric mattes (~70%). It does **NOT** fix **structural** mismatch (a lake
@@ -73,4 +92,5 @@ revisited only **after** a generation/transition method works. See HANDOFF.md §
   templates/EXPERIMENT_TEMPLATE). `AGENTS.md` created at repo root.
 - AXB prep pipeline exists and can generate current-loop prep assets with
   `npm run adapter:prep -- --all`.
+- AXB dashboard exists at `/#adapter-workbench`.
 - No Codex automations / scheduled jobs configured.

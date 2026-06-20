@@ -4,24 +4,33 @@
 
 ---
 
-## Next turn = adapter candidate dashboard/design slice
+## Next turn = generate/import first AXB candidate batch
 
 ### Goal
 
-Build the smallest useful management layer for the new AXB workflow:
+Use the AXB dashboard and prep assets to produce the first real candidate batch for
+one boundary:
 
-> Given one adjacent pair such as `dawn-valley -> dusk-ridge`, how should the repo
-> represent generated candidate adapters, pick one active candidate, and make that
-> choice visible/editable without replacing baselines?
+> For `dawn-valley -> dusk-ridge`, generate or import a small set of AI-filled X
+> outputs, register them as candidates, and make them selectable in the workbench
+> without deleting any baseline.
 
 This follows the new working direction from `new_plan.md`: generate many `A X B`
-candidate outputs later, then choose which one becomes the active `A->B` transition.
+candidate outputs, then choose which one becomes the active `A->B` transition.
 
 ### Current base
 
 Turn 16 created deterministic AXB prep assets for the full current loop under:
 
 `docs/research/experiments/working/006-axb-prep/`
+
+Turn 17 added an in-app dashboard at:
+
+`/#adapter-workbench`
+
+The dashboard reads browser-served copies under:
+
+`public/panos/adapter-prep/`
 
 Each pair has:
 - `adapter-work-canvas.png`
@@ -39,29 +48,25 @@ Default geometry:
 
 ### Allowed changes
 
-- Design or implement a minimal candidate/adoption data contract for generated AXB
-  results.
-- Prefer a simple JSON registry before UI complexity.
-- If implementing UI, keep it static/minimal and repo-local; do **not** add backend,
-  routing libraries, or heavy dependencies.
-- Keep the existing pano renderer intact unless reading the registry requires a very
-  small, explicit selector change.
+- Use one boundary only: `dawn-valley -> dusk-ridge`.
+- Generate or import a small candidate set only if a generation backend/tool is
+  explicitly available in the session.
+- If generation is not available, implement the import/registration path only and stop.
+- Register candidates without replacing baselines.
+- Keep the existing pano renderer intact unless reading the candidate registry requires
+  a very small, explicit selector change.
 - Keep baselines and all old adapter variants.
 
 ### Forbidden this turn
 
-- Do **not** call an image-generation backend.
 - Do **not** delete or overwrite existing adapters.
-- Do **not** generate more candidate images.
+- Do **not** generate more than 10 candidates.
 - Do **not** add Three.js / R3F / GSAP / canvas / backend / new libraries.
 - Do **not** lock global plate/seam/socket sizing beyond the AXB prep-canvas defaults.
 
 ### Required evaluation / stop condition
 
-- The repo should have a clear answer for:
-  - where candidate images for each `A->B` pair live;
-  - how 10 generated candidates would be registered;
-  - how one candidate is marked active;
-  - how the active candidate would be applied to the pano loop without deleting the
-    baseline.
+- The repo should have real candidate files or a working import path for them.
+- The dashboard should show candidate thumbnails/counts for `dawn-valley -> dusk-ridge`.
+- It should be clear how one candidate becomes active.
 - Run `npm run build`.

@@ -1,0 +1,90 @@
+{
+  "id": "axb-prep-v1",
+  "boundary": {
+    "from": "moonlit-tidelands",
+    "to": "dawn-valley"
+  },
+  "createdAt": "2026-06-20T20:56:43.298Z",
+  "sourcePaths": {
+    "from": "public/panos/moonlit-tidelands.jpg",
+    "to": "public/panos/dawn-valley.jpg"
+  },
+  "outputPaths": {
+    "manifest": "public/panos/adapter-prep/moonlit-tidelands__dawn-valley/manifest.json",
+    "prompt": "public/panos/adapter-prep/moonlit-tidelands__dawn-valley/prompt.txt",
+    "negativePrompt": "public/panos/adapter-prep/moonlit-tidelands__dawn-valley/negative-prompt.txt",
+    "fromRightAnchor": "public/panos/adapter-prep/moonlit-tidelands__dawn-valley/moonlit-tidelands-right-anchor.png",
+    "toLeftAnchor": "public/panos/adapter-prep/moonlit-tidelands__dawn-valley/dawn-valley-left-anchor.png",
+    "adapterWorkCanvas": "public/panos/adapter-prep/moonlit-tidelands__dawn-valley/adapter-work-canvas.png",
+    "adapterMask": "public/panos/adapter-prep/moonlit-tidelands__dawn-valley/adapter-mask.png"
+  },
+  "dimensions": {
+    "width": 3136,
+    "height": 1344,
+    "aspectRatio": "3136:1344"
+  },
+  "layout": {
+    "ratio": "1:12:1",
+    "leftAnchorWidth": 224,
+    "xRegionWidth": 2688,
+    "rightAnchorWidth": 224,
+    "xRegionBounds": {
+      "left": 224,
+      "right": 2912,
+      "width": 2688
+    }
+  },
+  "maskStrategy": {
+    "name": "center-x-with-anchor-overmask",
+    "meaning": "white = editable/regenerate, black = preserve",
+    "overmaskPxIntoEachAnchor": 32,
+    "hardPreservePixelsPerOuterAnchor": 192
+  },
+  "prefillStrategy": {
+    "name": "edge-color-gradient",
+    "description": "The work canvas is opaque. X is initialized with low-information pixels; the separate mask defines what an inpainting backend may edit.",
+    "leftInnerEdgeColor": {
+      "r": 71,
+      "g": 88,
+      "b": 122
+    },
+    "rightInnerEdgeColor": {
+      "r": 107,
+      "g": 91,
+      "b": 73
+    }
+  },
+  "cropPixels": {
+    "fromRightAnchor": {
+      "left": 2153,
+      "top": 0,
+      "width": 224,
+      "height": 1344
+    },
+    "toLeftAnchor": {
+      "left": 0,
+      "top": 0,
+      "width": 224,
+      "height": 1344
+    }
+  },
+  "sourceImageInfo": {
+    "from": {
+      "sourceWidth": 2688,
+      "sourceHeight": 1520,
+      "resizedWidth": 2377,
+      "resizedHeight": 1344
+    },
+    "to": {
+      "sourceWidth": 3168,
+      "sourceHeight": 1344,
+      "resizedWidth": 3168,
+      "resizedHeight": 1344
+    }
+  },
+  "notes": [
+    "No generation backend was called by this prep script.",
+    "No final adapter candidate was written to public/panos/adapters.",
+    "A/B anchors are narrow edge sockets; the X region is the actual transition adapter target."
+  ]
+}

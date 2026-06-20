@@ -27,6 +27,29 @@ body {
   overflow: hidden;
 }
 
+.app-workbench {
+  overflow: auto;
+  background: #0b0c10;
+}
+
+.view-switch {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 11;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(12, 14, 22, 0.72);
+  color: #f3f5f8;
+  text-decoration: none;
+  font-size: 13px;
+  backdrop-filter: blur(10px);
+}
+
 /* ---------- Pano ring strip ---------- */
 
 .pano-ring-stage {
@@ -225,4 +248,341 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 12px;
   opacity: 0.7;
+}
+
+/* ---------- Adapter workbench ---------- */
+
+.adapter-workbench {
+  min-height: 100dvh;
+  padding: 18px;
+  color: #eef1f4;
+  background:
+    linear-gradient(180deg, rgba(28, 30, 36, 0.72), rgba(11, 12, 16, 0.96)),
+    #0b0c10;
+}
+
+.workbench-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1440px;
+  margin: 0 auto 14px;
+}
+
+.workbench-kicker {
+  margin: 0 0 5px;
+  color: #9aa3ad;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workbench-header h1,
+.workbench-title-row h2 {
+  margin: 0;
+  color: #f7f8fa;
+  letter-spacing: 0;
+}
+
+.workbench-header h1 {
+  font-size: 26px;
+}
+
+.workbench-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #f3f5f8;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.workbench-shell {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 14px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.workbench-sidebar,
+.workbench-main,
+.details-panel {
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.workbench-sidebar {
+  align-self: start;
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.sidebar-heading {
+  margin-bottom: 9px;
+  color: #aeb6bf;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.pair-list {
+  display: grid;
+  gap: 8px;
+}
+
+.pair-button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  color: #edf0f2;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pair-button span {
+  color: #a7b0ba;
+  font-size: 12px;
+}
+
+.pair-button strong {
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.pair-button.is-active {
+  border-color: rgba(104, 199, 255, 0.62);
+  background: rgba(80, 158, 204, 0.16);
+}
+
+.workbench-status {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.workbench-status span,
+.workbench-stat span,
+.empty-candidates span {
+  color: #9da6af;
+  font-size: 12px;
+}
+
+.workbench-status strong {
+  color: #f7f8fa;
+  font-size: 13px;
+}
+
+.workbench-main {
+  min-width: 0;
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.workbench-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.workbench-title-row h2 {
+  font-size: 22px;
+}
+
+.mode-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mode-tabs button {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #edf0f2;
+  font: inherit;
+  cursor: pointer;
+}
+
+.mode-tabs button.is-active {
+  border-color: rgba(104, 199, 255, 0.65);
+  background: rgba(80, 158, 204, 0.18);
+}
+
+.workbench-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 14px;
+  align-items: start;
+}
+
+.preview-panel {
+  min-height: 420px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 8px;
+  background: #11131a;
+  overflow: auto;
+}
+
+.preview-panel img {
+  display: block;
+  width: 100%;
+  min-width: 760px;
+  height: auto;
+}
+
+.anchor-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 12px;
+}
+
+.anchor-preview img {
+  width: 100%;
+  min-width: 0;
+  max-height: 640px;
+  object-fit: contain;
+  background: #07080c;
+}
+
+.details-panel {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.details-block {
+  min-width: 0;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.workbench-stat {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.workbench-stat strong {
+  color: #f7f8fa;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.file-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.file-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #dceeff;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.empty-candidates {
+  display: grid;
+  gap: 5px;
+  padding: 11px;
+  border: 1px dashed rgba(255, 255, 255, 0.17);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.empty-candidates strong {
+  color: #f7f8fa;
+}
+
+.candidate-list {
+  display: grid;
+  gap: 8px;
+}
+
+.candidate-list button {
+  min-height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #edf0f2;
+  font: inherit;
+}
+
+@media (max-width: 1000px) {
+  .workbench-shell,
+  .workbench-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workbench-sidebar {
+    position: static;
+  }
+
+  .pair-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .details-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .adapter-workbench {
+    padding: 12px;
+  }
+
+  .workbench-header,
+  .workbench-title-row {
+    display: grid;
+  }
+
+  .pair-list,
+  .details-panel,
+  .stat-grid,
+  .file-links {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-panel img {
+    min-width: 620px;
+  }
+
+  .anchor-preview {
+    grid-template-columns: 1fr;
+  }
 }

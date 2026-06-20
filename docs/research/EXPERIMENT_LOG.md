@@ -6,6 +6,31 @@
 
 ---
 
+## Turn 17 - 2026-06-20 - AXB prep dashboard
+- **Role:** Engineering Runner / Archivist
+- **Boundary:** all current adjacent pairs for inspection; no generation verdict.
+- **Question:** where is the independent page for viewing `AXB`, `BXC`, and `CXA`
+  prep assets, and can it show the candidate/adoption state clearly?
+- **Implementation:** added an in-app dashboard reachable at `/#adapter-workbench`.
+  It is hash-based and uses no routing library or backend.
+- **Data contract:** added `src/pano/adapterWorkbench.ts` with one registry entry per
+  adjacent pair. Each entry includes:
+  - work canvas URL;
+  - mask URL;
+  - left/right anchor URLs;
+  - manifest and prompt URLs;
+  - geometry;
+  - `activeCandidateId`;
+  - `candidates`.
+- **Browser assets:** generated browser-served prep copies under
+  `public/panos/adapter-prep/` so the dashboard can display the canvases and masks.
+- **UI:** added `AdapterWorkbench` with pair switching, preview tabs (`Canvas`, `Mask`,
+  `Anchors`), geometry stats, file links, active adapter status, and candidate count.
+- **Scope notes:** no image-generation backend was called, no generated candidate images
+  exist yet, no candidate was marked active, and no runtime pano adapter was changed.
+- **Next:** see `NEXT.md` - produce/import the first `dawn-valley -> dusk-ridge`
+  AI-filled candidate batch, register it, and make active selection meaningful.
+
 ## Turn 16 - 2026-06-20 - AXB prep pipeline for all current loop pairs
 - **Role:** Engineering Runner / Archivist
 - **Boundary:** all current adjacent pairs:

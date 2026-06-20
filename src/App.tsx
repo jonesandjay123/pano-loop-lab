@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PanoRingStage } from "./components/PanoRingStage";
 import type { SeamLabState } from "./components/PanoRingStage";
 import { DebugPanel } from "./components/DebugPanel";
+import { AdapterWorkbench } from "./components/AdapterWorkbench";
 import {
   DAWN_DUSK_ADAPTER_OPTIONS,
   DEFAULT_DAWN_DUSK_ADAPTER_OPTION_ID,
@@ -18,19 +19,43 @@ const INITIAL_LAB: SeamLabState = {
   inspectIndex: null,
 };
 
+type AppView = "seam-lab" | "adapter-workbench";
+
+function readHashView(): AppView {
+  return window.location.hash === "#adapter-workbench" ? "adapter-workbench" : "seam-lab";
+}
+
 export default function App() {
   const [lab, setLab] = useState<SeamLabState>(INITIAL_LAB);
+  const [view, setView] = useState<AppView>(readHashView);
   const [dawnDuskAdapterId, setDawnDuskAdapterId] = useState<DawnDuskAdapterOptionId>(
     DEFAULT_DAWN_DUSK_ADAPTER_OPTION_ID,
   );
   const ring = useMemo(() => buildPanoRingWithDawnDuskAdapter(dawnDuskAdapterId), [dawnDuskAdapterId]);
   const reducedMotion = useReducedMotion();
 
+  useEffect(() => {
+    const handleHashChange = () => setView(readHashView());
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
   const patch = (p: Partial<SeamLabState>) => setLab((prev) => ({ ...prev, ...p }));
+
+  if (view === "adapter-workbench") {
+    return (
+      <main className="app app-workbench">
+        <AdapterWorkbench />
+      </main>
+    );
+  }
 
   return (
     <main className="app">
       <PanoRingStage ring={ring} lab={lab} reducedMotion={reducedMotion} />
+      <a className="view-switch" href="#adapter-workbench">
+        AXB dashboard
+      </a>
       <DebugPanel
         ring={ring}
         lab={lab}

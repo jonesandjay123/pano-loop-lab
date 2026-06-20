@@ -95,6 +95,12 @@ Generate the current ring's `A→B`, `B→C`, and `C→A` prep assets:
 npm run adapter:prep -- --all
 ```
 
+Open the browser dashboard:
+
+```text
+http://localhost:5173/#adapter-workbench
+```
+
 Useful variants:
 
 ```bash
@@ -106,6 +112,9 @@ npm run adapter:prep -- --all --prefill gray --overmask-px 24
 Each pair writes a folder under `docs/research/experiments/working/006-axb-prep/`
 containing `adapter-work-canvas.png`, `adapter-mask.png`, both anchor crops,
 prompt files, and `manifest.json`.
+
+The in-app dashboard reads browser-served copies under `public/panos/adapter-prep/`
+so the work canvases and masks can be inspected without a backend.
 
 ## Project structure
 
