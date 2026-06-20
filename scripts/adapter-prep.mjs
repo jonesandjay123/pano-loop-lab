@@ -8,10 +8,10 @@ const REPO_ROOT = process.cwd();
 const DEFAULT_SCENES = ["dawn-valley", "dusk-ridge", "moonlit-tidelands"];
 const DEFAULT_WIDTH = 3136;
 const DEFAULT_HEIGHT = 1344;
-const DEFAULT_RATIO = "1:12:1";
+const DEFAULT_RATIO = "1:4:1";
 const DEFAULT_OVERMASK_PX = 32;
 const DEFAULT_PREFILL = "gradient";
-const DEFAULT_OUTPUT_ROOT = "docs/research/experiments/working/006-axb-prep";
+const DEFAULT_OUTPUT_ROOT = "docs/research/experiments/working/010-axb-prep-1-4-1";
 const PREFILL_MODES = new Set(["gradient", "black", "white", "gray"]);
 
 function parseArgs(argv) {
@@ -103,12 +103,12 @@ function parseNonNegativeInteger(value, fallback, label) {
 function resolveLayout(width, ratioText) {
   const parts = ratioText.split(":").map((part) => Number.parseFloat(part));
   if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part) || part <= 0)) {
-    throw new Error(`Invalid --ratio "${ratioText}". Use a format like 1:12:1.`);
+    throw new Error(`Invalid --ratio "${ratioText}". Use a format like 1:4:1.`);
   }
 
   const [left, middle, right] = parts;
   if (left !== right) {
-    throw new Error("This prep script currently expects symmetrical anchors, e.g. 1:12:1.");
+    throw new Error("This prep script currently expects symmetrical anchors, e.g. 1:4:1.");
   }
 
   const unit = width / (left + middle + right);
@@ -357,6 +357,10 @@ async function preparePair(options, pair) {
       leftAnchorWidth: anchorWidth,
       xRegionWidth: middleWidth,
       rightAnchorWidth: anchorWidth,
+      xStart: anchorWidth,
+      xEnd: width - anchorWidth,
+      rightAnchorStart: width - anchorWidth,
+      overlapWidth: anchorWidth,
       xRegionBounds: {
         left: anchorWidth,
         right: width - anchorWidth,
@@ -394,10 +398,24 @@ async function preparePair(options, pair) {
         resizedHeight: toCrop.resizedHeight,
       },
     },
+    placementContract: {
+      name: "full-axb-overlap-plus-x-only-adoption",
+      adapterCanvas: "[A.right anchor][X transition][B.left anchor]",
+      leftAnchor:
+        "The left anchor is copied from the right edge of the from plate and is intended to overlap that same source edge during placement/review.",
+      rightAnchor:
+        "The right anchor is copied from the left edge of the to plate and is intended to overlap that same source edge during placement/review.",
+      adoption:
+        "AI-generated candidates must not be trusted to preserve anchors. Final adoption should hard-composite original anchors back into the candidate or extract X-only material before final placement.",
+      sourcePlateWidthPolicy:
+        "Source plates may be normal, wide, or ultra-wide. The script normalizes by height and crops only the edge anchors; source image width is not locked as long as the normalized image is at least one anchor wide.",
+      overlapWidth: anchorWidth,
+    },
     notes: [
       "No generation backend was called by this prep script.",
       "No final adapter candidate was written to public/panos/adapters.",
-      "A/B anchors are narrow edge sockets; the X region is the actual transition adapter target.",
+      "A/B anchors are context and placement sockets; the X region is the actual transition adapter target.",
+      "The AXB prep canvas width is fixed for generation/export convenience, but source plates are not width-locked.",
     ],
   };
 

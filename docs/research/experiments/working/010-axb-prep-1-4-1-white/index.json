@@ -1,0 +1,39 @@
+{
+  "id": "axb-prep-v1",
+  "createdAt": "2026-06-20T21:53:03.237Z",
+  "mode": "batch",
+  "scenes": [
+    "dawn-valley",
+    "dusk-ridge",
+    "moonlit-tidelands"
+  ],
+  "defaults": {
+    "width": 3136,
+    "height": 1344,
+    "ratio": "1:4:1",
+    "anchorWidth": 523,
+    "xRegionWidth": 2090,
+    "overmaskPx": 32,
+    "prefill": "white"
+  },
+  "workbenches": [
+    {
+      "from": "dawn-valley",
+      "to": "dusk-ridge",
+      "directory": "docs/research/experiments/working/010-axb-prep-1-4-1-white/dawn-valley__dusk-ridge",
+      "manifest": "docs/research/experiments/working/010-axb-prep-1-4-1-white/dawn-valley__dusk-ridge/manifest.json"
+    },
+    {
+      "from": "dusk-ridge",
+      "to": "moonlit-tidelands",
+      "directory": "docs/research/experiments/working/010-axb-prep-1-4-1-white/dusk-ridge__moonlit-tidelands",
+      "manifest": "docs/research/experiments/working/010-axb-prep-1-4-1-white/dusk-ridge__moonlit-tidelands/manifest.json"
+    },
+    {
+      "from": "moonlit-tidelands",
+      "to": "dawn-valley",
+      "directory": "docs/research/experiments/working/010-axb-prep-1-4-1-white/moonlit-tidelands__dawn-valley",
+      "manifest": "docs/research/experiments/working/010-axb-prep-1-4-1-white/moonlit-tidelands__dawn-valley/manifest.json"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "id": "axb-prep-v1",
-  "createdAt": "2026-06-20T21:15:35.402Z",
+  "createdAt": "2026-06-20T21:53:02.370Z",
   "mode": "batch",
   "scenes": [
     "dawn-valley",
@@ -10,9 +10,9 @@
   "defaults": {
     "width": 3136,
     "height": 1344,
-    "ratio": "1:12:1",
-    "anchorWidth": 224,
-    "xRegionWidth": 2688,
+    "ratio": "1:4:1",
+    "anchorWidth": 523,
+    "xRegionWidth": 2090,
     "overmaskPx": 32,
     "prefill": "black"
   },

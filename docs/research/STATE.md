@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-20** (Turn 20 — AXB prefill variants + downloads).
+> Last updated: **2026-06-20** (Turn 21 — 1:4:1 primary AXB baseline).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -47,12 +47,20 @@ a standard masked-fill input:
 - later candidate batches can be generated from these inputs and one candidate can be
   chosen as the active adapter.
 
-Default AXB prep geometry:
+Primary AXB prep geometry:
 - `3136 x 1344`;
-- `A : X : B = 1 : 12 : 1`;
-- anchors `224px` each;
-- X transition region `2688px`;
+- `A : X : B = 1 : 4 : 1`;
+- anchors `523px` each, via deterministic rounding from `3136 / 6`;
+- X transition region `2090px`;
 - `32px` overmask into each anchor.
+
+Source plate width policy:
+- source plates are **not** width-locked;
+- normal, wide, and ultra-wide plates are valid;
+- the prep script normalizes source images by height and crops only the left/right
+  edge anchors;
+- the only hard requirement is that the height-normalized source image is at least one
+  anchor wide.
 
 Generated current-loop prep folders:
 - `docs/research/experiments/working/006-axb-prep/dawn-valley__dusk-ridge/`
@@ -68,6 +76,10 @@ Additional browser-served prefill variants:
 - gradient: `public/panos/adapter-prep/`
 - white: `public/panos/adapter-prep-white/`
 - black: `public/panos/adapter-prep-black/`
+
+Legacy 1:12:1 prep artifacts remain in earlier working folders such as
+`docs/research/experiments/working/006-axb-prep/` and
+`docs/research/experiments/working/009-axb-prefill-variants/`.
 
 ## Dashboard status
 

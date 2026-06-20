@@ -81,13 +81,26 @@ and it does not promote any candidate into the runtime selector.
 
 Default prep settings:
 - output canvas: `3136 x 1344`
-- layout: `1:12:1`
-- anchors: `224px` each
-- editable X region: `2688px`
+- layout: `1:4:1`
+- anchors: `523px` each, via deterministic rounding from `3136 / 6`
+- editable X region: `2090px`
 - mask polarity: black = preserve, white = edit/regenerate
 - X prefill: opaque horizontal gradient from the two inner anchor edge colors
 - overmask: `32px` into each anchor so an inpainting backend can blend while still
   leaving the outer anchor pixels available for exact restore
+
+Source plates are not width-locked. The prep script normalizes each source image by
+height, then crops only the needed left/right edge anchors. A normal-width plate,
+wide plate, or ultra-wide plate is valid as long as the normalized image is at least
+one anchor wide.
+
+Placement contract:
+- `adapter-work-canvas.png` is `[A.right anchor][X transition][B.left anchor]`.
+- The left anchor is intended to overlap A's real right edge.
+- The right anchor is intended to overlap B's real left edge.
+- AI outputs should not be trusted to preserve anchors; adoption should either
+  hard-composite the original anchors back in or extract X-only material before final
+  placement.
 
 Generate the current ring's `A→B`, `B→C`, and `C→A` prep assets:
 
@@ -105,7 +118,7 @@ Useful variants:
 
 ```bash
 npm run adapter:prep -- --from dawn-valley --to dusk-ridge --out docs/research/experiments/working/manual-axb
-npm run adapter:prep -- --scenes dawn-valley,dusk-ridge,moonlit-tidelands --ratio 1:18:1
+npm run adapter:prep -- --scenes dawn-valley,dusk-ridge,moonlit-tidelands --ratio 1:12:1
 npm run adapter:prep -- --all --prefill gray --overmask-px 24
 ```
 

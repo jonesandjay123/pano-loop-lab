@@ -32,6 +32,10 @@ export interface AdapterWorkbenchPair {
     ratio: string;
     anchorWidth: number;
     xRegionWidth: number;
+    xStart: number;
+    xEnd: number;
+    rightAnchorStart: number;
+    overlapWidth: number;
     overmaskPx: number;
   };
 }
@@ -70,9 +74,13 @@ function candidateUrl(fromId: string, toId: string, fileName: string) {
 const DEFAULT_GEOMETRY = {
   width: 3136,
   height: 1344,
-  ratio: "1:12:1",
-  anchorWidth: 224,
-  xRegionWidth: 2688,
+  ratio: "1:4:1",
+  anchorWidth: 523,
+  xRegionWidth: 2090,
+  xStart: 523,
+  xEnd: 2613,
+  rightAnchorStart: 2613,
+  overlapWidth: 523,
   overmaskPx: 32,
 };
 

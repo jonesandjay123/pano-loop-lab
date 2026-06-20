@@ -6,6 +6,41 @@
 
 ---
 
+## Turn 21 - 2026-06-20 - Promote 1:4:1 AXB baseline and width policy
+- **Role:** Engineering Runner / Archivist
+- **Boundary:** all current adjacent pairs for prep export.
+- **Question:** should the primary AXB prep contract use wider semantic anchors and
+  explicitly support normal through ultra-wide source plates?
+- **User input:** GPT editing with downloaded AXB inputs was effective. User wants the
+  repo to support future A/B/C plates that may be much wider than the current sources.
+- **Implementation:** changed `scripts/adapter-prep.mjs` default ratio from `1:12:1`
+  to `1:4:1`, with `3136 x 1344` output retained. Deterministic rounding yields:
+  - anchor width: `523px`;
+  - X width: `2090px`;
+  - right anchor starts at `2613px`;
+  - overlap width: `523px`.
+- **Manifest contract:** each generated manifest now records:
+  - `xStart`, `xEnd`, `rightAnchorStart`, `overlapWidth`;
+  - `placementContract` describing full AXB overlap and X-only/hard-composite adoption;
+  - source plate width policy: normal, wide, and ultra-wide source plates are allowed as
+    long as the height-normalized source is at least one anchor wide.
+- **Assets regenerated:** public dashboard assets for gradient/white/black variants now
+  use the `1:4:1` geometry:
+  - `public/panos/adapter-prep/`;
+  - `public/panos/adapter-prep-white/`;
+  - `public/panos/adapter-prep-black/`.
+  Research copies were written under `docs/research/experiments/working/010-*`.
+- **Dashboard update:** geometry now displays `1:4:1`, `523px` anchors, `2090px` X, and
+  `523px` overlap. Download filenames include the ratio slug, e.g.
+  `dawn-valley__dusk-ridge__1-4-1__white.png`.
+- **Ultra-wide smoke test:** created a temporary `9000 x 1344` source plate outside the
+  committed artifacts, ran `adapter:prep` against it, confirmed the right anchor output
+  was `523 x 1344`, then removed the temporary source file.
+- **Scope notes:** no image generation, candidate import, renderer rewrite, or old
+  artifact deletion. The earlier `1:12:1` workbenches remain as legacy research outputs.
+- **Next:** import a GPT-filled `1:4:1` AXB candidate and run X-only / hard-composited
+  anchor adoption review.
+
 ## Turn 20 - 2026-06-20 - AXB prefill variants and download controls
 - **Role:** Engineering Runner
 - **Boundary:** all current adjacent pairs for prep export.

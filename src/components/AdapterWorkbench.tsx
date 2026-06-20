@@ -44,6 +44,7 @@ export function AdapterWorkbench() {
   const pairKey = `${pair.fromId}__${pair.toId}`;
   const selectedPrepVariant =
     pair.prepVariants.find((variant) => variant.id === prepVariantId) ?? pair.prepVariants[0];
+  const ratioSlug = pair.geometry.ratio.replace(/:/g, "-");
   const activeCandidateId = activeCandidateByPair[pairKey] ?? null;
   const activeCandidate = useMemo(
     () => pair.candidates.find((candidate) => candidate.id === activeCandidateId) ?? null,
@@ -151,6 +152,7 @@ export function AdapterWorkbench() {
                   <Stat label="Ratio" value={pair.geometry.ratio} />
                   <Stat label="Anchor" value={`${pair.geometry.anchorWidth}px`} />
                   <Stat label="X region" value={`${pair.geometry.xRegionWidth}px`} />
+                  <Stat label="Overlap" value={`${pair.geometry.overlapWidth}px`} />
                   <Stat label="Overmask" value={`${pair.geometry.overmaskPx}px`} />
                 </div>
               </div>
@@ -158,10 +160,13 @@ export function AdapterWorkbench() {
               <div className="details-block">
                 <div className="sidebar-heading">Files</div>
                 <div className="file-links">
-                  <a href={selectedPrepVariant.workCanvasUrl} download={`${pair.fromId}__${pair.toId}-${selectedPrepVariant.id}-work-canvas.png`}>
+                  <a
+                    href={selectedPrepVariant.workCanvasUrl}
+                    download={`${pair.fromId}__${pair.toId}__${ratioSlug}__${selectedPrepVariant.id}.png`}
+                  >
                     download canvas
                   </a>
-                  <a href={pair.maskUrl} download={`${pair.fromId}__${pair.toId}-adapter-mask.png`}>
+                  <a href={pair.maskUrl} download={`${pair.fromId}__${pair.toId}__${ratioSlug}__mask.png`}>
                     download mask
                   </a>
                   <a href={pair.manifestUrl} target="_blank" rel="noreferrer">

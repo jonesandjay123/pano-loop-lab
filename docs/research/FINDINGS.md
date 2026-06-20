@@ -63,12 +63,22 @@
 - ✅ **The prep contract is now an all-pairs AXB pipeline with narrow sockets.**
   Turn 16 updated `scripts/adapter-prep.mjs` from a dawn-to-dusk/single-pair helper
   into a deterministic batch CLI that prepares one workbench per adjacent ordered pair.
-  The current default matches the latest method decision: `3136 x 1344`,
+  The original Turn 16 default was `3136 x 1344`,
   `A : X : B = 1 : 12 : 1`, `224px` anchors, `2688px` editable X region, opaque
-  gradient prefill, separate mask, and `32px` overmask into each anchor. This is a
-  tooling finding only: it prepares standard inpainting inputs and does not prove any
-  generated adapter visually works. _Source: EXPERIMENT_LOG.md Turn 16 and
+  gradient prefill, separate mask, and `32px` overmask into each anchor. Turn 21
+  superseded this as the primary baseline with `1:4:1`, but the all-pairs prep
+  contract remains supported. This is a tooling finding only: it prepares standard
+  inpainting inputs and does not prove any generated adapter visually works. _Source:
+  EXPERIMENT_LOG.md Turn 16 and
   `docs/research/experiments/working/006-axb-prep/index.json`._
+
+- ✅ **Primary AXB baseline is now 1:4:1, with source plates allowed to be ultra-wide.**
+  Turn 21 promoted `A : X : B = 1 : 4 : 1` as the main prep geometry. At the retained
+  `3136 x 1344` export size this rounds to `523px` anchors and a `2090px` X region.
+  The prep script normalizes source images by height and crops only edge anchors, so
+  plate source width is not locked; normal, wide, and ultra-wide plates are valid as
+  long as the normalized source is at least one anchor wide. _Source:
+  EXPERIMENT_LOG.md Turn 21 and `public/panos/adapter-prep/index.json`._
 
 - ❌ **Higgsfield whole-frame image-to-image makes pretty standalone panoramas that do
   NOT pixel-weld at `blend = 0`.** Turn 9 produced clean coherent dawn→dusk panoramas
