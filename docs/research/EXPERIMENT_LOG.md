@@ -6,6 +6,45 @@
 
 ---
 
+## Turn 25 - 2026-06-21 - Soft256 loop review and strict-X parameter sweep
+- **Role:** Engineering Runner / Reviewer / Archivist
+- **Boundary:** `dawn-valley -> dusk-ridge`.
+- **Question:** is `gpt-axb-01-soft256` acceptable in the actual seam lab / moving
+  loop, and if not, does a small inside-X-only parameter sweep improve it?
+- **Decision framing:** raw GPT / generic image-edit output is now formally treated
+  as an X-content concept candidate, not a final adapter. Final candidates must pass:
+  - outer A/B anchor diff = `0`;
+  - internal A-X / X-B joins visually acceptable in seam-lab review.
+- **UI/data fix:** changed the generated candidate registry so `activeForReview` from
+  `candidates.json` is preserved and used by both:
+  - the adapter workbench active state;
+  - the seam-lab default dawn-to-dusk adapter.
+- **Workbench review metadata:** candidate cards now show left/right outer anchor max
+  diff and an internal-join verdict, so raw GPT candidates cannot be mistaken for
+  placement-safe final adapters.
+- **Browser verification:** with the dev server running, verified:
+  - seam-lab `dawn→dusk` selector defaults to `gpt-axb-01-soft256`;
+  - workbench active adapter is `GPT AXB 01 soft256`;
+  - active card shows `L diff: 0`, `R diff: 0`.
+  Screenshots were written under
+  `docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/`.
+- **Blend-0 review:** `soft256` is the current best strict-X candidate. A→adapter is
+  strong; adapter→B still shows a visible tonal step at `blend = 0`, so it is not
+  accepted as final.
+- **Parameter sweep:** extended `scripts/adapter-soft-adopt.mjs` with
+  `--curve linear|smoothstep|cosine`, then generated the requested grid:
+  - feather widths: `128`, `192`, `256`, `384`, `512`;
+  - curves: `linear`, `smoothstep`, `cosine`;
+  - all variants preserve outer anchors exactly (`0` max diff on left and right).
+- **Sweep result:** no sweep variant clearly beats `gpt-axb-01-soft256`. Wider
+  `384/512` blends reduce the right-side X-B tonal step, but introduce a broad muddy
+  A-X band on the left. `128/192` remain too narrow/hard. The best practical choice
+  remains `gpt-axb-01-soft256`.
+- **Verdict:** **CURRENT BEST / NOT FINAL.** Strict-X soft adoption salvages GPT's X
+  content into a placement-safe candidate, but the remaining internal tonal band means
+  this is not yet a solved method. The long-term path still points toward a true
+  mask-respecting inpaint backend.
+
 ## Turn 24 - 2026-06-20 - Strict-X soft anchor adoption
 - **Role:** Engineering Runner / Reviewer / Archivist
 - **Boundary:** `dawn-valley -> dusk-ridge`.

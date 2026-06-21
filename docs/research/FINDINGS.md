@@ -112,6 +112,16 @@
   _Source: EXPERIMENT_LOG.md Turn 24 and
   `docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/compare-soft-adoption-internal-boundaries.png`._
 
+- 🟡 **`gpt-axb-01-soft256` is the current best strict-X candidate, not a final
+  solution.** Turn 25 verified in the browser that `soft256` is active in both the
+  workbench and seam lab, with left/right outer anchor max diff `0`. At `blend = 0`,
+  A→adapter is strong, but adapter→B still has a visible tonal step. A 15-variant
+  inside-X-only sweep (`128/192/256/384/512` × `linear/smoothstep/cosine`) preserved
+  anchors for every candidate but did not find a clearly better replacement: wider
+  blends soften the right-side band while muddying the left A-X transition. _Source:
+  EXPERIMENT_LOG.md Turn 25 and
+  `docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/strict-x-sweep-summary.json`._
+
 - ❌ **Higgsfield whole-frame image-to-image makes pretty standalone panoramas that do
   NOT pixel-weld at `blend = 0`.** Turn 9 produced clean coherent dawn→dusk panoramas
   with `nano_banana_2`, and **none reproduced the exp001 left-edge dark-mass failure**.

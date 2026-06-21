@@ -586,6 +586,27 @@ body {
   font-size: 12px;
 }
 
+.candidate-review-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-top: 7px;
+  padding: 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #b8c1ca;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.candidate-review-summary span:last-child {
+  grid-column: 1 / -1;
+}
+
+.candidate-review-summary strong {
+  color: #f7f8fa;
+}
+
 .candidate-card p {
   margin: 6px 0 8px;
   color: #aeb6bf;

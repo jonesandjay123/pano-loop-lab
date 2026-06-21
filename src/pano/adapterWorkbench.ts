@@ -6,6 +6,11 @@ export interface AdapterCandidate {
   imageUrl: string;
   status: "generated" | "partial" | "accepted" | "rejected" | "legacy";
   notes: string;
+  reviewSummary: {
+    leftOuterAnchorMaxDiff: number | null;
+    rightOuterAnchorMaxDiff: number | null;
+    internalJoinVerdict: string;
+  } | null;
 }
 
 export interface AdapterPrepVariant {
@@ -70,17 +75,20 @@ function pairUrls(fromId: string, toId: string) {
 
 function candidatesForPair(fromId: string, toId: string): AdapterCandidate[] {
   const key = `${fromId}__${toId}` as keyof typeof ADAPTER_CANDIDATES_BY_PAIR;
-  return ((ADAPTER_CANDIDATES_BY_PAIR[key] ?? []) as readonly AdapterCandidate[]).map((candidate) => ({
+  const group = ADAPTER_CANDIDATES_BY_PAIR[key];
+  return ((group?.candidates ?? []) as readonly AdapterCandidate[]).map((candidate) => ({
     id: candidate.id,
     label: candidate.label,
     imageUrl: candidate.imageUrl,
     status: candidate.status,
     notes: candidate.notes,
+    reviewSummary: candidate.reviewSummary,
   }));
 }
 
 function activeCandidateForPair(fromId: string, toId: string) {
-  return candidatesForPair(fromId, toId).find((candidate) => candidate.status === "generated")?.id ?? null;
+  const key = `${fromId}__${toId}` as keyof typeof ADAPTER_CANDIDATES_BY_PAIR;
+  return ADAPTER_CANDIDATES_BY_PAIR[key]?.activeForReview ?? null;
 }
 
 const DEFAULT_GEOMETRY = {

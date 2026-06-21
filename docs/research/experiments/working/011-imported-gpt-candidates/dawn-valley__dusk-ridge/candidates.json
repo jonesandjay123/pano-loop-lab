@@ -17,7 +17,7 @@
     "resolution": "2k",
     "note": "Higgsfield did not expose a true mask-inpaint parameter here. These are whole-frame reference generations using the AXB work canvas and mask as input images; anchors are not pixel-guaranteed."
   },
-  "activeForReview": "gpt-axb-01",
+  "activeForReview": "gpt-axb-01-soft256",
   "candidates": [
     {
       "id": "hf-nb2-axb-01",
@@ -58,6 +58,11 @@
         "importedWidth": 3136,
         "importedHeight": 1344,
         "resizedToPrepDimensions": true
+      },
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 194,
+        "rightOuterAnchorMaxDiff": 100,
+        "internalJoinVerdict": "Natural X concept, but outer anchors are not exact."
       }
     },
     {
@@ -70,10 +75,321 @@
       "notes": "Derived from GPT AXB 01 by extracting only X and compositing exact original A/B anchors back in. Outer anchor diff verified at 0.",
       "reviewNotes": "Outer plate-facing anchors are exact, but hard X-only compositing creates visible internal anchor-to-X discontinuities. Useful diagnostic, not accepted final adapter.",
       "sourceCandidate": "gpt-axb-01",
-      "reviewReport": "docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/review/gpt-axb-01-xonly-anchor-diff.json"
+      "reviewReport": "docs/research/experiments/working/011-imported-gpt-candidates/dawn-valley__dusk-ridge/review/gpt-axb-01-xonly-anchor-diff.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact outer anchors; hard A-X / X-B cuts are visible."
+      }
+    },
+    {
+      "id": "gpt-axb-01-soft64",
+      "label": "GPT AXB 01 soft64",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft64.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-soft64.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 64px near the anchors.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-soft64-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; internal blend still reads hard."
+      }
+    },
+    {
+      "id": "gpt-axb-01-soft128",
+      "label": "GPT AXB 01 soft128",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft128.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-soft128.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 128px near the anchors.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-soft128-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; internal blend is reduced but still visible."
+      }
+    },
+    {
+      "id": "gpt-axb-01-soft256",
+      "label": "GPT AXB 01 soft256",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft256.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-soft256.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 256px near the anchors.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-soft256-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; smoothest pre-sweep strict-X candidate."
+      }
+    },
+    {
+      "id": "gpt-axb-01-linear128",
+      "label": "GPT AXB 01 linear 128",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-linear128.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-linear128.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 128px near the anchors with a linear curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-linear128-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; narrower blend leaves more internal banding."
+      }
+    },
+    {
+      "id": "gpt-axb-01-linear192",
+      "label": "GPT AXB 01 linear 192",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-linear192.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-linear192.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 192px near the anchors with a linear curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-linear192-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; narrower blend leaves more internal banding."
+      }
+    },
+    {
+      "id": "gpt-axb-01-linear256",
+      "label": "GPT AXB 01 linear 256",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-linear256.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-linear256.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 256px near the anchors with a linear curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-linear256-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; balanced sweep candidate, similar to soft256."
+      }
+    },
+    {
+      "id": "gpt-axb-01-linear384",
+      "label": "GPT AXB 01 linear 384",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-linear384.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-linear384.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 384px near the anchors with a linear curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-linear384-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; wider blend reduces right band but muddies left A-X transition."
+      }
+    },
+    {
+      "id": "gpt-axb-01-linear512",
+      "label": "GPT AXB 01 linear 512",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-linear512.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-linear512.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 512px near the anchors with a linear curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-linear512-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; wider blend reduces right band but muddies left A-X transition."
+      }
+    },
+    {
+      "id": "gpt-axb-01-smoothstep128",
+      "label": "GPT AXB 01 smoothstep 128",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep128.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep128.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 128px near the anchors with a smoothstep curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-smoothstep128-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; narrower blend leaves more internal banding."
+      }
+    },
+    {
+      "id": "gpt-axb-01-smoothstep192",
+      "label": "GPT AXB 01 smoothstep 192",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep192.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep192.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 192px near the anchors with a smoothstep curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-smoothstep192-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; narrower blend leaves more internal banding."
+      }
+    },
+    {
+      "id": "gpt-axb-01-smoothstep256",
+      "label": "GPT AXB 01 smoothstep 256",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep256.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep256.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 256px near the anchors with a smoothstep curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-smoothstep256-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; balanced sweep candidate, similar to soft256."
+      }
+    },
+    {
+      "id": "gpt-axb-01-smoothstep384",
+      "label": "GPT AXB 01 smoothstep 384",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep384.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep384.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 384px near the anchors with a smoothstep curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-smoothstep384-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; wider blend reduces right band but muddies left A-X transition."
+      }
+    },
+    {
+      "id": "gpt-axb-01-smoothstep512",
+      "label": "GPT AXB 01 smoothstep 512",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep512.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-smoothstep512.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 512px near the anchors with a smoothstep curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-smoothstep512-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; wider blend reduces right band but muddies left A-X transition."
+      }
+    },
+    {
+      "id": "gpt-axb-01-cosine128",
+      "label": "GPT AXB 01 cosine 128",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-cosine128.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-cosine128.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 128px near the anchors with a cosine curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-cosine128-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; narrower blend leaves more internal banding."
+      }
+    },
+    {
+      "id": "gpt-axb-01-cosine192",
+      "label": "GPT AXB 01 cosine 192",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-cosine192.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-cosine192.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 192px near the anchors with a cosine curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-cosine192-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; narrower blend leaves more internal banding."
+      }
+    },
+    {
+      "id": "gpt-axb-01-cosine256",
+      "label": "GPT AXB 01 cosine 256",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-cosine256.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-cosine256.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 256px near the anchors with a cosine curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-cosine256-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; balanced sweep candidate, similar to soft256."
+      }
+    },
+    {
+      "id": "gpt-axb-01-cosine384",
+      "label": "GPT AXB 01 cosine 384",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-cosine384.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-cosine384.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 384px near the anchors with a cosine curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-cosine384-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; wider blend reduces right band but muddies left A-X transition."
+      }
+    },
+    {
+      "id": "gpt-axb-01-cosine512",
+      "label": "GPT AXB 01 cosine 512",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-cosine512.png",
+      "researchCopy": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/gpt-axb-01-cosine512.png",
+      "status": "partial",
+      "method": "strict-anchor-x-only-soft-adoption",
+      "notes": "Derived from gpt-axb-01. A/B anchors are copied exactly; only X-region pixels are softened over 512px near the anchors with a cosine curve.",
+      "reviewNotes": "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
+      "sourceCandidate": "gpt-axb-01",
+      "reviewReport": "docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/gpt-axb-01-cosine512-review-report.json",
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Exact anchors; wider blend reduces right band but muddies left A-X transition."
+      }
     }
   ],
-  "reviewedAt": "2026-06-20T22:12:28.475Z",
-  "reviewVerdict": "PARTIAL. Keep GPT AXB 01 active for visual review; keep GPT AXB 01 X-only as exact-anchor diagnostic. Do not accept either as final until a soft anchor-adoption composite is tested.",
-  "updatedAt": "2026-06-20T22:09:39.913Z"
+  "reviewedAt": "2026-06-21T14:46:03.691Z",
+  "reviewVerdict": "PARTIAL CURRENT BEST. gpt-axb-01-soft256 remains the active strict-X review candidate. The 128/192/256/384/512 x linear/smoothstep/cosine sweep preserved anchors but did not find a clearly better visual candidate; wider blends reduce the right-side band while muddying the left-side A-X transition.",
+  "updatedAt": "2026-06-21T14:46:03.691Z"
 }

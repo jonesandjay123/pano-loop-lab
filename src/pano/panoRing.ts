@@ -17,7 +17,7 @@ export interface DawnDuskAdapterOption {
 }
 
 const DAWN_DUSK_GENERATED_OPTIONS: DawnDuskAdapterOption[] = (
-  ADAPTER_CANDIDATES_BY_PAIR["dawn-valley__dusk-ridge"] ?? []
+  ADAPTER_CANDIDATES_BY_PAIR["dawn-valley__dusk-ridge"]?.candidates ?? []
 ).map((candidate) => ({
   id: candidate.id,
   label: candidate.label,
@@ -55,7 +55,8 @@ export const DAWN_DUSK_ADAPTER_OPTIONS: DawnDuskAdapterOption[] = [
   ...DAWN_DUSK_GENERATED_OPTIONS,
 ];
 
-export const DEFAULT_DAWN_DUSK_ADAPTER_OPTION_ID: DawnDuskAdapterOptionId = "exp001-edge-anchored-v1";
+export const DEFAULT_DAWN_DUSK_ADAPTER_OPTION_ID: DawnDuskAdapterOptionId =
+  ADAPTER_CANDIDATES_BY_PAIR["dawn-valley__dusk-ridge"]?.activeForReview ?? "exp001-edge-anchored-v1";
 
 /**
  * The default ring.

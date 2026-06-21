@@ -38,13 +38,17 @@ async function readCandidateGroups() {
     }
 
     const data = JSON.parse(await readFile(jsonPath, "utf8"));
-    groups[pairKey] = (data.candidates ?? []).map((candidate) => ({
-      id: candidate.id,
-      label: candidate.label ?? candidate.id,
-      imageUrl: publicUrlFromPath(path.join(REPO_ROOT, candidate.localPath)),
-      status: candidate.status ?? "generated",
-      notes: candidate.reviewNotes ?? candidate.notes ?? "",
-    }));
+    groups[pairKey] = {
+      activeForReview: data.activeForReview ?? null,
+      candidates: (data.candidates ?? []).map((candidate) => ({
+        id: candidate.id,
+        label: candidate.label ?? candidate.id,
+        imageUrl: publicUrlFromPath(path.join(REPO_ROOT, candidate.localPath)),
+        status: candidate.status ?? "generated",
+        notes: candidate.reviewNotes ?? candidate.notes ?? "",
+        reviewSummary: candidate.reviewSummary ?? null,
+      })),
+    };
   }
 
   return groups;

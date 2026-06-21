@@ -198,6 +198,23 @@ export function AdapterWorkbench() {
                             <strong>{candidate.label}</strong>
                             <span>{candidate.status}</span>
                           </div>
+                          {candidate.reviewSummary && (
+                            <div className="candidate-review-summary" aria-label={`${candidate.label} review summary`}>
+                              <span>
+                                L diff:{" "}
+                                <strong>
+                                  {candidate.reviewSummary.leftOuterAnchorMaxDiff ?? "n/a"}
+                                </strong>
+                              </span>
+                              <span>
+                                R diff:{" "}
+                                <strong>
+                                  {candidate.reviewSummary.rightOuterAnchorMaxDiff ?? "n/a"}
+                                </strong>
+                              </span>
+                              <span>{candidate.reviewSummary.internalJoinVerdict}</span>
+                            </div>
+                          )}
                           <p>{candidate.notes}</p>
                           <button
                             type="button"

@@ -9,6 +9,7 @@ const DEFAULT_FROM = "dawn-valley";
 const DEFAULT_TO = "dusk-ridge";
 const DEFAULT_SOURCE_ID = "gpt-axb-01";
 const DEFAULT_FEATHER_PX = 128;
+const CURVES = ["linear", "smoothstep", "cosine"];
 
 function parseArgs(argv) {
   const args = {};
@@ -35,7 +36,11 @@ function parseArgs(argv) {
   }
 
   const sourceId = typeof args.source === "string" ? args.source : DEFAULT_SOURCE_ID;
-  const id = typeof args.id === "string" ? args.id : `${sourceId}-soft${featherPx}`;
+  const curve = typeof args.curve === "string" ? args.curve : "smoothstep";
+  if (!CURVES.includes(curve)) {
+    throw new Error(`--curve must be one of: ${CURVES.join(", ")}`);
+  }
+  const id = typeof args.id === "string" ? args.id : `${sourceId}-${curve}${featherPx}`;
 
   return {
     from: typeof args.from === "string" ? args.from : DEFAULT_FROM,
@@ -44,6 +49,7 @@ function parseArgs(argv) {
     id,
     label: typeof args.label === "string" ? args.label : `${sourceId.toUpperCase()} soft ${featherPx}`,
     featherPx,
+    curve,
     force: args.force === true,
   };
 }
@@ -79,6 +85,17 @@ function researchDir(from, to) {
 function smoothstep(value) {
   const clamped = Math.max(0, Math.min(1, value));
   return clamped * clamped * (3 - 2 * clamped);
+}
+
+function curveWeight(value, curve) {
+  const clamped = Math.max(0, Math.min(1, value));
+  if (curve === "linear") {
+    return clamped;
+  }
+  if (curve === "cosine") {
+    return 0.5 - Math.cos(clamped * Math.PI) / 2;
+  }
+  return smoothstep(clamped);
 }
 
 async function rawRgb(filePath, width, height) {
@@ -259,9 +276,9 @@ async function main() {
       }
 
       const xOffset = x - xStart;
-      const leftWeight = xOffset < featherPx ? smoothstep(xOffset / featherPx) : 1;
+      const leftWeight = xOffset < featherPx ? curveWeight(xOffset / featherPx, options.curve) : 1;
       const rightDistance = rightAnchorStart - x - 1;
-      const rightWeight = rightDistance < featherPx ? smoothstep(rightDistance / featherPx) : 1;
+      const rightWeight = rightDistance < featherPx ? curveWeight(rightDistance / featherPx, options.curve) : 1;
       const sourceWeight = Math.min(leftWeight, rightWeight);
       const workWeight = 1 - sourceWeight;
 
@@ -292,6 +309,7 @@ async function main() {
       xRegionWidth,
       rightAnchorStart,
       featherPx,
+      curve: options.curve,
     },
     invariant: "A/B anchor pixels are copied from the original prep anchors. Only X-region pixels are blended.",
     outerAnchorDiff: {
@@ -318,7 +336,7 @@ async function main() {
     researchCopy: repoRelative(researchOutputPath),
     status: "partial",
     method: "strict-anchor-x-only-soft-adoption",
-    notes: `Derived from ${options.sourceId}. A/B anchors are copied exactly; only X-region pixels are softened over ${featherPx}px near the anchors.`,
+    notes: `Derived from ${options.sourceId}. A/B anchors are copied exactly; only X-region pixels are softened over ${featherPx}px near the anchors with a ${options.curve} curve.`,
     reviewNotes:
       "Strictly preserves original A/B anchors and blends only inside X. Review at blend=0 before accepting.",
     sourceCandidate: options.sourceId,
