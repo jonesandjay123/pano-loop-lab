@@ -79,6 +79,14 @@ All four are exactly `6144 x 1536`.
 
 `generated/production-plates/contact-sheet-current.png` is only a review sheet. It is not a runtime plate.
 
+Photoshop-filled full adapter images should be stored under:
+
+```text
+generated/production-plates/finished-adapters/
+```
+
+Use this folder for complete `6144 x 1536` finished adapters, not X-only crops.
+
 ## Next Likely Work
 
 - Recheck the one visible Photoshop seam artifact in the browser loop.

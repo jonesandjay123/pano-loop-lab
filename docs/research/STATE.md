@@ -80,6 +80,14 @@ generated/production-plates/raw/03-6144x1536.png
 
 All four source plates are exactly `6144 x 1536`. The contact sheet in `generated/production-plates/contact-sheet-current.png` is for visual review only.
 
+Photoshop-filled full adapter outputs should be stored in:
+
+```text
+generated/production-plates/finished-adapters/
+```
+
+Those files must also be complete `6144 x 1536` adapter images, not cropped seam-only patches.
+
 The first four-plate loop has been proven in the browser with Photoshop-finished adapters. One visible seam still needs manual repair before treating the scene as final art.
 
 ## Guardrail
