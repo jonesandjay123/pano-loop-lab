@@ -1,298 +1,64 @@
 # pano-loop-lab
 
-A research lab for the **far-background environment of an immersive 3D website**
-(Jovicheer), built as a flat image strip instead of real 3D geometry — that's the
-performance argument: the distant world costs almost nothing to render.
+Clean AXB panorama loop prototype.
 
-> **The hard problem:** take **N independently AI-generated panorama plates** and
-> make them read as **one continuous world band** — looping forever — using only
-> web primitives (HTML/CSS/React + requestAnimationFrame).
-
-The ring is `plate0, seam0→1, plate1, …, plateN-1, seamN-1→0` (the wrap closes it).
-A **seam** is a generated transition image whose left edge continues plate A and
-right edge continues plate B. N plates ⇒ N seams. This is a pipeline for any N,
-shown here at N=3.
-
-No Three.js, R3F, GSAP, canvas, routing, or backend.
-
-## Current phase: manual-inpainting-ready adapter pipeline
-
-The repo is no longer trying to automatically generate a final adapter. The
-current workflow is deliberately human-in-the-loop:
+The repo now models the background as:
 
 ```text
-repo export AXB work canvas
--> human fills X in Kling / Photoshop / Midjourney / Firefly
--> repo imports only X
--> repo composites original A/B + generated X
--> repo validates outside-X pixel diff = 0
--> inspect in the workbench / loop
+A plate -> AXB adapter -> B plate -> BXC adapter -> C plate -> CXA adapter -> A plate
 ```
 
-Core rule:
+Runtime assets are intentionally small:
 
 ```text
-Only X may come from the external tool.
-A/B must always come from the original work canvas.
-outside-X pixel diff must be 0.
+public/panos/
+  dawn-valley.jpg
+  dusk-ridge.jpg
+  moonlit-tidelands.jpg
+  adapters-clean/
+    dawn-valley__dusk-ridge-work.png
+    dusk-ridge__moonlit-tidelands-work.png
+    moonlit-tidelands__dawn-valley-work.png
+    dawn-valley__dusk-ridge-photoshop-test1.png
 ```
 
-External editors are allowed to redraw or damage A/B because their A/B pixels are
-discarded. They are X sources only.
+`photoshop-test1` is the only manually completed adapter right now. The other two
+adapters are still work canvases, so their X regions should look visibly unfinished
+in the loop. That is deliberate: the homepage is now an honest visual debug surface.
 
-See `docs/research/MANUAL_INPAINT_WORKFLOW.md` for the exact export/import flow.
-
-## Seam inspection lab status
-
-The honest state: stitching independently-generated plates leaves **visible
-boundaries** — colours are close, but composition, horizon height, and ridge lines
-don't truly line up. This phase does **not** claim to fix that. It turns the
-renderer into an instrument to *study* the boundaries and to measure how far cheap
-CSS techniques get us:
-
-- **Overlap + feather blend.** Adjacent windows can overlap by `blendVw`
-  (0 / 8 / 12 / 16) and cross-fade via a CSS mask. At `blendVw = 0` they butt-join
-  so the **real contact seam is revealed** — debug must not hide the problem.
-- **Per-segment alignment knobs.** Every plate/seam exposes `fitMode`
-  (`cover` / `height` / `width`), `scale`, `xOffset`, `yOffset` so horizons and
-  ridges can be hand-aligned. (Seam edges are still `cover`-trimmed by default —
-  see "What this does NOT solve".)
-- **Inspect mode.** Pick any boundary to **center, hold, and highlight** it
-  (magenta line) for close study; toggle labels/lines; pause auto-scroll.
-- Still a continuous, drag-scrubbable, infinitely-looping ring.
-
-What the lab already shows: for these **soft atmospheric mattes**, overlap+feather
-hides most of the *tonal/line* discontinuity — but a **structural** mismatch (e.g.
-a lake on the seam side meeting a mountain on the plate side) only softens into
-haze; it is not resolved. That is the motivation for the next phase.
-
-## What this does NOT solve (yet)
-
-- **Pixel-perfect welds.** Seams *continue* their neighbours tonally, and each
-  window is `cover`-cropped, so joins are visually continuous at best, not welded.
-  CSS overlap cannot make a ridge line actually connect.
-- The real fix is **edge-locked outpainting per boundary**: take plate A's right
-  edge as a hard source, outpaint right; take plate B's left edge as a hard source,
-  outpaint left; blend only in the invented middle. That is a **separate next
-  phase**, to be proven on **one** boundary (dawn → dusk) before scaling to N.
-- Also out of scope here: drag inertia, parallax depth, UI polish, regenerating
-  all seams, any claim of "done".
-
-## Run it
+## Run
 
 ```bash
 npm install
-npm run dev      # opens into the auto-scrolling, drag-scrubbable ring
-npm run build    # type-check + production build (must pass)
-npm run adapter:prep -- --all
-npm run adapter:export-manual -- --all
-npm run preview
+npm run dev
+npm run build
 ```
 
-In the debug panel:
-- **blend** — `raw — 0` reveals the true seams; `8/12/16vw` test overlap blending.
-- **inspect** — center & hold one boundary for study (auto-pauses).
-- **boundary labels + lines** — show every contact line + its A▸B label.
-- **pause auto-scroll** — freeze the loop. Drag the background to scrub.
-
-## Manual AXB export / import pipeline
-
-Export manual work folders for all current adjacent pairs:
-
-```bash
-npm run adapter:export-manual -- --all
-```
-
-Output:
+Open:
 
 ```text
-docs/research/experiments/working/manual-inpaint/<pair-id>/
-  work-canvas.png
-  work-canvas-gradient.png
-  work-canvas-labeled.png
-  mask-hard.png
-  mask-soft.png
-  prompt.txt
-  manifest.json
+http://localhost:5173/
 ```
 
-Give `work-canvas.png` to an external editor and manually fill X. Then import the
-downloaded full image:
-
-```bash
-npm run adapter:import-manual -- \
-  --pair dawn-valley__dusk-ridge \
-  --input /absolute/path/to/external-output.png \
-  --id kling-01
-```
-
-If dimensions differ, the importer errors unless resize is explicit:
-
-```bash
-npm run adapter:import-manual -- \
-  --pair dawn-valley__dusk-ridge \
-  --input /absolute/path/to/external-output.png \
-  --id kling-01 \
-  --resize-to-canvas
-```
-
-The manual importer crops only the manifest X range, composites that X onto the
-original work canvas, verifies outside-X diff is `0`, writes review artifacts, and
-updates the generated candidate registry used by the workbench and loop selector.
-The registered runtime candidate remains a full `[A][X][B]` image; the seam lab
-uses anchor overlap so AXB anchors are sockets, not extra visible repeated content.
-
-## AXB adapter prep pipeline
-
-The current generation direction is to standardize every adjacent pair as one
-inpainting work canvas:
-
-```text
-[A right-edge anchor][editable X transition region][B left-edge anchor]
-```
-
-This is a deterministic prep step only. It does not call an image-generation backend
-and it does not promote any candidate into the runtime selector.
-
-Default prep settings:
-- output canvas: `3136 x 1344`
-- layout: `1:4:1`
-- anchors: `523px` each, via deterministic rounding from `3136 / 6`
-- editable X region: `2090px`
-- mask polarity: black = preserve, white = edit/regenerate
-- X prefill: opaque horizontal gradient from the two inner anchor edge colors
-- overmask: `32px` into each anchor so an inpainting backend can blend while still
-  leaving the outer anchor pixels available for exact restore
-
-Source plates are not width-locked. The prep script normalizes each source image by
-height, then crops only the needed left/right edge anchors. A normal-width plate,
-wide plate, or ultra-wide plate is valid as long as the normalized image is at least
-one anchor wide.
-
-Placement contract:
-- `adapter-work-canvas.png` is `[A.right anchor][X transition][B.left anchor]`.
-- The left anchor is intended to overlap A's real right edge.
-- The right anchor is intended to overlap B's real left edge.
-- AI outputs should not be trusted to preserve anchors; adoption should either
-  hard-composite the original anchors back in or extract X-only material before final
-  placement.
-
-Generate the current ring's `A→B`, `B→C`, and `C→A` prep assets:
-
-```bash
-npm run adapter:prep -- --all
-```
-
-Open the browser dashboard:
+The AXB dashboard is available at:
 
 ```text
 http://localhost:5173/#adapter-workbench
 ```
 
-Useful variants:
+## Contract
 
-```bash
-npm run adapter:prep -- --from dawn-valley --to dusk-ridge --out docs/research/experiments/working/manual-axb
-npm run adapter:prep -- --scenes dawn-valley,dusk-ridge,moonlit-tidelands --ratio 1:12:1
-npm run adapter:prep -- --all --prefill gray --overmask-px 24
+Each adapter is a full `[A][X][B]` image at `3136 x 1344`:
+
+- `A` anchor: `523px`
+- `X` region: `2090px`
+- `B` anchor: `523px`
+
+In runtime, adapter anchors overlap their neighboring plates. The visible journey is:
+
+```text
+plate A -> X -> plate B
 ```
 
-Each pair writes a folder under `docs/research/experiments/working/006-axb-prep/`
-containing `adapter-work-canvas.png`, `adapter-mask.png`, both anchor crops,
-prompt files, and `manifest.json`.
-
-The in-app dashboard reads browser-served copies under `public/panos/adapter-prep/`
-so the work canvases and masks can be inspected without a backend.
-
-The dashboard also exposes white/black prefill variants for GPT or other external
-editing tests:
-- gradient: `public/panos/adapter-prep/`
-- white: `public/panos/adapter-prep-white/`
-- black: `public/panos/adapter-prep-black/`
-
-Use the `Download canvas` and `Download mask` buttons in `/#adapter-workbench` to
-export the current pair's input files.
-
-Legacy whole-frame import for old GPT-filled AXB experiments:
-
-```bash
-npm run adapter:import -- \
-  --source /absolute/path/to/gpt-result.png \
-  --id gpt-axb-01 \
-  --label "GPT AXB 01" \
-  --notes "Imported from GPT image edit using the 1:4:1 white canvas."
-```
-
-This older importer resizes and registers the full external frame. Keep it for
-comparison with existing experiments, but do not use it for final manual inpaint
-adoption. New manual imports should use `adapter:import-manual`, which discards
-external A/B pixels and verifies outside-X diff.
-
-First candidate batch:
-- `dawn-valley -> dusk-ridge`
-- 2 Nano Banana 2 reference candidates under
-  `public/panos/adapter-candidates/dawn-valley__dusk-ridge/`
-- These are whole-frame reference generations from the AXB canvas + mask, not
-  strict mask-inpaint outputs.
-- Turn 19 review rejected both as final adapters: they improve the outer joins by
-  carrying anchor strips, but create visible internal anchor-to-X bands.
-
-## Project structure
-
-```
-src/
-  App.tsx                    # owns the SeamLabState (blend/labels/pause/inspect)
-  pano/
-    panoTypes.ts             # PanoPlate, PanoSeam, PanoRingConfig, RingSegment, RingBoundary
-    panoRing.ts              # default ring + buildRingSegments / buildBoundaries / seamCoverage
-    usePanoRingScroll.ts     # rAF auto-scroll + drag + inspect-centering, infinite wrap
-  components/
-    PanoRingStage.tsx        # overlap/feather renderer + per-segment knobs + SeamLabState
-    DebugPanel.tsx           # readout + lab controls
-public/panos/
-  dawn-valley.jpg  dusk-ridge.jpg  moonlit-tidelands.jpg     # plates (Higgsfield)
-  seams/
-    dawn-valley__dusk-ridge.jpg          # seam A→B (Higgsfield)
-    dusk-ridge__moonlit-tidelands.jpg    # seam B→C
-    moonlit-tidelands__dawn-valley.jpg   # seam C→A (wrap)
-```
-
-## How it works
-
-1. `buildRingSegments(config)` flattens plates + seams into the ordered window list
-   (wrapping last→first), resolving each window's fit/scale/offset defaults.
-2. `PanoRingStage` renders that sequence **twice** in a flex track. Each window is
-   `widthVw` wide; the image layer is `cover`/`height`/`width`-sized, panned by
-   `xOffset`/`yOffset`, zoomed by `scale`, and **overscanned 6%** so the pan knobs
-   don't reveal an edge. With `blendVw > 0`, windows get `margin-left: -blendVw`
-   and a left/right `mask-image` feather so the overlap cross-fades.
-3. `usePanoRingScroll` drives the track's `translate3d` via `requestAnimationFrame`,
-   keeping `offset` in `[0, sequenceWidth)` by modulo (infinite both ways). Auto-
-   scroll advances it; pointer drag scrubs it; inspect snaps it to a boundary
-   centre. All share the one wrapped offset, so hand-offs never jump.
-
-### Adding plates (the N-image pipeline)
-
-Add a `PanoPlate` plus the two `PanoSeam`s connecting it to its new neighbours
-(regenerate the affected wrap seam). No renderer changes — the ring re-assembles.
-
-## Roadmap
-
-```
-done   : continuous ring + N seams + overlap/feather + per-segment knobs + inspect lab
-done   : AXB work-canvas prep for every adjacent pair
-now    : manual export/import pipeline for human-filled X regions
-next   : use manual imports from real Kling/Photoshop/MJ/Firefly outputs and review
-then   : candidate selection and acceptance criteria for event-scene insertion
-later  : drag inertia, parallax depth bands, format/responsive passes
-```
-
-## Open questions
-
-- **How much can overlap+offset hide?** The lab exists to answer this per boundary;
-  early read: most tonal mismatch, not structural.
-- **Edge preservation vs. fill.** `cover` trims the seam's engineered edges; a
-  `height`/`width` fit preserves them but letterboxes — the real answer is the
-  outpaint phase, not a CSS fit mode.
-- **Loop closure.** The wrap seam (C→A) is the hardest; outpaint must still meet
-  plate A's left edge there.
+Unfilled work canvases are expected to look wrong until a human fills X in Photoshop,
+Kling, Midjourney, Firefly, or another editor.

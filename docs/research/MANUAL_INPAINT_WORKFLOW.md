@@ -1,93 +1,16 @@
-# Manual Inpaint Adapter Workflow
+# Manual Inpaint Workflow
 
-This is the current intended adapter pipeline:
-
-```text
-repo export AXB
--> human inpaints X in Kling / Photoshop / Midjourney / Firefly
--> repo imports external output
--> repo crops X only
--> repo composites original A/B + generated X
--> repo verifies outside-X diff = 0
--> inspect in the workbench / loop
-```
-
-Human-in-the-loop is a formal design choice, not a workaround. New seasonal scenes
-are major updates, not high-frequency batch jobs, so manual X treatment is
-acceptable if the repo handles the mechanical contract and verification.
-
-## Export
-
-Generate manual work folders for every current adjacent pair:
-
-```bash
-npm run adapter:export-manual -- --all
-```
-
-Each pair is written to:
+1. Open `/#adapter-workbench`.
+2. Download the work canvas for `AXB`, `BXC`, or `CXA`.
+3. Fill the X region in Photoshop / Kling / Midjourney / Firefly.
+4. Export the full `[A][X][B]` image at `3136 x 1344`.
+5. Add the completed image under:
 
 ```text
-docs/research/experiments/working/manual-inpaint/<pair-id>/
+public/panos/adapters-clean/
 ```
 
-Files:
+6. Wire the corresponding pair in `src/pano/panoRing.ts` to the completed image.
 
-- `work-canvas.png` - upload this to the external editor.
-- `work-canvas-gradient.png` - same gradient AXB canvas, kept as an explicit alias.
-- `work-canvas-labeled.png` - human reference only; do not upload it to a model.
-- `mask-hard.png` - strict X harvest region: white = X, black = original A/B.
-- `mask-soft.png` - existing soft/overmask prep mask for future mask-aware tools.
-- `prompt.txt` - short human/external-editor prompt.
-- `manifest.json` - geometry and import contract.
-
-## Human Step
-
-Upload `work-canvas.png` to Kling, Photoshop, Midjourney, Firefly, or another
-editor. Select/fill only X. Download the external full image.
-
-The external tool's A/B pixels are untrusted. They are context for generating X,
-not final pixels.
-
-## Import
-
-Import the external full image as an X source:
-
-```bash
-npm run adapter:import-manual -- \
-  --pair dawn-valley__dusk-ridge \
-  --input /absolute/path/to/external-output.png \
-  --id kling-01
-```
-
-If the external output dimensions differ from the manifest, the import fails by
-default. Resize only when that choice is explicit:
-
-```bash
-npm run adapter:import-manual -- \
-  --pair dawn-valley__dusk-ridge \
-  --input /absolute/path/to/external-output.png \
-  --id kling-01 \
-  --resize-to-canvas
-```
-
-Import rules:
-
-- Only X may come from the external tool.
-- A/B must always come from the original work canvas.
-- Final candidate = original A/B + external X.
-- outside-X pixel diff must be `0`.
-
-The importer writes:
-
-- runtime candidate under `public/panos/adapter-candidates/<pair-id>/<id>.png`;
-- research copy under `docs/research/experiments/working/manual-inpaint-imports/<pair-id>/`;
-- `diff-report.json`;
-- review artifacts: original work canvas, external output, final composite,
-  A/X closeup, X/B closeup, and a comparison contact sheet;
-- updated `candidates.json` and regenerated TypeScript candidate registry.
-
-Runtime note: imported candidates remain full `[A][X][B]` images. The seam lab
-places them with anchor overlap, so A/B anchors act as sockets and the visible
-transition is `plate A -> X -> plate B`.
-
-After import, inspect the candidate in `/#adapter-workbench` and the seam lab.
+The runtime uses full AXB images with `523px` anchor overlap on both sides. Anchors
+are sockets; X is the visible transition.

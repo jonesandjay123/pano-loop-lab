@@ -1,19 +1,8 @@
 /**
- * Data model for the panorama RING — now a seam-research lab.
+ * Data model for the clean panorama ring.
  *
- * The hard problem this repo exists to solve: take N independently AI-generated
- * far-background plates and make them read as ONE continuous world band. The ring
- * is `plate0, seam0→1, plate1, …, plateN-1, seamN-1→0` (the wrap closes it).
- *
- * This phase does NOT claim pixel-perfect welds. It turns the renderer into an
- * instrument for studying the boundaries: every segment exposes fit/scale/offset
- * knobs so horizons and ridges can be hand-aligned, adjacent segments can OVERLAP
- * and cross-fade, and a debug/inspect mode can reveal the *real* contact seam
- * (feather off) instead of hiding it. Whether CSS overlap + offsets can hide ~70%
- * of the mismatch is exactly what we want to find out here; the true fix
- * (edge-locked outpaint per boundary) is a later, separate phase.
- *
- * Everything is plain serializable data, so a ring could live in a JSON manifest.
+ * Runtime order is A, AXB, B, BXC, C, CXA. The adapters are full work-canvas
+ * images, not hidden blend zones. Unfinished adapters should remain visible.
  */
 
 /**
@@ -23,12 +12,6 @@
  * - `width`  : fit width, height follows aspect (preserves left/right edges).
  */
 export type FitMode = "cover" | "height" | "width";
-
-/** Optional darkening/vignette overlay painted across the whole strip. */
-export interface OverlayGradient {
-  css: string;
-  opacity: number;
-}
 
 /** Per-window visual knobs, shared by plates and seams. All optional w/ defaults. */
 export interface SegmentVisuals {
@@ -82,10 +65,8 @@ export interface PanoRingConfig {
   loopDurationSeconds: number;
   /** Auto-scroll travel direction. Defaults to "left". */
   direction?: "left" | "right";
-  /** Default overlap/feather width (vw) between adjacent windows. Default 12. */
+  /** Default overlap width (vw) between adjacent windows. Clean mode keeps this 0. */
   defaultOverlapVw?: number;
-  /** Optional vignette across the whole strip. */
-  overlayGradient?: OverlayGradient;
   notes?: string;
 }
 

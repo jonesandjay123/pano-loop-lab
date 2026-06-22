@@ -101,8 +101,8 @@ function Segment({
  *
  * `buildRingSegments` flattens the config into `[plate, seam, plate, seam, …]`
  * (wrapping last→first); that sequence is rendered twice for a seamless modulo
- * wrap. Adjacent windows may OVERLAP by `blendVw` and cross-fade via a CSS mask —
- * or, at `blendVw === 0`, butt-join so the *real* seam shows (debug honesty).
+ * wrap. Clean mode keeps `blendVw === 0`, so unfinished adapters stay visible
+ * and the runtime does not hide seams with a CSS feather.
  * Per-segment `fitMode` / `scale` / `xOffset` / `yOffset` are the alignment knobs.
  *
  * No Three.js / canvas / GSAP — the far layer is a plain CSS image strip.
@@ -142,12 +142,6 @@ export function PanoRingStage({ ring, lab, reducedMotion }: PanoRingStageProps) 
           );
         })}
       </div>
-      {ring.overlayGradient && (
-        <div
-          className="pano-ring-overlay"
-          style={{ background: ring.overlayGradient.css, opacity: ring.overlayGradient.opacity }}
-        />
-      )}
     </div>
   );
 }

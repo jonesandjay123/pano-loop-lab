@@ -1,16 +1,12 @@
 import type { PanoRingConfig } from "../pano/panoTypes";
 import type { SeamLabState } from "./PanoRingStage";
 import { buildBoundaries, buildRingSegments, seamCoverage } from "../pano/panoRing";
-import type { DawnDuskAdapterOption, DawnDuskAdapterOptionId } from "../pano/panoRing";
 
 interface DebugPanelProps {
   ring: PanoRingConfig;
   lab: SeamLabState;
   onChange: (patch: Partial<SeamLabState>) => void;
   reducedMotion: boolean;
-  dawnDuskAdapterOptions: DawnDuskAdapterOption[];
-  dawnDuskAdapterId: DawnDuskAdapterOptionId;
-  onDawnDuskAdapterChange: (optionId: DawnDuskAdapterOptionId) => void;
 }
 
 function Row({ label, value }: { label: string; value: string }) {
@@ -22,21 +18,18 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-const BLEND_OPTIONS = [0, 8, 12, 16];
+const BLEND_OPTIONS = [0];
 
 /**
  * Seam-lab instrument. Reports ring structure and exposes the inspection controls:
- * overlap/feather width (0 = raw seams revealed), boundary labels, pause, and a
- * per-boundary inspect that centers & holds one seam for close study.
+ * raw boundary mode, boundary labels, pause, and a per-boundary inspect that
+ * centers & holds one seam for close study.
  */
 export function DebugPanel({
   ring,
   lab,
   onChange,
   reducedMotion,
-  dawnDuskAdapterOptions,
-  dawnDuskAdapterId,
-  onDawnDuskAdapterChange,
 }: DebugPanelProps) {
   const segments = buildRingSegments(ring);
   const boundaries = buildBoundaries(segments);
@@ -62,20 +55,6 @@ export function DebugPanel({
       </div>
 
       <div className="debug-controls">
-        <label className="debug-field">
-          <span className="debug-key">dawn→dusk</span>
-          <select
-            value={dawnDuskAdapterId}
-            onChange={(e) => onDawnDuskAdapterChange(e.target.value as DawnDuskAdapterOptionId)}
-          >
-            {dawnDuskAdapterOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
         <label className="debug-field">
           <span className="debug-key">blend</span>
           <select
@@ -128,8 +107,8 @@ export function DebugPanel({
       </div>
 
       <p className="debug-notes">
-        Set blend to <strong>raw — 0</strong> to reveal the true contact seams; raise
-        overlap to test how much CSS feather + offsets can hide. Drag to scrub.
+        Clean mode is locked to <strong>raw — 0</strong>. Unfinished AXB/BXC/CXA
+        adapters should stay visibly wrong until a filled image replaces them.
       </p>
     </aside>
   );

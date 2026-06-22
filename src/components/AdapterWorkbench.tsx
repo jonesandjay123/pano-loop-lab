@@ -1,9 +1,8 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ADAPTER_WORKBENCH_PAIRS } from "../pano/adapterWorkbench";
 import type { AdapterWorkbenchPair } from "../pano/adapterWorkbench";
 
-type PreviewMode = "canvas" | "mask" | "anchors";
-type PrepVariantId = "gradient" | "white" | "black";
+type PreviewMode = "work" | "runtime";
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
@@ -33,30 +32,17 @@ function PairButton({
 
 export function AdapterWorkbench() {
   const [pairIndex, setPairIndex] = useState(0);
-  const [previewMode, setPreviewMode] = useState<PreviewMode>("canvas");
-  const [prepVariantId, setPrepVariantId] = useState<PrepVariantId>("gradient");
-  const [activeCandidateByPair, setActiveCandidateByPair] = useState<Record<string, string | null>>(() =>
-    Object.fromEntries(
-      ADAPTER_WORKBENCH_PAIRS.map((item) => [`${item.fromId}__${item.toId}`, item.activeCandidateId]),
-    ),
-  );
+  const [previewMode, setPreviewMode] = useState<PreviewMode>("runtime");
   const pair = ADAPTER_WORKBENCH_PAIRS[pairIndex];
+  const previewUrl = previewMode === "work" ? pair.workCanvasUrl : pair.activeRuntimeUrl;
   const pairKey = `${pair.fromId}__${pair.toId}`;
-  const selectedPrepVariant =
-    pair.prepVariants.find((variant) => variant.id === prepVariantId) ?? pair.prepVariants[0];
-  const ratioSlug = pair.geometry.ratio.replace(/:/g, "-");
-  const activeCandidateId = activeCandidateByPair[pairKey] ?? null;
-  const activeCandidate = useMemo(
-    () => pair.candidates.find((candidate) => candidate.id === activeCandidateId) ?? null,
-    [pair, activeCandidateId],
-  );
 
   return (
     <section className="adapter-workbench" aria-label="Adapter workbench">
       <header className="workbench-header">
         <div>
-          <p className="workbench-kicker">Adapter workbench</p>
-          <h1>AXB prep dashboard</h1>
+          <p className="workbench-kicker">Clean AXB dashboard</p>
+          <h1>AXB / BXC / CXA work canvases</h1>
         </div>
         <a className="workbench-link" href="#seam-lab">
           Seam lab
@@ -78,8 +64,8 @@ export function AdapterWorkbench() {
           </div>
 
           <div className="workbench-status">
-            <span>Active adapter</span>
-            <strong>{activeCandidate ? activeCandidate.label : "none yet"}</strong>
+            <span>Runtime state</span>
+            <strong>{pair.status === "filled" ? "filled" : "placeholder"}</strong>
           </div>
         </aside>
 
@@ -92,56 +78,24 @@ export function AdapterWorkbench() {
             <div className="mode-tabs" aria-label="Preview mode">
               <button
                 type="button"
-                className={previewMode === "canvas" ? "is-active" : ""}
-                onClick={() => setPreviewMode("canvas")}
+                className={previewMode === "runtime" ? "is-active" : ""}
+                onClick={() => setPreviewMode("runtime")}
               >
-                Canvas
+                Runtime
               </button>
               <button
                 type="button"
-                className={previewMode === "mask" ? "is-active" : ""}
-                onClick={() => setPreviewMode("mask")}
+                className={previewMode === "work" ? "is-active" : ""}
+                onClick={() => setPreviewMode("work")}
               >
-                Mask
-              </button>
-              <button
-                type="button"
-                className={previewMode === "anchors" ? "is-active" : ""}
-                onClick={() => setPreviewMode("anchors")}
-              >
-                Anchors
+                Work canvas
               </button>
             </div>
           </div>
 
-          <div className="prefill-tabs" aria-label="Canvas prefill">
-            {pair.prepVariants.map((variant) => (
-              <button
-                key={variant.id}
-                type="button"
-                className={variant.id === selectedPrepVariant.id ? "is-active" : ""}
-                onClick={() => {
-                  setPreviewMode("canvas");
-                  setPrepVariantId(variant.id);
-                }}
-              >
-                {variant.label}
-              </button>
-            ))}
-          </div>
-
           <div className="workbench-grid">
-            <section className="preview-panel" aria-label="Prep preview">
-              {previewMode === "canvas" && (
-                <img src={selectedPrepVariant.workCanvasUrl} alt={`${pair.label} ${selectedPrepVariant.label} AXB work canvas`} />
-              )}
-              {previewMode === "mask" && <img src={pair.maskUrl} alt={`${pair.label} adapter mask`} />}
-              {previewMode === "anchors" && (
-                <div className="anchor-preview">
-                  <img src={pair.fromAnchorUrl} alt={`${pair.fromId} right anchor`} />
-                  <img src={pair.toAnchorUrl} alt={`${pair.toId} left anchor`} />
-                </div>
-              )}
+            <section className="preview-panel" aria-label="Adapter preview">
+              <img src={previewUrl} alt={`${pair.label} ${previewMode} image`} />
             </section>
 
             <aside className="details-panel">
@@ -150,88 +104,32 @@ export function AdapterWorkbench() {
                 <div className="stat-grid">
                   <Stat label="Canvas" value={`${pair.geometry.width} x ${pair.geometry.height}`} />
                   <Stat label="Ratio" value={pair.geometry.ratio} />
-                  <Stat label="Anchor" value={`${pair.geometry.anchorWidth}px`} />
+                  <Stat label="Anchor" value={`${pair.geometry.anchorWidth}px each`} />
                   <Stat label="X region" value={`${pair.geometry.xRegionWidth}px`} />
-                  <Stat label="Overlap" value={`${pair.geometry.overlapWidth}px`} />
-                  <Stat label="Overmask" value={`${pair.geometry.overmaskPx}px`} />
                 </div>
               </div>
 
               <div className="details-block">
                 <div className="sidebar-heading">Files</div>
                 <div className="file-links">
-                  <a
-                    href={selectedPrepVariant.workCanvasUrl}
-                    download={`${pair.fromId}__${pair.toId}__${ratioSlug}__${selectedPrepVariant.id}.png`}
-                  >
-                    download canvas
+                  <a href={pair.workCanvasUrl} download={`${pairKey}-work-canvas.png`}>
+                    download work canvas
                   </a>
-                  <a href={pair.maskUrl} download={`${pair.fromId}__${pair.toId}__${ratioSlug}__mask.png`}>
-                    download mask
-                  </a>
-                  <a href={pair.manifestUrl} target="_blank" rel="noreferrer">
-                    manifest
-                  </a>
-                  <a href={pair.promptUrl} target="_blank" rel="noreferrer">
-                    prompt
+                  <a href={pair.activeRuntimeUrl} download={`${pairKey}-runtime.png`}>
+                    download runtime image
                   </a>
                 </div>
               </div>
 
               <div className="details-block">
-                <div className="sidebar-heading">Candidates</div>
-                {pair.candidates.length === 0 ? (
-                  <div className="empty-candidates">
-                    <strong>0 generated</strong>
-                    <span>Candidate slots are ready; no AI-filled X outputs have been added.</span>
-                  </div>
-                ) : (
-                  <div className="candidate-list">
-                    {pair.candidates.map((candidate) => (
-                      <article
-                        key={candidate.id}
-                        className={`candidate-card${candidate.id === activeCandidateId ? " is-active" : ""}`}
-                      >
-                        <img src={candidate.imageUrl} alt={candidate.label} />
-                        <div>
-                          <div className="candidate-title-row">
-                            <strong>{candidate.label}</strong>
-                            <span>{candidate.status}</span>
-                          </div>
-                          {candidate.reviewSummary && (
-                            <div className="candidate-review-summary" aria-label={`${candidate.label} review summary`}>
-                              <span>
-                                L diff:{" "}
-                                <strong>
-                                  {candidate.reviewSummary.leftOuterAnchorMaxDiff ?? "n/a"}
-                                </strong>
-                              </span>
-                              <span>
-                                R diff:{" "}
-                                <strong>
-                                  {candidate.reviewSummary.rightOuterAnchorMaxDiff ?? "n/a"}
-                                </strong>
-                              </span>
-                              <span>{candidate.reviewSummary.internalJoinVerdict}</span>
-                            </div>
-                          )}
-                          <p>{candidate.notes}</p>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setActiveCandidateByPair((prev) => ({
-                                ...prev,
-                                [pairKey]: candidate.id,
-                              }))
-                            }
-                          >
-                            {candidate.id === activeCandidateId ? "Active for review" : "Use for review"}
-                          </button>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                )}
+                <div className="sidebar-heading">Runtime contract</div>
+                <div className="empty-candidates">
+                  <strong>{pair.status === "filled" ? "ready" : "intentionally unfinished"}</strong>
+                  <span>
+                    Full AXB image with 523px anchor overlap. Unfilled placeholders should look wrong in
+                    the loop until their X region is manually completed.
+                  </span>
+                </div>
               </div>
             </aside>
           </div>

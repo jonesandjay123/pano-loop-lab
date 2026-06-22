@@ -3,13 +3,7 @@ import { PanoRingStage } from "./components/PanoRingStage";
 import type { SeamLabState } from "./components/PanoRingStage";
 import { DebugPanel } from "./components/DebugPanel";
 import { AdapterWorkbench } from "./components/AdapterWorkbench";
-import {
-  DAWN_DUSK_ADAPTER_OPTIONS,
-  DEFAULT_DAWN_DUSK_ADAPTER_OPTION_ID,
-  PANO_RING,
-  buildPanoRingWithDawnDuskAdapter,
-} from "./pano/panoRing";
-import type { DawnDuskAdapterOptionId } from "./pano/panoRing";
+import { PANO_RING } from "./pano/panoRing";
 import { useReducedMotion } from "./useReducedMotion";
 
 const INITIAL_LAB: SeamLabState = {
@@ -28,10 +22,7 @@ function readHashView(): AppView {
 export default function App() {
   const [lab, setLab] = useState<SeamLabState>(INITIAL_LAB);
   const [view, setView] = useState<AppView>(readHashView);
-  const [dawnDuskAdapterId, setDawnDuskAdapterId] = useState<DawnDuskAdapterOptionId>(
-    DEFAULT_DAWN_DUSK_ADAPTER_OPTION_ID,
-  );
-  const ring = useMemo(() => buildPanoRingWithDawnDuskAdapter(dawnDuskAdapterId), [dawnDuskAdapterId]);
+  const ring = useMemo(() => PANO_RING, []);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -61,9 +52,6 @@ export default function App() {
         lab={lab}
         onChange={patch}
         reducedMotion={reducedMotion}
-        dawnDuskAdapterOptions={DAWN_DUSK_ADAPTER_OPTIONS}
-        dawnDuskAdapterId={dawnDuskAdapterId}
-        onDawnDuskAdapterChange={setDawnDuskAdapterId}
       />
     </main>
   );

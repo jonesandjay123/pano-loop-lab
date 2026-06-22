@@ -94,13 +94,6 @@ body {
   pointer-events: none;
 }
 
-/* Vignette across the whole viewport, above the moving strip. */
-.pano-ring-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
 /* ---------- Seam inspection (debug) ---------- */
 
 .pano-seam-line {
@@ -539,89 +532,6 @@ body {
 
 .empty-candidates strong {
   color: #f7f8fa;
-}
-
-.candidate-list {
-  display: grid;
-  gap: 8px;
-}
-
-.candidate-card {
-  display: grid;
-  gap: 8px;
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.045);
-}
-
-.candidate-card.is-active {
-  border-color: rgba(104, 199, 255, 0.62);
-  background: rgba(80, 158, 204, 0.14);
-}
-
-.candidate-card img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 21 / 9;
-  object-fit: cover;
-  border-radius: 6px;
-  background: #07080c;
-}
-
-.candidate-title-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.candidate-title-row strong {
-  color: #f7f8fa;
-  font-size: 13px;
-}
-
-.candidate-title-row span {
-  color: #9da6af;
-  font-size: 12px;
-}
-
-.candidate-review-summary {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5px;
-  margin-top: 7px;
-  padding: 7px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.055);
-  color: #b8c1ca;
-  font-size: 11px;
-  line-height: 1.25;
-}
-
-.candidate-review-summary span:last-child {
-  grid-column: 1 / -1;
-}
-
-.candidate-review-summary strong {
-  color: #f7f8fa;
-}
-
-.candidate-card p {
-  margin: 6px 0 8px;
-  color: #aeb6bf;
-  font-size: 12px;
-  line-height: 1.35;
-}
-
-.candidate-card button {
-  width: 100%;
-  min-height: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.065);
-  color: #edf0f2;
-  font: inherit;
-  cursor: pointer;
 }
 
 @media (max-width: 1000px) {

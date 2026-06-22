@@ -1,6 +1,0 @@
-Pair-specific panoramic adapter for dawn-valley to dusk-ridge.
-Use the left anchor as the actual right edge of dawn-valley and the right anchor as the actual left edge of dusk-ridge.
-Generate a wide natural transition world between them: open dawn valley atmosphere, low mist basin, distant layered ridges, soft haze, coherent horizon, dusk ridge gradually emerging on the right.
-Keep the left endpoint airy and low-contrast; do not introduce a large dark mountain mass immediately on the left edge.
-Preserve the anchor crops where the mask is black and regenerate the white center band plus slight overmask area.
-The result should feel like one continuous panoramic journey, not two wallpapers taped together.
