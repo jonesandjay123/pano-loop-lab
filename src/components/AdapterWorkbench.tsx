@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { DragEvent } from "react";
 import {
   WORKBENCH_GEOMETRY,
   exportScene,
@@ -70,6 +71,7 @@ export function AdapterWorkbench({
 }: AdapterWorkbenchProps) {
   const [selectedPairId, setSelectedPairId] = useState<string | null>(pairs[0]?.id ?? null);
   const [notice, setNotice] = useState<Notice>(null);
+  const [dragTarget, setDragTarget] = useState<string | null>(null);
   const selectedPair = pairs.find((pair) => pair.id === selectedPairId) ?? pairs[0];
   const finishedCount = pairs.filter((pair) => pair.finishedAdapter).length;
   const missingCount = Math.max(0, pairs.length - finishedCount);
@@ -100,6 +102,39 @@ export function AdapterWorkbench({
       },
     ]);
     setNotice({ tone: "ok", text: `已新增 plate：${file.name}` });
+  };
+
+  const firstImageFile = (files: FileList) => Array.from(files).find((file) => file.type.startsWith("image/"));
+
+  const prepareDrop = (event: DragEvent<HTMLElement>, target: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "copy";
+    setDragTarget(target);
+  };
+
+  const dropNewPlate = async (event: DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragTarget(null);
+    const file = firstImageFile(event.dataTransfer.files);
+    if (!file) {
+      setNotice({ tone: "warn", text: "拖曳的檔案不是圖片。" });
+      return;
+    }
+    await addPlate(file);
+  };
+
+  const dropReplacementPlate = async (event: DragEvent<HTMLElement>, plate: WorkbenchPlate) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragTarget(null);
+    const file = firstImageFile(event.dataTransfer.files);
+    if (!file) {
+      setNotice({ tone: "warn", text: "拖曳的檔案不是圖片。" });
+      return;
+    }
+    await replacePlate(plate, file);
   };
 
   const replacePlate = async (plate: WorkbenchPlate, file: File) => {
@@ -336,7 +371,13 @@ export function AdapterWorkbench({
           </div>
 
           <div className="sidebar-heading">Plate slots</div>
-          <label className="upload-button">
+          <label
+            className={`upload-button drop-zone ${dragTarget === "new-plate" ? "is-dragging" : ""}`}
+            onDragEnter={(event) => prepareDrop(event, "new-plate")}
+            onDragOver={(event) => prepareDrop(event, "new-plate")}
+            onDragLeave={() => setDragTarget(null)}
+            onDrop={dropNewPlate}
+          >
             新增 plate
             <input
               type="file"
@@ -351,7 +392,14 @@ export function AdapterWorkbench({
 
           <div className="plate-list">
             {state.plates.map((plate, index) => (
-              <div className="plate-card" key={plate.id}>
+              <div
+                className={`plate-card drop-zone ${dragTarget === plate.id ? "is-dragging" : ""}`}
+                key={plate.id}
+                onDragEnter={(event) => prepareDrop(event, plate.id)}
+                onDragOver={(event) => prepareDrop(event, plate.id)}
+                onDragLeave={() => setDragTarget(null)}
+                onDrop={(event) => void dropReplacementPlate(event, plate)}
+              >
                 <img src={plate.imageUrl} alt={plate.label} />
                 <div className="plate-meta">
                   <strong>{plate.label}</strong>

@@ -348,6 +348,19 @@ body {
   margin-bottom: 12px;
 }
 
+.drop-zone {
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.drop-zone.is-dragging {
+  border-color: rgba(104, 199, 255, 0.8);
+  background: rgba(80, 158, 204, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(104, 199, 255, 0.34);
+}
+
 .upload-button input,
 .file-label input,
 .plate-actions input,
