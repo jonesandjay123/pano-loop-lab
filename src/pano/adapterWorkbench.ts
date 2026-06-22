@@ -41,8 +41,8 @@ export const ADAPTER_WORKBENCH_PAIRS: AdapterWorkbenchPair[] = [
     toId: "moonlit-tidelands",
     label: "Dusk Ridge -> Moonlit Tidelands",
     workCanvasUrl: "/panos/adapters-clean/dusk-ridge__moonlit-tidelands-work.png",
-    activeRuntimeUrl: "/panos/adapters-clean/dusk-ridge__moonlit-tidelands-work.png",
-    status: "placeholder",
+    activeRuntimeUrl: "/panos/adapters-clean/dusk-ridge__moonlit-tidelands-photoshop-test2.png",
+    status: "filled",
     geometry: GEOMETRY,
   },
   {
@@ -50,8 +50,8 @@ export const ADAPTER_WORKBENCH_PAIRS: AdapterWorkbenchPair[] = [
     toId: "dawn-valley",
     label: "Moonlit Tidelands -> Dawn Valley",
     workCanvasUrl: "/panos/adapters-clean/moonlit-tidelands__dawn-valley-work.png",
-    activeRuntimeUrl: "/panos/adapters-clean/moonlit-tidelands__dawn-valley-work.png",
-    status: "placeholder",
+    activeRuntimeUrl: "/panos/adapters-clean/moonlit-tidelands__dawn-valley-photoshop-test3.png",
+    status: "filled",
     geometry: GEOMETRY,
   },
 ];
