@@ -43,6 +43,15 @@ function plateLabelFromFile(file: File) {
   return file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
 }
 
+function downloadUrl(url: string, filename: string) {
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
 export function AdapterWorkbench({
   state,
   pairs,
@@ -145,12 +154,27 @@ export function AdapterWorkbench({
   const exportConfig = () => {
     const blob = new Blob([exportScene(state)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `pano-loop-scene-${new Date().toISOString().slice(0, 10)}.json`;
-    link.click();
+    downloadUrl(url, `pano-loop-scene-${new Date().toISOString().slice(0, 10)}.json`);
     URL.revokeObjectURL(url);
     setNotice({ tone: "ok", text: "已匯出 scene config。" });
+  };
+
+  const downloadAllWorkAdapters = () => {
+    if (generating) {
+      setNotice({ tone: "warn", text: "work adapter 還在產生中，請稍後再下載。" });
+      return;
+    }
+    if (pairs.length === 0) {
+      setNotice({ tone: "warn", text: "目前沒有可下載的 work adapter。" });
+      return;
+    }
+
+    pairs.forEach((pair, index) => {
+      window.setTimeout(() => {
+        downloadUrl(pair.workAdapterUrl, `${String(index + 1).padStart(2, "0")}-${pair.id}-work.png`);
+      }, index * 160);
+    });
+    setNotice({ tone: "ok", text: `已開始下載 ${pairs.length} 張 work adapter。` });
   };
 
   const importConfig = async (file: File) => {
@@ -188,6 +212,9 @@ export function AdapterWorkbench({
             <div className="scene-actions">
               <button type="button" onClick={exportConfig}>
                 匯出 config
+              </button>
+              <button type="button" onClick={downloadAllWorkAdapters} disabled={generating || pairs.length === 0}>
+                下載全部 work
               </button>
               <label>
                 匯入 config

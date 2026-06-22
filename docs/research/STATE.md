@@ -58,6 +58,7 @@ The X zone is intentionally unfinished and should stay visible until Photoshop o
 - runtime fallback between finished and work adapter
 - localStorage auto-save
 - scene config export/import with geometry and image checks
+- batch download for all generated work adapters
 
 State is local React state backed by `localStorage`. If browser storage quota is exceeded, the workbench asks the user to preserve the scene through config export.
 
@@ -65,7 +66,6 @@ State is local React state backed by `localStorage`. If browser storage quota is
 
 Do not bring back legacy seam registries, GPT/HF sweep artifacts, or fixed A/B/C assumptions.
 
-The next useful work is packaging and cleanup:
+The next useful work is asset cleanup:
 
-- batch work adapter download
 - cleanup of old `public/panos` assets after replacement plates exist
