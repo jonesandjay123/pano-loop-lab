@@ -1,10 +1,13 @@
 import { useState } from "react";
 import {
   WORKBENCH_GEOMETRY,
+  exportScene,
+  importScene,
   makePlateId,
   readImageFile,
   validateAdapterDimensions,
   validatePlateDimensions,
+  validateWorkbenchStateImages,
 } from "../pano/workbenchState";
 import type { WorkbenchFinishedAdapter, WorkbenchPair, WorkbenchPlate, WorkbenchState } from "../pano/workbenchState";
 
@@ -14,7 +17,9 @@ interface AdapterWorkbenchProps {
   state: WorkbenchState;
   pairs: WorkbenchPair[];
   onChange: (next: WorkbenchState) => void;
+  onReset: () => void;
   generating: boolean;
+  storageStatus: string;
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -38,7 +43,14 @@ function plateLabelFromFile(file: File) {
   return file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
 }
 
-export function AdapterWorkbench({ state, pairs, onChange, generating }: AdapterWorkbenchProps) {
+export function AdapterWorkbench({
+  state,
+  pairs,
+  onChange,
+  onReset,
+  generating,
+  storageStatus,
+}: AdapterWorkbenchProps) {
   const [selectedPairId, setSelectedPairId] = useState<string | null>(pairs[0]?.id ?? null);
   const [notice, setNotice] = useState<Notice>(null);
   const selectedPair = pairs.find((pair) => pair.id === selectedPairId) ?? pairs[0];
@@ -130,6 +142,33 @@ export function AdapterWorkbench({ state, pairs, onChange, generating }: Adapter
     setNotice({ tone: "ok", text: "已回到 work adapter fallback。" });
   };
 
+  const exportConfig = () => {
+    const blob = new Blob([exportScene(state)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `pano-loop-scene-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setNotice({ tone: "ok", text: "已匯出 scene config。" });
+  };
+
+  const importConfig = async (file: File) => {
+    try {
+      const text = await file.text();
+      const next = importScene(text);
+      await validateWorkbenchStateImages(next);
+      onChange(next);
+      setSelectedPairId(null);
+      setNotice({ tone: "ok", text: `已匯入 scene config：${file.name}` });
+    } catch (error) {
+      setNotice({
+        tone: "warn",
+        text: error instanceof Error ? `匯入失敗：${error.message}` : "匯入失敗。",
+      });
+    }
+  };
+
   return (
     <section className="adapter-workbench" aria-label="Adapter workbench">
       <header className="workbench-header">
@@ -144,6 +183,38 @@ export function AdapterWorkbench({ state, pairs, onChange, generating }: Adapter
 
       <div className="workbench-shell">
         <aside className="workbench-sidebar" aria-label="Plate manager">
+          <div className="scene-tools">
+            <div className="sidebar-heading">Scene file</div>
+            <div className="scene-actions">
+              <button type="button" onClick={exportConfig}>
+                匯出 config
+              </button>
+              <label>
+                匯入 config
+                <input
+                  type="file"
+                  accept="application/json,.json"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files?.[0];
+                    event.currentTarget.value = "";
+                    if (file) void importConfig(file);
+                  }}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  onReset();
+                  setSelectedPairId(null);
+                  setNotice({ tone: "ok", text: "已重置為內建 staging scene。" });
+                }}
+              >
+                重置
+              </button>
+            </div>
+            <p>{storageStatus}</p>
+          </div>
+
           <div className="sidebar-heading">Plate slots</div>
           <label className="upload-button">
             新增 plate

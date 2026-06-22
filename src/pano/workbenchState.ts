@@ -37,6 +37,14 @@ export interface WorkbenchState {
   finishedAdapters: Record<string, WorkbenchFinishedAdapter | undefined>;
 }
 
+interface WorkbenchSceneFile {
+  app: "pano-loop-lab";
+  version: 1;
+  exportedAt: string;
+  geometry: typeof WORKBENCH_GEOMETRY;
+  state: WorkbenchState;
+}
+
 export interface ResolvedWorkbenchPair {
   id: string;
   from: WorkbenchPlate;
@@ -156,8 +164,20 @@ export function makePlateId(label: string) {
   return `${slug || "plate"}-${Date.now().toString(36)}`;
 }
 
+export function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") resolve(reader.result);
+      else reject(new Error("File could not be read as a data URL."));
+    };
+    reader.onerror = () => reject(new Error("File read failed."));
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function readImageFile(file: File): Promise<{ url: string; width: number; height: number }> {
-  const url = URL.createObjectURL(file);
+  const url = await readFileAsDataUrl(file);
   const image = new Image();
   image.decoding = "async";
   image.src = url;
@@ -172,6 +192,111 @@ export async function readImageFile(file: File): Promise<{ url: string; width: n
   }
 
   return { url, width: image.naturalWidth, height: image.naturalHeight };
+}
+
+export function exportScene(state: WorkbenchState): string {
+  const payload: WorkbenchSceneFile = {
+    app: "pano-loop-lab",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    geometry: WORKBENCH_GEOMETRY,
+    state,
+  };
+  return JSON.stringify(payload, null, 2);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isValidImageUrl(value: unknown): value is string {
+  return typeof value === "string" && (value.startsWith("data:image/") || value.startsWith("/"));
+}
+
+function validateImportedState(value: unknown): WorkbenchState {
+  if (!isRecord(value)) throw new Error("Scene state is missing.");
+  const plates = value.plates;
+  const finishedAdapters = value.finishedAdapters;
+
+  if (!Array.isArray(plates) || plates.length < 2) {
+    throw new Error("Scene must contain at least 2 plates.");
+  }
+
+  const normalizedPlates: WorkbenchPlate[] = plates.map((plate, index) => {
+    if (!isRecord(plate)) throw new Error(`Plate ${index + 1} is invalid.`);
+    if (typeof plate.id !== "string" || !plate.id) throw new Error(`Plate ${index + 1} is missing an id.`);
+    if (typeof plate.label !== "string" || !plate.label) throw new Error(`Plate ${index + 1} is missing a label.`);
+    if (!isValidImageUrl(plate.imageUrl)) throw new Error(`Plate ${index + 1} is missing image data.`);
+    const imageUrl = plate.imageUrl;
+    return {
+      id: plate.id,
+      label: plate.label,
+      imageUrl,
+      sourceName: typeof plate.sourceName === "string" ? plate.sourceName : "imported plate",
+      locked: Boolean(plate.locked),
+    };
+  });
+
+  const normalizedFinished: Record<string, WorkbenchFinishedAdapter | undefined> = {};
+  if (isRecord(finishedAdapters)) {
+    Object.entries(finishedAdapters).forEach(([key, adapter]) => {
+      if (!adapter) return;
+      if (!isRecord(adapter)) throw new Error(`Finished adapter ${key} is invalid.`);
+      if (!isValidImageUrl(adapter.imageUrl)) throw new Error(`Finished adapter ${key} is missing image data.`);
+      const imageUrl = adapter.imageUrl;
+      normalizedFinished[key] = {
+        imageUrl,
+        sourceName: typeof adapter.sourceName === "string" ? adapter.sourceName : "imported finished adapter",
+      };
+    });
+  }
+
+  return { plates: normalizedPlates, finishedAdapters: normalizedFinished };
+}
+
+export function importScene(text: string): WorkbenchState {
+  const parsed: unknown = JSON.parse(text);
+  if (!isRecord(parsed)) throw new Error("Scene file is invalid JSON.");
+  if (parsed.app !== "pano-loop-lab" || parsed.version !== 1) {
+    throw new Error("Scene file version is not supported.");
+  }
+
+  const geometry = parsed.geometry;
+  if (!isRecord(geometry)) throw new Error("Scene geometry is missing.");
+  if (
+    geometry.plateWidth !== WORKBENCH_GEOMETRY.plateWidth ||
+    geometry.plateHeight !== WORKBENCH_GEOMETRY.plateHeight ||
+    geometry.adapterWidth !== WORKBENCH_GEOMETRY.adapterWidth ||
+    geometry.adapterHeight !== WORKBENCH_GEOMETRY.adapterHeight ||
+    geometry.edgeWidth !== WORKBENCH_GEOMETRY.edgeWidth ||
+    geometry.xWidth !== WORKBENCH_GEOMETRY.xWidth
+  ) {
+    throw new Error("Scene geometry does not match this workbench.");
+  }
+
+  return validateImportedState(parsed.state);
+}
+
+export async function validateWorkbenchStateImages(state: WorkbenchState): Promise<void> {
+  const plates = await Promise.all(state.plates.map((plate) => loadImage(plate.imageUrl)));
+  plates.forEach((image, index) => {
+    if (!validatePlateDimensions(image.naturalWidth, image.naturalHeight)) {
+      throw new Error(
+        `Plate ${index + 1} is ${image.naturalWidth} x ${image.naturalHeight}; expected ${WORKBENCH_GEOMETRY.plateWidth} x ${WORKBENCH_GEOMETRY.plateHeight}.`,
+      );
+    }
+  });
+
+  const finished = Object.entries(state.finishedAdapters);
+  const images = await Promise.all(finished.map(([, adapter]) => (adapter ? loadImage(adapter.imageUrl) : null)));
+  images.forEach((image, index) => {
+    if (!image) return;
+    if (!validateAdapterDimensions(image.naturalWidth, image.naturalHeight)) {
+      throw new Error(
+        `Finished adapter ${finished[index][0]} is ${image.naturalWidth} x ${image.naturalHeight}; expected ${WORKBENCH_GEOMETRY.adapterWidth} x ${WORKBENCH_GEOMETRY.adapterHeight}.`,
+      );
+    }
+  });
 }
 
 export function validatePlateDimensions(width: number, height: number) {

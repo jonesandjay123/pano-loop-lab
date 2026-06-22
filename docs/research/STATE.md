@@ -56,16 +56,16 @@ The X zone is intentionally unfinished and should stay visible until Photoshop o
 - generated work adapter preview/download
 - finished adapter upload/clear
 - runtime fallback between finished and work adapter
+- localStorage auto-save
+- scene config export/import with geometry and image checks
 
-State is local React state only. Refreshing resets to built-in staging plates.
+State is local React state backed by `localStorage`. If browser storage quota is exceeded, the workbench asks the user to preserve the scene through config export.
 
 ## Guardrail
 
 Do not bring back legacy seam registries, GPT/HF sweep artifacts, or fixed A/B/C assumptions.
 
-The next useful work is persistence/export:
+The next useful work is packaging and cleanup:
 
-- localStorage state restore
-- scene config export/import
 - batch work adapter download
 - cleanup of old `public/panos` assets after replacement plates exist

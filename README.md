@@ -65,6 +65,12 @@ http://localhost:5173/
 http://localhost:5173/#adapter-workbench
 ```
 
+## 保存與搬移
+
+工具台會自動把目前場景保存到此瀏覽器的 `localStorage`。如果圖片資料太大導致瀏覽器拒絕保存，請用工具台左側的「匯出 config」保存一份 JSON。
+
+scene config 會包含 plate / finished adapter 的圖片資料、順序、label 與目前幾何規格。匯入時會檢查版本、規格和圖片尺寸，不符合就拒絕。
+
 ## 圖片方向
 
 第一組素材建議維持同一個世界觀、同一種地理氣質，但不要做同一張地圖換時間。
@@ -82,11 +88,9 @@ http://localhost:5173/#adapter-workbench
 
 ## 目前狀態
 
-工具台目前使用瀏覽器本地狀態，重新整理後會回到內建 staging plates。
+工具台目前使用瀏覽器本地狀態加 `localStorage` 自動保存。也可以匯出 / 匯入 scene config。
 
 下一步會考慮：
 
-- localStorage 保存目前工作狀態
-- 匯出 / 匯入 scene config
 - 更完整的 adapter 批次下載
 - 清理舊 public demo 圖片

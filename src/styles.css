@@ -361,7 +361,8 @@ body {
 
 .upload-button,
 .file-label,
-.plate-actions label {
+.plate-actions label,
+.scene-actions label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -383,12 +384,45 @@ body {
 
 .upload-button input,
 .file-label input,
-.plate-actions input {
+.plate-actions input,
+.scene-actions input {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
   opacity: 0;
   pointer-events: none;
+}
+
+.scene-tools {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scene-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+
+.scene-actions button {
+  min-height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #edf0f2;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.scene-tools p {
+  margin: 0;
+  color: #9da6af;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .plate-list {
