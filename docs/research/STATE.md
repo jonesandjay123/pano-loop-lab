@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-22** (Turn 28 — edge-accurate seam-lab renderer).
+> Last updated: **2026-06-22** (Turn 29 — full AXB runtime anchor overlap).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -22,6 +22,10 @@ routing / backend. `npm run build` passes, TS clean.
     widths follow measured image aspect ratios and overscan is disabled, so segment
     boundaries correspond to real source image edges instead of center-cropped
     interiors.
+  - Full AXB candidates run with **anchor overlap geometry**: the AXB left anchor
+    overlaps the previous plate's right edge, and the next plate overlaps the AXB
+    right anchor. The visible runtime path is therefore `plate A -> X -> plate B`,
+    not `plate A -> A anchor -> X -> B anchor -> plate B`.
   - Per-segment knobs: `fitMode` (cover/height/width), `scale`, `xOffset`, `yOffset`
     (legacy free-pan segments may still overscan 6%; edge-locked review segments do
     not).
@@ -158,6 +162,9 @@ First real manual import:
   fixed `100vw` centered `cover` rendering was cropping true source edges. Use the
   current edge-locked renderer for judgment; older screenshots before this fix are
   not valid evidence against the manual import.
+- runtime note: Turn 29 changed full AXB candidates to use anchor overlap in the
+  loop. `photoshop-test1` should be judged as a full `[A][X][B]` segment whose
+  anchors are sockets, not as duplicated visible content or as an X-only crop.
 
 Smoke-tested manual import:
 - id: `manual-smoke-identity`;

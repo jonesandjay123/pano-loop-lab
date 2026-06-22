@@ -105,6 +105,15 @@
   natural-aspect segments, disabling overscan for current plates/seams so `blend = 0`
   inspection actually compares source edges. _Source: EXPERIMENT_LOG.md Turn 28._
 
+- ✅ **Manual AXB candidates should run as full `[A][X][B]` with anchor overlap.**
+  Turn 29 corrected the runtime model: a full AXB candidate should not be reduced to
+  X-only for loop inspection, and it should not be inserted as extra non-overlapped
+  A/B anchor material. Its left anchor overlaps the previous plate edge; its right
+  anchor is overlapped by the next plate. This makes the visible runtime transition
+  `plate A -> X -> plate B`, while preserving the intuitive debug behavior that an
+  unfilled X looks visibly wrong and a good human-filled AXB looks continuous.
+  _Source: EXPERIMENT_LOG.md Turn 29._
+
 - 🟡 **GPT-filled 1:4:1 AXB produces the strongest semantic transition so far, but
   still needs anchor adoption.** Turn 23 imported the user's GPT result as
   `gpt-axb-01`. Visually it is the best warm-to-cool mountain bridge so far, but its

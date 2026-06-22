@@ -139,6 +139,8 @@ npm run adapter:import-manual -- \
 The manual importer crops only the manifest X range, composites that X onto the
 original work canvas, verifies outside-X diff is `0`, writes review artifacts, and
 updates the generated candidate registry used by the workbench and loop selector.
+The registered runtime candidate remains a full `[A][X][B]` image; the seam lab
+uses anchor overlap so AXB anchors are sockets, not extra visible repeated content.
 
 ## AXB adapter prep pipeline
 

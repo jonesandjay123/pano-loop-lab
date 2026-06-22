@@ -14,6 +14,8 @@ export interface DawnDuskAdapterOption {
   label: string;
   imageUrl: string;
   aspectRatio?: number;
+  overlapStartPx?: number;
+  overlapEndPx?: number;
   notes: string;
 }
 
@@ -25,6 +27,8 @@ const ASPECT = {
   axbCandidate: 3136 / 1344,
 };
 
+const AXB_ANCHOR_WIDTH_PX = 523;
+
 const DAWN_DUSK_GENERATED_OPTIONS: DawnDuskAdapterOption[] = (
   ADAPTER_CANDIDATES_BY_PAIR["dawn-valley__dusk-ridge"]?.candidates ?? []
 ).map((candidate) => ({
@@ -32,6 +36,8 @@ const DAWN_DUSK_GENERATED_OPTIONS: DawnDuskAdapterOption[] = (
   label: candidate.label,
   imageUrl: candidate.imageUrl,
   aspectRatio: ASPECT.axbCandidate,
+  overlapStartPx: AXB_ANCHOR_WIDTH_PX,
+  overlapEndPx: AXB_ANCHOR_WIDTH_PX,
   notes: candidate.notes,
 }));
 
@@ -156,7 +162,14 @@ export function buildPanoRingWithDawnDuskAdapter(optionId: DawnDuskAdapterOption
     ...PANO_RING,
     seams: PANO_RING.seams?.map((seam) =>
       seam.fromId === "dawn-valley" && seam.toId === "dusk-ridge"
-        ? { ...seam, imageUrl: option.imageUrl, aspectRatio: option.aspectRatio ?? seam.aspectRatio, notes: option.notes }
+        ? {
+            ...seam,
+            imageUrl: option.imageUrl,
+            aspectRatio: option.aspectRatio ?? seam.aspectRatio,
+            overlapStartPx: option.overlapStartPx,
+            overlapEndPx: option.overlapEndPx,
+            notes: option.notes,
+          }
         : seam,
     ),
   };
@@ -164,26 +177,32 @@ export function buildPanoRingWithDawnDuskAdapter(optionId: DawnDuskAdapterOption
 
 const PLATE_DEFAULTS = {
   widthVw: 100,
+  overlapStartPx: 0,
+  overlapEndPx: 0,
   fitMode: "cover",
   scale: 1,
   xOffset: 0,
   yOffset: 0,
   edgeLocked: false,
-} satisfies Required<Pick<SegmentVisuals, "widthVw" | "fitMode" | "scale" | "xOffset" | "yOffset" | "edgeLocked">>;
+} satisfies Required<Pick<SegmentVisuals, "widthVw" | "overlapStartPx" | "overlapEndPx" | "fitMode" | "scale" | "xOffset" | "yOffset" | "edgeLocked">>;
 
 const SEAM_DEFAULTS = {
   widthVw: 100,
+  overlapStartPx: 0,
+  overlapEndPx: 0,
   fitMode: "cover",
   scale: 1,
   xOffset: 0,
   yOffset: 0,
   edgeLocked: false,
-} satisfies Required<Pick<SegmentVisuals, "widthVw" | "fitMode" | "scale" | "xOffset" | "yOffset" | "edgeLocked">>;
+} satisfies Required<Pick<SegmentVisuals, "widthVw" | "overlapStartPx" | "overlapEndPx" | "fitMode" | "scale" | "xOffset" | "yOffset" | "edgeLocked">>;
 
 function resolve(v: SegmentVisuals, defaults: typeof PLATE_DEFAULTS): Omit<RingSegment, "key" | "kind" | "label" | "imageUrl"> {
   return {
     widthVw: v.widthVw ?? defaults.widthVw,
     aspectRatio: v.aspectRatio,
+    overlapStartPx: v.overlapStartPx ?? defaults.overlapStartPx,
+    overlapEndPx: v.overlapEndPx ?? defaults.overlapEndPx,
     edgeLocked: v.edgeLocked ?? defaults.edgeLocked,
     fitMode: v.fitMode ?? defaults.fitMode,
     scale: v.scale ?? defaults.scale,
@@ -207,7 +226,13 @@ export function buildRingSegments(config: PanoRingConfig): RingSegment[] {
   const segments: RingSegment[] = [];
 
   plates.forEach((plate, i) => {
-    const v = resolve(plate, PLATE_DEFAULTS);
+    const previous = plates[(i - 1 + n) % n];
+    const previousSeam = findSeam(seams, previous.id, plate.id);
+    const previousOverlapEndPx = previousSeam?.overlapEndPx ?? 0;
+    const v = {
+      ...resolve(plate, PLATE_DEFAULTS),
+      overlapStartPx: plate.overlapStartPx ?? previousOverlapEndPx,
+    };
     segments.push({ key: `plate-${plate.id}`, kind: "plate", label: plate.id, imageUrl: plate.imageUrl, ...v });
 
     const next = plates[(i + 1) % n];

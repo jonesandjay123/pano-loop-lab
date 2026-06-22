@@ -86,4 +86,8 @@ The importer writes:
   A/X closeup, X/B closeup, and a comparison contact sheet;
 - updated `candidates.json` and regenerated TypeScript candidate registry.
 
+Runtime note: imported candidates remain full `[A][X][B]` images. The seam lab
+places them with anchor overlap, so A/B anchors act as sockets and the visible
+transition is `plate A -> X -> plate B`.
+
 After import, inspect the candidate in `/#adapter-workbench` and the seam lab.

@@ -6,6 +6,33 @@
 
 ---
 
+## Turn 29 - 2026-06-22 - Full AXB runtime anchor-overlap model
+- **Role:** Reviewer / Engineering Runner.
+- **Boundary:** runtime inspection model for manual AXB candidates.
+- **Question:** if the workbench already exports full `[A][X][B]` images, why not
+  put those full AXB images directly into the loop and make visual debugging obvious?
+- **User correction:** the runtime should not secretly crop X or rely on extra
+  gradient/line tricks. If X is blank/ugly, the loop should visibly look wrong; if a
+  human-filled AXB is good, it should look continuous.
+- **Root cause:** after Turn 28, the renderer was edge-accurate, but full AXB was
+  still treated as an ordinary seam placed between two plates. That effectively
+  rendered `A plate | A anchor | X | B anchor | B plate`, so the anchor material was
+  replayed instead of serving as overlap material.
+- **Implementation:** added segment `overlapStartPx` / `overlapEndPx`. Generated AXB
+  candidates now declare `523px` overlap on both sides. The renderer places a seam's
+  left anchor over the previous plate's right edge, and the following plate overlaps
+  the seam's right anchor. Runtime visual structure becomes:
+  `A plate | visible X region | B plate`.
+- **Important:** no new image generation, no gradient fix, and no artificial seam line
+  is used for alignment. This is pure layout geometry matching the AXB contract.
+- **Verification:** `npm run build` passes. Browser inspection of `photoshop-test1`
+  at `blend = 0` shows the debug boundary line now marks the overlapped anchor edge;
+  the visible transition path is the full-AXB overlap model rather than duplicated
+  A/B anchors.
+- **Verdict:** **BUG FIX / MODEL SIMPLIFIED.** The loop now directly uses full AXB
+  candidates as the user intended, with anchors acting as overlap sockets and X as the
+  visible transition region.
+
 ## Turn 28 - 2026-06-22 - Edge-accurate seam-lab renderer calibration
 - **Role:** Reviewer / Engineering Runner.
 - **Boundary:** runtime inspection surface, verified on `dawn-valley -> dusk-ridge`

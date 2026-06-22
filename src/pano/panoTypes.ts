@@ -36,6 +36,10 @@ export interface SegmentVisuals {
   widthVw?: number;
   /** Natural image width / height. When set, review can preserve true image edges. */
   aspectRatio?: number;
+  /** Pixels from this segment's left edge that should overlap the previous segment. */
+  overlapStartPx?: number;
+  /** Pixels from this segment's right edge that the next segment should overlap. */
+  overlapEndPx?: number;
   /** Disable overscan/pan cropping so segment boundaries correspond to source image edges. */
   edgeLocked?: boolean;
   /** How the image fills the window. Default `cover`. */
@@ -97,6 +101,8 @@ export interface RingSegment {
   imageUrl: string;
   widthVw: number;
   aspectRatio?: number;
+  overlapStartPx: number;
+  overlapEndPx: number;
   edgeLocked: boolean;
   fitMode: FitMode;
   scale: number;

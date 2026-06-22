@@ -29,6 +29,10 @@ function backgroundSizeFor(fit: FitMode): string {
   return "cover";
 }
 
+function heightScaledPx(px: number): string {
+  return `calc(100dvh * ${px / 1344})`;
+}
+
 function Segment({
   segment,
   boundary,
@@ -51,7 +55,14 @@ function Segment({
     flex: segment.aspectRatio
       ? `0 0 calc(100dvh * ${segment.aspectRatio})`
       : `0 0 ${segment.widthVw}vw`,
-    marginLeft: feather ? `-${blendVw}vw` : 0,
+    marginLeft:
+      segment.overlapStartPx > 0
+        ? feather
+          ? `calc(-1 * ${heightScaledPx(segment.overlapStartPx)} - ${blendVw}vw)`
+          : `calc(-1 * ${heightScaledPx(segment.overlapStartPx)})`
+        : feather
+          ? `-${blendVw}vw`
+          : 0,
   };
 
   // Mask only the image layer (not the whole segment) so the overlap cross-fades
