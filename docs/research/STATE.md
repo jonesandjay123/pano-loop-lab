@@ -59,6 +59,9 @@ The X zone is intentionally unfinished and should stay visible until Photoshop o
 - localStorage auto-save
 - scene config export/import with geometry and image checks
 - batch download for all generated work adapters
+- finished adapter status inventory
+- batch download / clear-all for finished adapters
+- scene manifest export for external asset handoff
 
 State is local React state backed by `localStorage`. If browser storage quota is exceeded, the workbench asks the user to preserve the scene through config export.
 
@@ -70,7 +73,7 @@ There are no runtime panorama assets checked into `public/panos` now. Production
 
 Do not bring back legacy seam registries, GPT/HF sweep artifacts, or fixed A/B/C assumptions.
 
-The next useful work is Photoshop round-trip ergonomics:
+The next useful work is production content:
 
-- clearer finished adapter inventory
-- optional scene manifest for external asset handoff
+- generate or import the first real `6144 x 1536` plate set
+- run the Photoshop adapter round-trip on that set

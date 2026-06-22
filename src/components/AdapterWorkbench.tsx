@@ -43,6 +43,14 @@ function plateLabelFromFile(file: File) {
   return file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
 }
 
+function safeName(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48) || "asset";
+}
+
 function downloadUrl(url: string, filename: string) {
   const link = document.createElement("a");
   link.href = url;
@@ -63,6 +71,8 @@ export function AdapterWorkbench({
   const [selectedPairId, setSelectedPairId] = useState<string | null>(pairs[0]?.id ?? null);
   const [notice, setNotice] = useState<Notice>(null);
   const selectedPair = pairs.find((pair) => pair.id === selectedPairId) ?? pairs[0];
+  const finishedCount = pairs.filter((pair) => pair.finishedAdapter).length;
+  const missingCount = Math.max(0, pairs.length - finishedCount);
 
   const patchPlates = (plates: WorkbenchPlate[]) => {
     onChange({ ...state, plates });
@@ -177,6 +187,70 @@ export function AdapterWorkbench({
     setNotice({ tone: "ok", text: `已開始下載 ${pairs.length} 張 work adapter。` });
   };
 
+  const downloadAllFinishedAdapters = () => {
+    const finishedPairs = pairs.filter((pair) => pair.finishedAdapter);
+    if (finishedPairs.length === 0) {
+      setNotice({ tone: "warn", text: "目前沒有 finished adapter 可下載。" });
+      return;
+    }
+
+    finishedPairs.forEach((pair, index) => {
+      window.setTimeout(() => {
+        const ext = pair.finishedAdapter?.sourceName.split(".").pop()?.toLowerCase() || "png";
+        downloadUrl(pair.finishedAdapter?.imageUrl ?? "", `${String(index + 1).padStart(2, "0")}-${pair.id}-finished.${ext}`);
+      }, index * 160);
+    });
+    setNotice({ tone: "ok", text: `已開始下載 ${finishedPairs.length} 張 finished adapter。` });
+  };
+
+  const clearAllFinished = () => {
+    if (finishedCount === 0) {
+      setNotice({ tone: "warn", text: "目前沒有 finished adapter 可清除。" });
+      return;
+    }
+    onChange({ ...state, finishedAdapters: {} });
+    setNotice({ tone: "ok", text: "已清除全部 finished adapter，runtime 回到 work fallback。" });
+  };
+
+  const exportManifest = () => {
+    const manifest = {
+      app: "pano-loop-lab",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      geometry: WORKBENCH_GEOMETRY,
+      summary: {
+        plates: state.plates.length,
+        pairs: pairs.length,
+        finishedAdapters: finishedCount,
+        missingFinishedAdapters: missingCount,
+      },
+      plates: state.plates.map((plate, index) => ({
+        index,
+        id: plate.id,
+        label: plate.label,
+        sourceName: plate.sourceName,
+        suggestedFilename: `${String(index + 1).padStart(2, "0")}-${safeName(plate.label)}-plate.png`,
+      })),
+      pairs: pairs.map((pair, index) => ({
+        index,
+        id: pair.id,
+        fromId: pair.from.id,
+        toId: pair.to.id,
+        fromLabel: pair.from.label,
+        toLabel: pair.to.label,
+        status: pair.finishedAdapter ? "finished" : "work-fallback",
+        workFilename: `${String(index + 1).padStart(2, "0")}-${pair.id}-work.png`,
+        finishedSourceName: pair.finishedAdapter?.sourceName ?? null,
+        suggestedFinishedFilename: `${String(index + 1).padStart(2, "0")}-${pair.id}-finished.png`,
+      })),
+    };
+    const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    downloadUrl(url, `pano-loop-manifest-${new Date().toISOString().slice(0, 10)}.json`);
+    URL.revokeObjectURL(url);
+    setNotice({ tone: "ok", text: "已匯出 scene manifest。" });
+  };
+
   const importConfig = async (file: File) => {
     try {
       const text = await file.text();
@@ -216,6 +290,12 @@ export function AdapterWorkbench({
               <button type="button" onClick={downloadAllWorkAdapters} disabled={generating || pairs.length === 0}>
                 下載全部 work
               </button>
+              <button type="button" onClick={downloadAllFinishedAdapters} disabled={finishedCount === 0}>
+                下載全部 finished
+              </button>
+              <button type="button" onClick={exportManifest} disabled={pairs.length === 0}>
+                匯出 manifest
+              </button>
               <label>
                 匯入 config
                 <input
@@ -240,6 +320,19 @@ export function AdapterWorkbench({
               </button>
             </div>
             <p>{storageStatus}</p>
+          </div>
+
+          <div className="scene-summary">
+            <div className="sidebar-heading">Round-trip</div>
+            <div className="summary-grid">
+              <Stat label="Plates" value={String(state.plates.length)} />
+              <Stat label="Pairs" value={String(pairs.length)} />
+              <Stat label="Finished" value={`${finishedCount} / ${pairs.length}`} />
+              <Stat label="Missing" value={String(missingCount)} />
+            </div>
+            <button type="button" onClick={clearAllFinished} disabled={finishedCount === 0}>
+              清除全部 finished
+            </button>
           </div>
 
           <div className="sidebar-heading">Plate slots</div>
@@ -305,10 +398,11 @@ export function AdapterWorkbench({
                 <button
                   key={pair.id}
                   type="button"
-                  className={pair.id === selectedPair?.id ? "is-active" : ""}
+                  className={`${pair.id === selectedPair?.id ? "is-active" : ""} ${pair.finishedAdapter ? "has-finished" : "needs-finished"}`}
                   onClick={() => setSelectedPairId(pair.id)}
                 >
-                  {pair.from.label} → {pair.to.label}
+                  <span>{pair.from.label} → {pair.to.label}</span>
+                  <strong>{pair.finishedAdapter ? "finished" : "work fallback"}</strong>
                 </button>
               ))}
             </div>
@@ -339,7 +433,7 @@ export function AdapterWorkbench({
 
               <div className="details-block">
                 <div className="sidebar-heading">Runtime source</div>
-                <div className="empty-candidates">
+                <div className={`empty-candidates ${selectedPair?.finishedAdapter ? "is-finished" : "is-missing"}`}>
                   <strong>{selectedPair?.finishedAdapter ? "finished adapter" : "work adapter fallback"}</strong>
                   <span>
                     {selectedPair?.finishedAdapter?.sourceName ??
@@ -355,6 +449,14 @@ export function AdapterWorkbench({
                     <a href={selectedPair.workAdapterUrl} download={`${selectedPair.id}-work.png`}>
                       下載 work
                     </a>
+                    {selectedPair.finishedAdapter && (
+                      <a
+                        href={selectedPair.finishedAdapter.imageUrl}
+                        download={`${selectedPair.id}-finished.${selectedPair.finishedAdapter.sourceName.split(".").pop() || "png"}`}
+                      >
+                        下載 finished
+                      </a>
+                    )}
                     <label className="file-label">
                       上傳 finished
                       <input
