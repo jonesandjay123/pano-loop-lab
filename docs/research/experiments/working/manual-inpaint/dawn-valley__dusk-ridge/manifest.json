@@ -1,0 +1,63 @@
+{
+  "id": "manual-inpaint-v1",
+  "pairId": "dawn-valley__dusk-ridge",
+  "createdAt": "2026-06-22T01:30:26.839Z",
+  "fromScene": "dawn-valley",
+  "toScene": "dusk-ridge",
+  "sourcePaths": {
+    "from": "public/panos/dawn-valley.jpg",
+    "to": "public/panos/dusk-ridge.jpg",
+    "prepManifest": "public/panos/adapter-prep/dawn-valley__dusk-ridge/manifest.json",
+    "prepWorkCanvas": "public/panos/adapter-prep/dawn-valley__dusk-ridge/adapter-work-canvas.png",
+    "prepSoftMask": "public/panos/adapter-prep/dawn-valley__dusk-ridge/adapter-mask.png"
+  },
+  "outputPaths": {
+    "directory": "docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge",
+    "workCanvas": "docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge/work-canvas.png",
+    "workCanvasGradient": "docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge/work-canvas-gradient.png",
+    "workCanvasLabeled": "docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge/work-canvas-labeled.png",
+    "maskHard": "docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge/mask-hard.png",
+    "maskSoft": "docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge/mask-soft.png",
+    "prompt": "docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge/prompt.txt",
+    "manifest": "docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge/manifest.json"
+  },
+  "canvas": {
+    "width": 3136,
+    "height": 1344,
+    "aspectRatio": "3136:1344"
+  },
+  "regions": {
+    "leftAnchor": {
+      "xStart": 0,
+      "xEnd": 523,
+      "width": 523
+    },
+    "x": {
+      "xStart": 523,
+      "xEnd": 2613,
+      "width": 2090
+    },
+    "rightAnchor": {
+      "xStart": 2613,
+      "xEnd": 3136,
+      "width": 523
+    }
+  },
+  "expectedExternalOutputDimensions": {
+    "width": 3136,
+    "height": 1344
+  },
+  "finalCandidateImportRules": {
+    "core": "Only X may come from the external tool. A/B must always come from the original work canvas. outside-X pixel diff must be 0.",
+    "externalOutputRole": "X source only; external A/B pixels are untrusted and discarded.",
+    "dimensionPolicy": "Importer rejects dimension mismatches unless --resize-to-canvas is explicitly passed.",
+    "compositeRule": "final = original work-canvas A/B + external-output X range",
+    "diffRule": "Compare final candidate against original work-canvas outside the X range. changedPixels must be 0."
+  },
+  "notes": [
+    "Human-in-the-loop manual inpainting is the intended workflow, not a workaround.",
+    "Use work-canvas.png for external tools; work-canvas-labeled.png is for human inspection only.",
+    "mask-hard.png marks the strict X harvest region. mask-soft.png is retained only for future mask-aware tools.",
+    "The final candidate must never trust external A/B pixels."
+  ]
+}

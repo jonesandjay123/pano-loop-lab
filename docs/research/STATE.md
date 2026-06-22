@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-21** (Turn 25 — soft256 review and strict-X sweep).
+> Last updated: **2026-06-22** (Turn 26 — manual-inpaint export/import pipeline).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -31,21 +31,31 @@ routing / backend. `npm run build` passes, TS clean.
 
 ## Current method direction
 
-The active direction is now **AXB prep + candidate selection**:
+The active direction is now **manual-inpainting-ready AXB export/import**:
 
 ```
-[A right-edge anchor][editable X transition region][B left-edge anchor]
+repo export AXB work canvas
+-> human fills X in Kling / Photoshop / Midjourney / Firefly
+-> repo imports only X
+-> repo composites original A/B + generated X
+-> repo validates outside-X pixel diff = 0
+-> inspect in workbench / loop
 ```
 
-`scripts/adapter-prep.mjs` deterministically prepares one inpainting workbench for
-every adjacent ordered pair in the loop. This converts the hard adapter problem into
-a standard masked-fill input:
+Core contract:
 
-- opaque `adapter-work-canvas.png`;
-- separate `adapter-mask.png` where black = preserve and white = edit/regenerate;
-- narrow A/B edge sockets, not large content blocks;
-- later candidate batches can be generated from these inputs and one candidate can be
-  chosen as the active adapter.
+```
+Only X may come from the external tool.
+A/B must always come from the original work canvas.
+outside-X pixel diff must be 0.
+```
+
+`scripts/adapter-prep.mjs` still deterministically prepares one AXB workbench for
+every adjacent ordered pair. `scripts/adapter-export-manual.mjs` packages those prep
+assets into human-ready work folders. `scripts/adapter-import-manual.mjs` then treats
+an external full image as an X source only, discards external A/B pixels, composites
+original A/B back in, verifies outside-X diff, writes review artifacts, and updates the
+candidate registry.
 
 Primary AXB prep geometry:
 - `3136 x 1344`;
@@ -81,6 +91,20 @@ Legacy 1:12:1 prep artifacts remain in earlier working folders such as
 `docs/research/experiments/working/006-axb-prep/` and
 `docs/research/experiments/working/009-axb-prefill-variants/`.
 
+Manual export folders:
+- `docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge/`
+- `docs/research/experiments/working/manual-inpaint/dusk-ridge__moonlit-tidelands/`
+- `docs/research/experiments/working/manual-inpaint/moonlit-tidelands__dawn-valley/`
+
+Each contains:
+- `work-canvas.png`;
+- `work-canvas-gradient.png`;
+- `work-canvas-labeled.png`;
+- `mask-hard.png`;
+- `mask-soft.png`;
+- `prompt.txt`;
+- `manifest.json`.
+
 ## Dashboard status
 
 An in-app workbench is available at `/#adapter-workbench`.
@@ -98,13 +122,38 @@ both the workbench and seam lab by default. No candidate is accepted as final ye
 The dashboard can switch the prep canvas between gradient, white, and black X
 prefill variants, and provides download links for the selected work canvas and mask.
 
-Candidate import path:
+Manual candidate import path:
+- `npm run adapter:import-manual -- --pair dawn-valley__dusk-ridge --input /absolute/path/to/external-output.png --id kling-01`
+- reads `docs/research/experiments/working/manual-inpaint/<pair>/manifest.json`;
+- rejects dimension mismatches unless `--resize-to-canvas` is explicit;
+- crops only the manifest X range from the external output;
+- composites that X onto original `work-canvas.png` A/B;
+- verifies outside-X diff is `0`;
+- writes review artifacts under `docs/research/experiments/working/manual-inpaint-imports/<pair>/review/<id>/`;
+- updates `public/panos/adapter-candidates/<pair>/candidates.json`;
+- regenerates `src/pano/adapterCandidates.generated.ts`;
+- dashboard and seam-lab selector read from the generated registry.
+
+Smoke-tested manual import:
+- id: `manual-smoke-identity`;
+- pair: `dawn-valley__dusk-ridge`;
+- input: exported `work-canvas.png` used as a fake external full image;
+- status: `rejected`, not a visual candidate;
+- `--no-activate` preserved `gpt-axb-01-soft256` as `activeForReview`;
+- diff report:
+  `docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/manual-smoke-identity/diff-report.json`;
+- outside-X changed pixels: `0`;
+- outside-X max diff: `0`.
+
+Legacy whole-frame candidate import path:
 - `npm run adapter:import -- --source /absolute/path/to/result.png --id gpt-axb-01`
 - imports into `public/panos/adapter-candidates/<from>__<to>/`;
 - mirrors into `docs/research/experiments/working/011-imported-gpt-candidates/`;
 - updates `candidates.json`;
 - regenerates `src/pano/adapterCandidates.generated.ts`;
 - dashboard and seam-lab selector read from the generated registry.
+- Keep this for old comparison experiments. New manual adoption should use
+  `adapter:import-manual`, not full-frame import.
 
 Imported GPT candidate status:
 - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01.png`
@@ -159,6 +208,9 @@ revisited only **after** a generation/transition method works. See HANDOFF.md §
   templates/EXPERIMENT_TEMPLATE). `AGENTS.md` created at repo root.
 - AXB prep pipeline exists and can generate current-loop prep assets with
   `npm run adapter:prep -- --all`.
+- Manual export pipeline exists with `npm run adapter:export-manual -- --all`.
+- Manual import pipeline exists with `npm run adapter:import-manual`; it enforces
+  X-only harvest and outside-X diff verification.
 - Strict-X soft adoption exists with `npm run adapter:soft-adopt`; it supports
   `--feather-px` and `--curve linear|smoothstep|cosine`.
 - AXB dashboard exists at `/#adapter-workbench`.

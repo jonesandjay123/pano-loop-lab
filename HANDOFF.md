@@ -96,10 +96,45 @@ Reframed research question (put this in any future README):
 
 ---
 
-## 4. The actual next research = GENERATION methodology (not CSS, not sizing)
+## 4. Current practical method = manual-inpainting-ready adapter pipeline
 
-The next session should investigate **how to generate plates and adapters**, by
-testing these hypotheses (one at a time, with honest inspection):
+As of Turn 26, the immediate path is **not** to make the repo automatically call a
+model that generates final adapters. The practical workflow is human-in-the-loop:
+
+```text
+repo export AXB work canvas
+-> human fills X in Kling / Photoshop / Midjourney / Firefly
+-> repo imports only X
+-> repo composites original A/B + generated X
+-> repo validates outside-X pixel diff = 0
+-> inspect in workbench / loop
+```
+
+Core engineering rule:
+
+```text
+Only X may come from the external tool.
+A/B must always come from the original work canvas.
+outside-X pixel diff must be 0.
+```
+
+This is a formal design choice, not a workaround. Event scenes are major updates,
+not high-frequency batch jobs, so a human can use the best available creative tool
+to fill X while the repo owns geometry, exact anchor restoration, verification,
+review artifacts, and candidate registration.
+
+Implemented commands:
+- `npm run adapter:export-manual -- --all`
+- `npm run adapter:import-manual -- --pair dawn-valley__dusk-ridge --input /path/to/external-output.png --id kling-01`
+
+Workflow docs:
+- `docs/research/MANUAL_INPAINT_WORKFLOW.md`
+
+## 4b. Background research hypotheses (deferred; do not override current NEXT)
+
+Earlier generation hypotheses remain useful background for reviewing human-filled X
+outputs, but they are deferred unless `NEXT.md` explicitly reopens generation
+research:
 
 - **H1 — Pair-specific adapter generation.** Generate a dedicated `A→B` image from
   the (A,B) pair. Must read as a *transition world*, not just "colour averaged
@@ -164,12 +199,10 @@ plan) as of handoff.
 
 ## 7. Suggested first move for the next session
 
-Do **not** open the editor first. Start by writing a short **generation spec**:
-pick **H1** (pair-specific adapter) and design 2–3 concrete Higgsfield experiments
-on **one** pair (e.g. dawn → dusk) — including the *edge-anchored* variant (crop A's
-right + B's left, generate the middle) — then judge them against §5 with the repo's
-inspect mode (`blend = 0` to see the truth). Only after a method looks promising do
-we revisit fixed sizing (§3) and the plate/adapter model rename.
+Follow `docs/research/NEXT.md`. The current next step is to use the manual pipeline
+with one real external X output, not to research more generation backends. Export the
+AXB work canvas, let the human fill X externally, import with
+`adapter:import-manual`, verify outside-X diff is `0`, and inspect at `blend = 0`.
 
 ---
 

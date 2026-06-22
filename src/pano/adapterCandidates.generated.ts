@@ -258,6 +258,18 @@ export const ADAPTER_CANDIDATES_BY_PAIR = {
           "rightOuterAnchorMaxDiff": 0,
           "internalJoinVerdict": "Exact anchors; wider blend reduces right band but muddies left A-X transition."
         }
+      },
+      {
+        "id": "manual-smoke-identity",
+        "label": "Manual smoke identity",
+        "imageUrl": "/panos/adapter-candidates/dawn-valley__dusk-ridge/manual-smoke-identity.png",
+        "status": "rejected",
+        "notes": "External output was treated as X source only. Original A/B anchors were composited back from the manual work canvas; outside-X diff is verified at 0.",
+        "reviewSummary": {
+          "leftOuterAnchorMaxDiff": 0,
+          "rightOuterAnchorMaxDiff": 0,
+          "internalJoinVerdict": "Manual X-only import; exact A/B anchors restored. Inspect A-X and X-B at blend=0."
+        }
       }
     ]
   }

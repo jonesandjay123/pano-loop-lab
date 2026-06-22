@@ -15,7 +15,34 @@ shown here at N=3.
 
 No Three.js, R3F, GSAP, canvas, routing, or backend.
 
-## Current phase: a seam *inspection lab* (not a solved seam)
+## Current phase: manual-inpainting-ready adapter pipeline
+
+The repo is no longer trying to automatically generate a final adapter. The
+current workflow is deliberately human-in-the-loop:
+
+```text
+repo export AXB work canvas
+-> human fills X in Kling / Photoshop / Midjourney / Firefly
+-> repo imports only X
+-> repo composites original A/B + generated X
+-> repo validates outside-X pixel diff = 0
+-> inspect in the workbench / loop
+```
+
+Core rule:
+
+```text
+Only X may come from the external tool.
+A/B must always come from the original work canvas.
+outside-X pixel diff must be 0.
+```
+
+External editors are allowed to redraw or damage A/B because their A/B pixels are
+discarded. They are X sources only.
+
+See `docs/research/MANUAL_INPAINT_WORKFLOW.md` for the exact export/import flow.
+
+## Seam inspection lab status
 
 The honest state: stitching independently-generated plates leaves **visible
 boundaries** — colours are close, but composition, horizon height, and ridge lines
@@ -58,6 +85,7 @@ npm install
 npm run dev      # opens into the auto-scrolling, drag-scrubbable ring
 npm run build    # type-check + production build (must pass)
 npm run adapter:prep -- --all
+npm run adapter:export-manual -- --all
 npm run preview
 ```
 
@@ -66,6 +94,51 @@ In the debug panel:
 - **inspect** — center & hold one boundary for study (auto-pauses).
 - **boundary labels + lines** — show every contact line + its A▸B label.
 - **pause auto-scroll** — freeze the loop. Drag the background to scrub.
+
+## Manual AXB export / import pipeline
+
+Export manual work folders for all current adjacent pairs:
+
+```bash
+npm run adapter:export-manual -- --all
+```
+
+Output:
+
+```text
+docs/research/experiments/working/manual-inpaint/<pair-id>/
+  work-canvas.png
+  work-canvas-gradient.png
+  work-canvas-labeled.png
+  mask-hard.png
+  mask-soft.png
+  prompt.txt
+  manifest.json
+```
+
+Give `work-canvas.png` to an external editor and manually fill X. Then import the
+downloaded full image:
+
+```bash
+npm run adapter:import-manual -- \
+  --pair dawn-valley__dusk-ridge \
+  --input /absolute/path/to/external-output.png \
+  --id kling-01
+```
+
+If dimensions differ, the importer errors unless resize is explicit:
+
+```bash
+npm run adapter:import-manual -- \
+  --pair dawn-valley__dusk-ridge \
+  --input /absolute/path/to/external-output.png \
+  --id kling-01 \
+  --resize-to-canvas
+```
+
+The manual importer crops only the manifest X range, composites that X onto the
+original work canvas, verifies outside-X diff is `0`, writes review artifacts, and
+updates the generated candidate registry used by the workbench and loop selector.
 
 ## AXB adapter prep pipeline
 
@@ -138,7 +211,7 @@ editing tests:
 Use the `Download canvas` and `Download mask` buttons in `/#adapter-workbench` to
 export the current pair's input files.
 
-Import a GPT-filled AXB result after downloading/editing:
+Legacy whole-frame import for old GPT-filled AXB experiments:
 
 ```bash
 npm run adapter:import -- \
@@ -148,10 +221,10 @@ npm run adapter:import -- \
   --notes "Imported from GPT image edit using the 1:4:1 white canvas."
 ```
 
-The import script resizes the image to the current prep dimensions if needed, writes
-it under `public/panos/adapter-candidates/<from>__<to>/`, updates
-`candidates.json`, regenerates `src/pano/adapterCandidates.generated.ts`, and makes
-the candidate visible in both the dashboard and the seam-lab selector.
+This older importer resizes and registers the full external frame. Keep it for
+comparison with existing experiments, but do not use it for final manual inpaint
+adoption. New manual imports should use `adapter:import-manual`, which discards
+external A/B pixels and verifies outside-X diff.
 
 First candidate batch:
 - `dawn-valley -> dusk-ridge`
@@ -205,9 +278,10 @@ Add a `PanoPlate` plus the two `PanoSeam`s connecting it to its new neighbours
 
 ```
 done   : continuous ring + N seams + overlap/feather + per-segment knobs + inspect lab
-now    : AXB work-canvas prep for every adjacent pair
-next   : generate candidate batches from AXB canvases and choose active adapters
-then   : independent adapter dashboard for candidate generation/review/adoption
+done   : AXB work-canvas prep for every adjacent pair
+now    : manual export/import pipeline for human-filled X regions
+next   : use manual imports from real Kling/Photoshop/MJ/Firefly outputs and review
+then   : candidate selection and acceptance criteria for event-scene insertion
 later  : drag inertia, parallax depth bands, format/responsive passes
 ```
 

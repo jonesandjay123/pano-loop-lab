@@ -1,0 +1,9 @@
+Manual AXB inpaint source for dawn-valley -> dusk-ridge.
+
+Upload work-canvas.png to Kling, Photoshop, Midjourney, Firefly, or another editor.
+Select only the X region between the A/B anchors and generate a believable panoramic transition.
+
+The external tool does not need to preserve A/B perfectly. The repo will ignore external A/B pixels on import.
+Only X may come from the external tool. A/B must always come from the original work canvas.
+
+Visual target: coherent horizon, compatible lighting, compatible scale, no hard vertical split, and no text/watermark/foreground objects.

@@ -6,6 +6,47 @@
 
 ---
 
+## Turn 26 - 2026-06-22 - Manual-inpaint export/import pipeline
+- **Role:** Engineering Runner / Archivist.
+- **Boundary:** infrastructure, with smoke test on `dawn-valley -> dusk-ridge`.
+- **Question:** can the repo formally support the human-in-the-loop AXB workflow:
+  repo exports `[A][X][B]`, a human fills X externally, then repo imports only X,
+  composites original A/B back in, verifies outside-X diff, and registers the
+  candidate?
+- **Scope correction:** the next step is no longer a strict mask-inpaint backend
+  probe. External tools are allowed to redraw A/B because their A/B pixels are
+  discarded. The repo owns geometry, X extraction, exact A/B restoration, diff
+  verification, review artifacts, and registry updates.
+- **Implementation:** added:
+  - `scripts/adapter-export-manual.mjs`;
+  - `scripts/adapter-import-manual.mjs`;
+  - npm scripts `adapter:export-manual` and `adapter:import-manual`;
+  - `docs/research/MANUAL_INPAINT_WORKFLOW.md`.
+- **Export behavior:** `npm run adapter:export-manual -- --all` writes one folder
+  per current adjacent pair under
+  `docs/research/experiments/working/manual-inpaint/<pair-id>/`, containing:
+  `work-canvas.png`, `work-canvas-gradient.png`, `work-canvas-labeled.png`,
+  `mask-hard.png`, `mask-soft.png`, `prompt.txt`, and `manifest.json`.
+- **Import behavior:** `adapter:import-manual` reads the manual manifest, rejects
+  dimension mismatches unless `--resize-to-canvas` is explicit, crops only the X
+  range from the external full image, composites that X into the original work
+  canvas, verifies outside-X diff, writes review artifacts, updates
+  `candidates.json`, and regenerates `src/pano/adapterCandidates.generated.ts`.
+- **Smoke test:** ran:
+  `npm run adapter:import-manual -- --pair dawn-valley__dusk-ridge --input docs/research/experiments/working/manual-inpaint/dawn-valley__dusk-ridge/work-canvas.png --id manual-smoke-identity --label "Manual smoke identity" --notes "Smoke test for manual X-only import using the exported work canvas as the external full image. Not a visual candidate." --status rejected --no-activate`.
+- **Smoke diff:** `outsideXChangedPixels = 0`, `outsideXMaxAbsDiff = 0`.
+  Report:
+  `docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/manual-smoke-identity/diff-report.json`.
+- **Registry result:** `manual-smoke-identity` is registered for dashboard/loop
+  comparison, but `--no-activate` preserved `gpt-axb-01-soft256` as
+  `activeForReview`.
+- **Docs:** updated `README.md`, `NEXT.md`, and this log to make the manual
+  inpainting pipeline the formal next path.
+- **Verdict:** **SUPPORTED as infrastructure.** The repo can now enforce the core
+  contract mechanically: only X comes from the external image, original A/B are
+  restored, and outside-X diff is numerically verified. Visual quality still depends
+  on the human-filled X and must be reviewed at `blend = 0`.
+
 ## Turn 25 - 2026-06-21 - Soft256 loop review and strict-X parameter sweep
 - **Role:** Engineering Runner / Reviewer / Archivist
 - **Boundary:** `dawn-valley -> dusk-ridge`.

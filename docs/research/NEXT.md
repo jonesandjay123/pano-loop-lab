@@ -4,61 +4,74 @@
 
 ---
 
-## Next turn = strict mask-inpaint backend capability probe
+## Next turn = manual-inpaint pipeline smoke test with a real external X
 
 ### Goal
 
-Stop asking general image-edit models to protect A/B anchors by prompt. Find or test a
-backend path that can obey the actual AXB contract:
+Use the manual-inpainting-ready adapter pipeline as the primary path:
 
-> Given `adapter-work-canvas.png` and `adapter-mask.png`, regenerate only white mask
-> pixels and preserve black mask pixels exactly.
+```text
+repo export AXB work canvas
+-> human fills X in Kling / Photoshop / Midjourney / Firefly
+-> repo imports only X
+-> repo composites original A/B + generated X
+-> repo validates outside-X pixel diff = 0
+-> inspect in workbench / loop
+```
+
+Priority is manual export/import infrastructure, not automatic model generation.
+Do **not** pursue a strict mask-inpaint backend this turn.
 
 ### Current base
 
-Current best candidate:
+Manual export/import scripts exist:
+
+- `npm run adapter:export-manual -- --all`
+- `npm run adapter:import-manual -- --pair <from>__<to> --input <image> --id <id>`
+
+Core contract:
+
+```text
+Only X may come from the external tool.
+A/B must always come from the original work canvas.
+outside-X pixel diff must be 0.
+```
+
+Manual workflow docs:
+
+- `docs/research/MANUAL_INPAINT_WORKFLOW.md`
+
+Current best old candidate:
+
 - `public/panos/adapter-candidates/dawn-valley__dusk-ridge/gpt-axb-01-soft256.png`
 
-Current verdict:
-- `gpt-axb-01-soft256` is placement-safe and active for review.
-- Outer anchors diff = `0`.
-- It is still not final because the internal X-B tonal step remains visible at
-  `blend = 0`.
-
-Sweep already done:
-- feather widths: `128`, `192`, `256`, `384`, `512`;
-- curves: `linear`, `smoothstep`, `cosine`;
-- all preserve anchors;
-- no variant clearly beats `soft256`.
-
-Review summary:
-- `docs/research/experiments/working/012-soft-anchor-adoption/dawn-valley__dusk-ridge/review/strict-x-sweep-summary.json`
+This remains a comparison candidate only. It is not a final solution.
 
 ### Allowed changes
 
-- Inspect available local / CLI / API generation backends for true mask-inpaint
-  support.
-- Add a small backend capability note under `docs/research/experiments/working/`.
-- If a backend can be called non-interactively and supports real masks, run one small
-  dawn-to-dusk probe using the existing AXB work canvas and mask.
-- Verify black-mask / preserved-region diff numerically.
-- Register a generated candidate only if preserved-region diff is reported.
+- Run `npm run adapter:export-manual -- --all` if manual folders need refreshing.
+- Import exactly one real external manual-inpaint output with
+  `npm run adapter:import-manual`.
+- Use `--resize-to-canvas` only if the external tool changed dimensions and that
+  decision is recorded.
+- Verify `diff-report.json` reports outside-X changed pixels `0`.
+- Inspect the imported candidate in the workbench / seam lab at `blend = 0`.
+- Record the result in `EXPERIMENT_LOG.md`, `FINDINGS.md`, and `STATE.md`.
 
 ### Forbidden this turn
 
-- Do **not** run more generic GPT / whole-image reference generations as final
-  candidates.
-- Do **not** do another soft-adoption parameter sweep.
-- Do **not** treat red/green/blue frame prompting as a strict-mask solution.
+- Do **not** call any external AI generation API from the repo.
+- Do **not** research more models.
+- Do **not** pursue strict mask backend capability.
+- Do **not** import a full external output as final.
+- Do **not** trust external A/B pixels.
 - Do **not** delete or overwrite existing candidates.
 - Do **not** change global sizing or renderer architecture.
-- Do **not** add backend infrastructure unless a minimal probe proves the backend can
-  preserve mask-black pixels.
 
 ### Required evaluation / stop condition
 
-- Answer whether a strict mask-inpaint backend is available in the current environment.
-- If tested, report preserved-region max diff.
-- If no backend is available, record that honestly and list the minimal backend
-  contract needed next.
+- Report the manual import command used.
+- Report whether the external image dimensions matched the manifest.
+- Report outside-X changed pixels and max diff.
+- If imported, confirm the candidate appears in generated registry / workbench.
 - Run `npm run build` if code or generated registry changes.

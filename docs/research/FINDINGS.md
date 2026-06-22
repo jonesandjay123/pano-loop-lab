@@ -87,6 +87,16 @@
   imports do not require hand-editing multiple TypeScript files. _Source:
   EXPERIMENT_LOG.md Turn 22._
 
+- ✅ **Manual-inpaint export/import is now the primary adapter pipeline.** Turn 26
+  formalized the human-in-the-loop workflow: repo exports `[A][X][B]`; the human
+  fills X in Kling / Photoshop / Midjourney / Firefly; repo imports only X,
+  composites original A/B from the work canvas, verifies outside-X diff, writes
+  review artifacts, and registers the candidate. A smoke import using the exported
+  work canvas as the external full image reported `outsideXChangedPixels = 0` and
+  `outsideXMaxAbsDiff = 0`. This proves the infrastructure contract, not visual
+  adapter quality. _Source: EXPERIMENT_LOG.md Turn 26 and
+  `docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/manual-smoke-identity/diff-report.json`._
+
 - 🟡 **GPT-filled 1:4:1 AXB produces the strongest semantic transition so far, but
   still needs anchor adoption.** Turn 23 imported the user's GPT result as
   `gpt-axb-01`. Visually it is the best warm-to-cool mountain bridge so far, but its
