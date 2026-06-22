@@ -96,7 +96,16 @@ scene config 會包含 plate / finished adapter 的圖片資料、順序、label
 
 舊的 `public/panos` demo 圖已移除。現在 runtime 靠內建 staging plates、瀏覽器上傳、或 scene config 匯入。
 
+第一組 production source plates 已經放在：
+
+```text
+generated/production-plates/raw/
+```
+
+目前是四張 `6144 x 1536` PNG，可以用工具台替換進 plate slots，再下載 work adapters 給 Photoshop 手修。`generated/production-plates/contact-sheet-current.png` 只是檢查用 contact sheet，不是 runtime plate。
+
 下一步會考慮：
 
-- 產生第一批 production 規格 plates
+- 修掉目前 Photoshop 成品裡那條可見接縫
+- finished adapters 都確認後，從工具台匯出一份 scene config
 - 視需要加入更完整的成品檢查清單

@@ -54,6 +54,7 @@ The X zone is a Photoshop work area. Do not hide it with runtime blending.
 - Finished adapters have a round-trip inventory: counts, missing status, batch download, and clear-all.
 - Scene manifest export lists plate order, pair order, suggested filenames, and finished/work status.
 - Old demo files under `public/panos` have been removed; runtime now depends on built-in staging plates, uploads, and imported scene configs.
+- The first production plate set is checked in under `generated/production-plates/raw/`.
 
 ## Commands
 
@@ -63,7 +64,23 @@ npm run build
 npm run preview
 ```
 
+## Production Plate Set
+
+The current production source plates are:
+
+```text
+generated/production-plates/raw/00-6144x1536.png
+generated/production-plates/raw/01-6144x1536.png
+generated/production-plates/raw/02-6144x1536.png
+generated/production-plates/raw/03-6144x1536.png
+```
+
+All four are exactly `6144 x 1536`.
+
+`generated/production-plates/contact-sheet-current.png` is only a review sheet. It is not a runtime plate.
+
 ## Next Likely Work
 
-- Generate or import the first production-grade `6144 x 1536` plate set.
-- Add a final QA checklist if the Photoshop round-trip needs stricter signoff.
+- Recheck the one visible Photoshop seam artifact in the browser loop.
+- Export a scene config from the workbench after the final finished adapters are settled.
+- Add a stricter QA checklist only if the Photoshop round-trip starts producing inconsistent outputs.

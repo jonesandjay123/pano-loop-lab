@@ -10,10 +10,23 @@
 - Rebuilt runtime around the clean asset model:
 
 ```text
-A plate -> AXB -> B plate -> BXC -> C plate -> CXA -> A plate
+plate 0 -> adapter 0→1 -> plate 1 -> adapter 1→2 -> ... -> adapter last→0
 ```
 
-- `AXB` uses `dawn-valley__dusk-ridge-photoshop-test1.png`.
-- `BXC` and `CXA` intentionally use raw work-canvas placeholders.
-- Homepage should now reveal unfinished adapters honestly instead of hiding them
-  behind legacy generated seams.
+- Reworked `/#adapter-workbench` into a browser-only control surface for strict
+  upload validation, plate reorder/add/delete, work adapter generation, finished
+  adapter upload, scene config export/import, batch downloads, and manifest export.
+
+## 2026-06-22 — first four-plate production loop
+
+- Added the first curated production source plates under:
+
+```text
+generated/production-plates/raw/
+```
+
+- Verified the four source plates are exactly `6144 x 1536`.
+- Confirmed the four-plate loop can run successfully in the browser after
+  Photoshop-filled adapters are uploaded through the workbench.
+- Known art issue: one Photoshop seam still has a visible line and should be
+  manually repaired before final delivery.

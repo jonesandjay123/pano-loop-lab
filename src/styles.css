@@ -325,40 +325,6 @@ body {
   text-transform: uppercase;
 }
 
-.pair-list {
-  display: grid;
-  gap: 8px;
-}
-
-.pair-button {
-  display: grid;
-  gap: 3px;
-  width: 100%;
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.045);
-  color: #edf0f2;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.pair-button span {
-  color: #a7b0ba;
-  font-size: 12px;
-}
-
-.pair-button strong {
-  font-size: 13px;
-  word-break: break-word;
-}
-
-.pair-button.is-active {
-  border-color: rgba(104, 199, 255, 0.62);
-  background: rgba(80, 158, 204, 0.16);
-}
-
 .upload-button,
 .file-label,
 .plate-actions label,
@@ -543,24 +509,10 @@ body {
   color: #ffe2b8;
 }
 
-.workbench-status {
-  display: grid;
-  gap: 4px;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.workbench-status span,
 .workbench-stat span,
 .empty-candidates span {
   color: #9da6af;
   font-size: 12px;
-}
-
-.workbench-status strong {
-  color: #f7f8fa;
-  font-size: 13px;
 }
 
 .workbench-main {
@@ -587,8 +539,7 @@ body {
   gap: 6px;
 }
 
-.mode-tabs button,
-.prefill-tabs button {
+.mode-tabs button {
   min-height: 34px;
   padding: 0 11px;
   border: 1px solid rgba(255, 255, 255, 0.13);
@@ -619,7 +570,7 @@ body {
 }
 
 .mode-tabs button.is-active,
-.prefill-tabs button.is-active {
+.mode-tabs button.is-active {
   border-color: rgba(104, 199, 255, 0.65);
   background: rgba(80, 158, 204, 0.18);
 }
@@ -638,18 +589,6 @@ body {
 
 .mode-tabs button.needs-finished strong {
   color: #f0cf9b;
-}
-
-.prefill-tabs {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.prefill-tabs button {
-  min-height: 30px;
-  font-size: 13px;
 }
 
 .workbench-grid {
@@ -672,21 +611,6 @@ body {
   width: 100%;
   min-width: 760px;
   height: auto;
-}
-
-.anchor-preview {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 12px;
-}
-
-.anchor-preview img {
-  width: 100%;
-  min-width: 0;
-  max-height: 640px;
-  object-fit: contain;
-  background: #07080c;
 }
 
 .details-panel {
@@ -776,10 +700,6 @@ body {
     position: static;
   }
 
-  .pair-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .details-panel {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -795,7 +715,6 @@ body {
     display: grid;
   }
 
-  .pair-list,
   .details-panel,
   .stat-grid,
   .file-links {
@@ -804,9 +723,5 @@ body {
 
   .preview-panel img {
     min-width: 620px;
-  }
-
-  .anchor-preview {
-    grid-template-columns: 1fr;
   }
 }

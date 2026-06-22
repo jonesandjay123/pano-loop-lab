@@ -69,11 +69,25 @@ State is local React state backed by `localStorage`. If browser storage quota is
 
 There are no runtime panorama assets checked into `public/panos` now. Production plates and finished adapters enter through browser upload or scene config import.
 
+The first production source plate set is now checked into the repo for handoff/reference:
+
+```text
+generated/production-plates/raw/00-6144x1536.png
+generated/production-plates/raw/01-6144x1536.png
+generated/production-plates/raw/02-6144x1536.png
+generated/production-plates/raw/03-6144x1536.png
+```
+
+All four source plates are exactly `6144 x 1536`. The contact sheet in `generated/production-plates/contact-sheet-current.png` is for visual review only.
+
+The first four-plate loop has been proven in the browser with Photoshop-finished adapters. One visible seam still needs manual repair before treating the scene as final art.
+
 ## Guardrail
 
 Do not bring back legacy seam registries, GPT/HF sweep artifacts, or fixed A/B/C assumptions.
 
-The next useful work is production content:
+The next useful work is polish/content QA:
 
-- generate or import the first real `6144 x 1536` plate set
-- run the Photoshop adapter round-trip on that set
+- repair the one visible Photoshop seam artifact
+- export a workbench scene config once the finished adapters are final
+- keep generated production sources under `generated/production-plates/`, not `public/panos`
