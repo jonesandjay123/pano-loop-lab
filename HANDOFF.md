@@ -51,6 +51,7 @@ The X zone is a Photoshop work area. Do not hide it with runtime blending.
 - Scene config export/import is available from `/#adapter-workbench`.
 - Imported scene configs are schema, geometry, and image-dimension checked.
 - All generated work adapters can be downloaded from the Scene file tools.
+- Old demo files under `public/panos` have been removed; runtime now depends on built-in staging plates, uploads, and imported scene configs.
 
 ## Commands
 
@@ -62,4 +63,5 @@ npm run preview
 
 ## Next Likely Work
 
-- Remove old demo assets from `public/panos` once replacement production plates exist.
+- Improve finished adapter management for Photoshop round-trips.
+- Add a scene summary/export manifest if production asset handoff needs filenames outside the browser.

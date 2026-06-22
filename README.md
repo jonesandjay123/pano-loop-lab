@@ -91,6 +91,9 @@ scene config 會包含 plate / finished adapter 的圖片資料、順序、label
 
 工具台目前使用瀏覽器本地狀態加 `localStorage` 自動保存。也可以匯出 / 匯入 scene config。
 
+舊的 `public/panos` demo 圖已移除。現在 runtime 靠內建 staging plates、瀏覽器上傳、或 scene config 匯入。
+
 下一步會考慮：
 
-- 清理舊 public demo 圖片
+- 改善 finished adapter 的 Photoshop 來回管理
+- 視需要輸出外部交付用 scene manifest

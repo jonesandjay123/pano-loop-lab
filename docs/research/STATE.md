@@ -6,13 +6,13 @@ Last updated: 2026-06-22.
 
 `pano-loop-lab` is now a browser-local panorama loop workbench.
 
-The old fixed sequence:
+The old fixed sequence was:
 
 ```text
 dawn-valley -> AXB -> dusk-ridge -> BXC -> moonlit-tidelands -> CXA
 ```
 
-is no longer the runtime source of truth.
+It is no longer the runtime source of truth, and the old demo image files have been removed from `public/panos`.
 
 The current runtime is resolved from workbench state:
 
@@ -62,10 +62,15 @@ The X zone is intentionally unfinished and should stay visible until Photoshop o
 
 State is local React state backed by `localStorage`. If browser storage quota is exceeded, the workbench asks the user to preserve the scene through config export.
 
+## Asset State
+
+There are no runtime panorama assets checked into `public/panos` now. Production plates and finished adapters enter through browser upload or scene config import.
+
 ## Guardrail
 
 Do not bring back legacy seam registries, GPT/HF sweep artifacts, or fixed A/B/C assumptions.
 
-The next useful work is asset cleanup:
+The next useful work is Photoshop round-trip ergonomics:
 
-- cleanup of old `public/panos` assets after replacement plates exist
+- clearer finished adapter inventory
+- optional scene manifest for external asset handoff
