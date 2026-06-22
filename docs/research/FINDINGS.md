@@ -97,6 +97,14 @@
   adapter quality. _Source: EXPERIMENT_LOG.md Turn 26 and
   `docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/manual-smoke-identity/diff-report.json`._
 
+- ✅ **Seam-lab review must be edge-accurate, not fixed-100vw center-cropped.**
+  Turn 28 found that the `photoshop-test1` screenshot looked misaligned because the
+  runtime renderer displayed every segment as a `100vw` centered `cover` window with
+  6% overscan. That crops interior pixels at the segment boundary, while the AXB
+  manifest is built from true source edges. The renderer now supports edge-locked
+  natural-aspect segments, disabling overscan for current plates/seams so `blend = 0`
+  inspection actually compares source edges. _Source: EXPERIMENT_LOG.md Turn 28._
+
 - 🟡 **GPT-filled 1:4:1 AXB produces the strongest semantic transition so far, but
   still needs anchor adoption.** Turn 23 imported the user's GPT result as
   `gpt-axb-01`. Visually it is the best warm-to-cool mountain bridge so far, but its

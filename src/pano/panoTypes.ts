@@ -32,8 +32,12 @@ export interface OverlayGradient {
 
 /** Per-window visual knobs, shared by plates and seams. All optional w/ defaults. */
 export interface SegmentVisuals {
-  /** Window width in vw. Default 100 for plates; seams may differ. */
+  /** Fallback window width in vw. Ignored when `aspectRatio` is set. */
   widthVw?: number;
+  /** Natural image width / height. When set, review can preserve true image edges. */
+  aspectRatio?: number;
+  /** Disable overscan/pan cropping so segment boundaries correspond to source image edges. */
+  edgeLocked?: boolean;
   /** How the image fills the window. Default `cover`. */
   fitMode?: FitMode;
   /** Zoom applied within the window (>= 1 keeps it covered). Default 1. */
@@ -92,6 +96,8 @@ export interface RingSegment {
   label: string;
   imageUrl: string;
   widthVw: number;
+  aspectRatio?: number;
+  edgeLocked: boolean;
   fitMode: FitMode;
   scale: number;
   xOffset: number;

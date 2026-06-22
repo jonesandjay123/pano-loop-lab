@@ -13,8 +13,17 @@ export interface DawnDuskAdapterOption {
   id: DawnDuskAdapterOptionId;
   label: string;
   imageUrl: string;
+  aspectRatio?: number;
   notes: string;
 }
+
+const ASPECT = {
+  dawnValley: 3168 / 1344,
+  duskRidge: 2688 / 1520,
+  moonlitTidelands: 2688 / 1520,
+  legacySeam: 3168 / 1344,
+  axbCandidate: 3136 / 1344,
+};
 
 const DAWN_DUSK_GENERATED_OPTIONS: DawnDuskAdapterOption[] = (
   ADAPTER_CANDIDATES_BY_PAIR["dawn-valley__dusk-ridge"]?.candidates ?? []
@@ -22,6 +31,7 @@ const DAWN_DUSK_GENERATED_OPTIONS: DawnDuskAdapterOption[] = (
   id: candidate.id,
   label: candidate.label,
   imageUrl: candidate.imageUrl,
+  aspectRatio: ASPECT.axbCandidate,
   notes: candidate.notes,
 }));
 
@@ -30,18 +40,21 @@ export const DAWN_DUSK_ADAPTER_OPTIONS: DawnDuskAdapterOption[] = [
     id: "baseline",
     label: "baseline",
     imageUrl: "/panos/seams/dawn-valley__dusk-ridge.jpg",
+    aspectRatio: ASPECT.legacySeam,
     notes: "Original dawn-valley -> dusk-ridge seam baseline.",
   },
   {
     id: "exp001-edge-anchored-v1",
     label: "exp001 edge-anchored",
     imageUrl: "/panos/adapters/dawn-valley__dusk-ridge/exp001-edge-anchored-v1.jpg",
+    aspectRatio: ASPECT.axbCandidate,
     notes: "Loop 2 edge-anchored adapter candidate; verdict INCONCLUSIVE.",
   },
   {
     id: "exp002-c08-struct-off-leftpreserve",
     label: "exp002 c08 left-preserve",
     imageUrl: "/panos/adapters/dawn-valley__dusk-ridge/exp002-c08-struct-off-leftpreserve.png",
+    aspectRatio: ASPECT.axbCandidate,
     notes:
       "Loop 9 Higgsfield whole-frame image-to-image candidate c08; promoted for honest blend=0 inspection.",
   },
@@ -49,6 +62,7 @@ export const DAWN_DUSK_ADAPTER_OPTIONS: DawnDuskAdapterOption[] = [
     id: "exp002-c04-struct-off-orig",
     label: "exp002 c04 original",
     imageUrl: "/panos/adapters/dawn-valley__dusk-ridge/exp002-c04-struct-off-orig.png",
+    aspectRatio: ASPECT.axbCandidate,
     notes:
       "Loop 9 Higgsfield whole-frame image-to-image candidate c04; promoted for honest blend=0 inspection.",
   },
@@ -77,20 +91,24 @@ export const PANO_RING: PanoRingConfig = {
       id: "dawn-valley",
       label: "Dawn Valley",
       imageUrl: "/panos/dawn-valley.jpg",
+      aspectRatio: ASPECT.dawnValley,
+      edgeLocked: true,
       notes: "Golden-hour valley + winding lake (21:9).",
     },
     {
       id: "dusk-ridge",
       label: "Dusk Ridge",
       imageUrl: "/panos/dusk-ridge.jpg",
-      yOffset: -0.02,
+      aspectRatio: ASPECT.duskRidge,
+      edgeLocked: true,
       notes: "Indigo/magenta twilight ridges (16:9).",
     },
     {
       id: "moonlit-tidelands",
       label: "Moonlit Tidelands",
       imageUrl: "/panos/moonlit-tidelands.jpg",
-      yOffset: 0.02,
+      aspectRatio: ASPECT.moonlitTidelands,
+      edgeLocked: true,
       notes: "Moonlit tideland, reflective flats (16:9).",
     },
   ],
@@ -99,18 +117,24 @@ export const PANO_RING: PanoRingConfig = {
       fromId: "dawn-valley",
       toId: "dusk-ridge",
       imageUrl: "/panos/seams/dawn-valley__dusk-ridge.jpg",
+      aspectRatio: ASPECT.legacySeam,
+      edgeLocked: true,
       notes: "Warm dawn morphs into cool dusk.",
     },
     {
       fromId: "dusk-ridge",
       toId: "moonlit-tidelands",
       imageUrl: "/panos/seams/dusk-ridge__moonlit-tidelands.jpg",
+      aspectRatio: ASPECT.legacySeam,
+      edgeLocked: true,
       notes: "Twilight ridges descend into moonlit flats.",
     },
     {
       fromId: "moonlit-tidelands",
       toId: "dawn-valley",
       imageUrl: "/panos/seams/moonlit-tidelands__dawn-valley.jpg",
+      aspectRatio: ASPECT.legacySeam,
+      edgeLocked: true,
       notes: "Wrap seam: night brightens back to dawn, closing the ring.",
     },
   ],
@@ -132,31 +156,35 @@ export function buildPanoRingWithDawnDuskAdapter(optionId: DawnDuskAdapterOption
     ...PANO_RING,
     seams: PANO_RING.seams?.map((seam) =>
       seam.fromId === "dawn-valley" && seam.toId === "dusk-ridge"
-        ? { ...seam, imageUrl: option.imageUrl, notes: option.notes }
+        ? { ...seam, imageUrl: option.imageUrl, aspectRatio: option.aspectRatio ?? seam.aspectRatio, notes: option.notes }
         : seam,
     ),
   };
 }
 
-const PLATE_DEFAULTS: Required<SegmentVisuals> = {
+const PLATE_DEFAULTS = {
   widthVw: 100,
   fitMode: "cover",
   scale: 1,
   xOffset: 0,
   yOffset: 0,
-};
+  edgeLocked: false,
+} satisfies Required<Pick<SegmentVisuals, "widthVw" | "fitMode" | "scale" | "xOffset" | "yOffset" | "edgeLocked">>;
 
-const SEAM_DEFAULTS: Required<SegmentVisuals> = {
+const SEAM_DEFAULTS = {
   widthVw: 100,
   fitMode: "cover",
   scale: 1,
   xOffset: 0,
   yOffset: 0,
-};
+  edgeLocked: false,
+} satisfies Required<Pick<SegmentVisuals, "widthVw" | "fitMode" | "scale" | "xOffset" | "yOffset" | "edgeLocked">>;
 
-function resolve(v: SegmentVisuals, defaults: Required<SegmentVisuals>): Required<SegmentVisuals> {
+function resolve(v: SegmentVisuals, defaults: typeof PLATE_DEFAULTS): Omit<RingSegment, "key" | "kind" | "label" | "imageUrl"> {
   return {
     widthVw: v.widthVw ?? defaults.widthVw,
+    aspectRatio: v.aspectRatio,
+    edgeLocked: v.edgeLocked ?? defaults.edgeLocked,
     fitMode: v.fitMode ?? defaults.fitMode,
     scale: v.scale ?? defaults.scale,
     xOffset: v.xOffset ?? defaults.xOffset,

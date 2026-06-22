@@ -88,9 +88,8 @@ body {
 
 .pano-segment-image {
   position: absolute;
-  /* Overscan so the per-segment xOffset/yOffset pan (alignment knobs) doesn't
-     reveal an empty edge within +/-6% of travel. background-* + transform come
-     from inline styles. */
+  /* Default overscan is supplied inline for legacy free-pan segments. Edge-locked
+     review segments override this to inset: 0 so source edges stay inspectable. */
   inset: -6%;
   pointer-events: none;
 }

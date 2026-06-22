@@ -6,6 +6,32 @@
 
 ---
 
+## Turn 28 - 2026-06-22 - Edge-accurate seam-lab renderer calibration
+- **Role:** Reviewer / Engineering Runner.
+- **Boundary:** runtime inspection surface, verified on `dawn-valley -> dusk-ridge`
+  with `photoshop-test1`.
+- **Question:** why did `photoshop-test1` still look badly misaligned in the seam
+  lab screenshot even though the manual importer reported outside-X diff `0`?
+- **Finding:** the manual import was mechanically correct; the seam lab renderer was
+  not edge-accurate. Runtime segments were rendered as fixed `100vw` windows with
+  `cover`, centered background positioning, and a 6% overscanned image layer. That
+  means a segment boundary did not necessarily show the source image's real left/right
+  edge. The AXB manifest crops true source edges, but the runtime was inspecting
+  cropped interior pixels.
+- **Implementation:** added optional `aspectRatio` and `edgeLocked` segment visuals.
+  Edge-locked segments use natural image aspect width via `calc(100dvh * aspect)` and
+  disable overscan so source image edges land on segment boundaries. Current plates
+  and seams now declare their measured natural aspect ratios.
+- **Verification:** rebuilt successfully with `npm run build`. Browser review at
+  `blend = 0` showed:
+  - boundary `0. dawn-valley -> dawn-valley -> dusk-ridge` now aligns the exact dawn
+    edge to the adapter left edge;
+  - boundary `1. dawn-valley -> dusk-ridge -> dusk-ridge` now aligns the adapter right
+    edge to the dusk left edge.
+- **Verdict:** **BUG FIX / INSTRUMENT CALIBRATED.** The Photoshop manual workflow did
+  not fail; the previous screenshot exposed renderer crop/overscan mismatch. Future
+  visual judgments must use this edge-accurate renderer, especially at `blend = 0`.
+
 ## Turn 27 - 2026-06-22 - First real Photoshop manual X import
 - **Role:** Runner / Reviewer.
 - **Boundary:** `dawn-valley -> dusk-ridge`.

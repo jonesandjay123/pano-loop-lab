@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-22** (Turn 27 — first real Photoshop manual X import).
+> Last updated: **2026-06-22** (Turn 28 — edge-accurate seam-lab renderer).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -18,8 +18,13 @@ routing / backend. `npm run build` passes, TS clean.
 - **Seam inspection lab** (`PanoRingStage.tsx` + `DebugPanel.tsx`):
   - `blend` 0 / 8 / 12 / 16 vw overlap + CSS-mask feather.
     **`blend = 0` butt-joins to reveal the REAL seam** — debug stays honest.
+  - Current plates/seams are **edge-locked natural-aspect segments**: runtime segment
+    widths follow measured image aspect ratios and overscan is disabled, so segment
+    boundaries correspond to real source image edges instead of center-cropped
+    interiors.
   - Per-segment knobs: `fitMode` (cover/height/width), `scale`, `xOffset`, `yOffset`
-    (image layer overscanned 6%).
+    (legacy free-pan segments may still overscan 6%; edge-locked review segments do
+    not).
   - **Inspect mode**: center / hold / highlight (magenta) any boundary; toggle
     labels/lines; pause.
 
@@ -149,6 +154,10 @@ First real manual import:
 - visual read: plausible mountain transition in X; A-X reads strong in closeup;
   X-B is much improved over gradient baseline and should be judged in seam lab at
   `blend = 0`.
+- renderer note: Turn 28 fixed the seam lab itself after a screenshot revealed that
+  fixed `100vw` centered `cover` rendering was cropping true source edges. Use the
+  current edge-locked renderer for judgment; older screenshots before this fix are
+  not valid evidence against the manual import.
 
 Smoke-tested manual import:
 - id: `manual-smoke-identity`;

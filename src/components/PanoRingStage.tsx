@@ -48,13 +48,16 @@ function Segment({
     : "none";
 
   const segStyle: CSSProperties = {
-    flex: `0 0 ${segment.widthVw}vw`,
+    flex: segment.aspectRatio
+      ? `0 0 calc(100dvh * ${segment.aspectRatio})`
+      : `0 0 ${segment.widthVw}vw`,
     marginLeft: feather ? `-${blendVw}vw` : 0,
   };
 
   // Mask only the image layer (not the whole segment) so the overlap cross-fades
   // while debug lines/labels stay fully visible.
   const imageStyle: CSSProperties = {
+    inset: segment.edgeLocked ? 0 : "-6%",
     backgroundImage: `url("${segment.imageUrl}")`,
     backgroundSize: backgroundSizeFor(segment.fitMode),
     backgroundPosition: "center center",
