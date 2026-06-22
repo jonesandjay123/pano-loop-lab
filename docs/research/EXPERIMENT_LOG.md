@@ -6,6 +6,31 @@
 
 ---
 
+## Turn 27 - 2026-06-22 - First real Photoshop manual X import
+- **Role:** Runner / Reviewer.
+- **Boundary:** `dawn-valley -> dusk-ridge`.
+- **Question:** can a real Photoshop web output be used as the external full image
+  source for the manual-inpaint pipeline, with the repo harvesting only X and
+  restoring original A/B exactly?
+- **Input:** `/Users/joneswang/Downloads/photoshopt_test1.png`.
+- **Input dimensions:** `3136 x 1344`, matching the manual AXB manifest; no resize
+  was used.
+- **Import command:** `npm run adapter:import-manual -- --pair dawn-valley__dusk-ridge --input /Users/joneswang/Downloads/photoshopt_test1.png --id photoshop-test1 --label "Photoshop test 1" --notes "Manual Photoshop web test. External full image used as X source only; original A/B anchors composited back by repo."`
+- **Output candidate:** `public/panos/adapter-candidates/dawn-valley__dusk-ridge/photoshop-test1.png`.
+- **Diff verification:** outside-X changed pixels `0`; outside-X max diff `0`.
+  Report:
+  `docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/diff-report.json`.
+- **Review artifacts:** contact sheet and A-X / X-B closeups under
+  `docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/`.
+- **Registry:** `photoshop-test1` is registered and active for review in the
+  generated candidate registry.
+- **Visual read:** contact sheet shows a plausible mountain transition replacing
+  the gradient X region. A-X reads strong in closeup; X-B is much more coherent than
+  the hard gradient baseline but still needs seam-lab review at `blend = 0`.
+- **Verdict:** **SUCCESSFUL PIPELINE TEST.** The manual Photoshop workflow satisfies
+  the core mechanical contract. Next decision is visual acceptance in the moving
+  loop / seam lab, not whether the pipeline works.
+
 ## Turn 26 - 2026-06-22 - Manual-inpaint export/import pipeline
 - **Role:** Engineering Runner / Archivist.
 - **Boundary:** infrastructure, with smoke test on `dawn-valley -> dusk-ridge`.

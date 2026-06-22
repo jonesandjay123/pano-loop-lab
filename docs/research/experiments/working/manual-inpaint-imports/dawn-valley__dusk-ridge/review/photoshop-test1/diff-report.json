@@ -1,0 +1,30 @@
+{
+  "id": "photoshop-test1",
+  "pairId": "dawn-valley__dusk-ridge",
+  "createdAt": "2026-06-22T01:52:59.289Z",
+  "rule": "Only X may come from the external tool. A/B must always come from the original work canvas.",
+  "sourceInput": {
+    "path": "../../photoshopt_test1.png",
+    "width": 3136,
+    "height": 1344,
+    "resizedToCanvas": false
+  },
+  "canvas": {
+    "width": 3136,
+    "height": 1344
+  },
+  "xRange": {
+    "xStart": 523,
+    "xEnd": 2613,
+    "width": 2090
+  },
+  "outsideXDiff": {
+    "outsideXChangedPixels": 0,
+    "outsideXChangedValues": 0,
+    "outsideXMaxAbsDiff": 0,
+    "outsideXMeanAbsDiff": 0,
+    "comparedOutsideXPixels": 1405824,
+    "comparedOutsideXValues": 5623296
+  },
+  "passed": true
+}

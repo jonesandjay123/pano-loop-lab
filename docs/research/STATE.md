@@ -2,7 +2,7 @@
 
 > The "you are here" snapshot. Updated by the **Archivist** at the end of a turn.
 > For the full rationale and the redefined core problem, see `HANDOFF.md`.
-> Last updated: **2026-06-22** (Turn 26 — manual-inpaint export/import pipeline).
+> Last updated: **2026-06-22** (Turn 27 — first real Photoshop manual X import).
 
 ## Stack
 Vite + React 18 + TypeScript + plain CSS. **No** Three.js / R3F / GSAP / canvas /
@@ -115,10 +115,11 @@ It currently supports:
 - opening manifest/prompt files;
 - showing the active adapter state and candidate count.
 
-It now shows the original rejected AXB candidates, raw GPT concept candidates, and a
-strict-X soft-adoption sweep for `dawn-valley -> dusk-ridge`. The generated registry
-preserves `activeForReview` from `candidates.json`; `gpt-axb-01-soft256` is active in
-both the workbench and seam lab by default. No candidate is accepted as final yet.
+It now shows the original rejected AXB candidates, raw GPT concept candidates, a
+strict-X soft-adoption sweep, and real manual-inpaint imports for
+`dawn-valley -> dusk-ridge`. The generated registry preserves `activeForReview` from
+`candidates.json`; `photoshop-test1` is active in both the workbench and seam lab by
+default. No candidate is accepted as final yet.
 The dashboard can switch the prep canvas between gradient, white, and black X
 prefill variants, and provides download links for the selected work canvas and mask.
 
@@ -133,6 +134,21 @@ Manual candidate import path:
 - updates `public/panos/adapter-candidates/<pair>/candidates.json`;
 - regenerates `src/pano/adapterCandidates.generated.ts`;
 - dashboard and seam-lab selector read from the generated registry.
+
+First real manual import:
+- id: `photoshop-test1`;
+- pair: `dawn-valley__dusk-ridge`;
+- input: `/Users/joneswang/Downloads/photoshopt_test1.png`;
+- source dimensions: `3136 x 1344`, matching the manual AXB manifest;
+- no resize was used;
+- active for review in the generated registry;
+- diff report:
+  `docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/diff-report.json`;
+- outside-X changed pixels: `0`;
+- outside-X max diff: `0`;
+- visual read: plausible mountain transition in X; A-X reads strong in closeup;
+  X-B is much improved over gradient baseline and should be judged in seam lab at
+  `blend = 0`.
 
 Smoke-tested manual import:
 - id: `manual-smoke-identity`;

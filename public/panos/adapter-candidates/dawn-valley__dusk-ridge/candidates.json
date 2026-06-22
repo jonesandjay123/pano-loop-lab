@@ -18,7 +18,7 @@
     "resolution": "2k",
     "note": "Higgsfield did not expose a true mask-inpaint parameter here. These are whole-frame reference generations using the AXB work canvas and mask as input images; anchors are not pixel-guaranteed."
   },
-  "activeForReview": "gpt-axb-01-soft256",
+  "activeForReview": "photoshop-test1",
   "candidates": [
     {
       "id": "hf-nb2-axb-01",
@@ -423,9 +423,44 @@
         "rightOuterAnchorMaxDiff": 0,
         "internalJoinVerdict": "Manual X-only import; exact A/B anchors restored. Inspect A-X and X-B at blend=0."
       }
+    },
+    {
+      "id": "photoshop-test1",
+      "label": "Photoshop test 1",
+      "localPath": "public/panos/adapter-candidates/dawn-valley__dusk-ridge/photoshop-test1.png",
+      "researchCopy": "docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/photoshop-test1.png",
+      "status": "partial",
+      "method": "manual-inpaint-x-only-import",
+      "notes": "Manual Photoshop web test. External full image used as X source only; original A/B anchors composited back by repo.",
+      "reviewNotes": "External output was treated as X source only. Original A/B anchors were composited back from the manual work canvas; outside-X diff is verified at 0.",
+      "reviewReport": "docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/diff-report.json",
+      "reviewArtifacts": {
+        "directory": "docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1",
+        "originalWorkCanvas": "docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/original-work-canvas.png",
+        "externalOutput": "docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/external-output.png",
+        "finalCompositedCandidate": "docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/final-composited-candidate.png",
+        "aXBoundaryCloseup": "docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/a-x-boundary-closeup.png",
+        "xBBoundaryCloseup": "docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/x-b-boundary-closeup.png",
+        "comparisonContactSheet": "docs/research/experiments/working/manual-inpaint-imports/dawn-valley__dusk-ridge/review/photoshop-test1/comparison-contact-sheet.png"
+      },
+      "sourceImport": {
+        "path": "../../photoshopt_test1.png",
+        "sourceWidth": 3136,
+        "sourceHeight": 1344,
+        "importedWidth": 3136,
+        "importedHeight": 1344,
+        "resizedToPrepDimensions": false,
+        "xOnlyHarvest": true,
+        "discardedExternalAnchors": true
+      },
+      "reviewSummary": {
+        "leftOuterAnchorMaxDiff": 0,
+        "rightOuterAnchorMaxDiff": 0,
+        "internalJoinVerdict": "Manual X-only import; exact A/B anchors restored. Inspect A-X and X-B at blend=0."
+      }
     }
   ],
   "reviewedAt": "2026-06-21T14:46:03.691Z",
   "reviewVerdict": "PARTIAL CURRENT BEST. gpt-axb-01-soft256 remains the active strict-X review candidate. The 128/192/256/384/512 x linear/smoothstep/cosine sweep preserved anchors but did not find a clearly better visual candidate; wider blends reduce the right-side band while muddying the left-side A-X transition.",
-  "updatedAt": "2026-06-22T01:30:33.933Z"
+  "updatedAt": "2026-06-22T01:52:59.842Z"
 }
