@@ -359,6 +359,121 @@ body {
   background: rgba(80, 158, 204, 0.16);
 }
 
+.upload-button,
+.file-label,
+.plate-actions label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #edf0f2;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.upload-button {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.upload-button input,
+.file-label input,
+.plate-actions input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.plate-list {
+  display: grid;
+  gap: 10px;
+}
+
+.plate-card {
+  display: grid;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.plate-card img {
+  width: 100%;
+  aspect-ratio: 4 / 1;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #07080c;
+}
+
+.plate-meta {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.plate-meta strong {
+  color: #f7f8fa;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.plate-meta span {
+  color: #9da6af;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.plate-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.plate-actions button,
+.clear-button {
+  min-height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #edf0f2;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.plate-actions button:disabled {
+  cursor: default;
+  opacity: 0.38;
+}
+
+.workbench-notice {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.workbench-notice.is-ok {
+  border: 1px solid rgba(117, 210, 159, 0.36);
+  background: rgba(72, 150, 105, 0.16);
+  color: #c9f0d8;
+}
+
+.workbench-notice.is-warn {
+  border: 1px solid rgba(236, 183, 105, 0.42);
+  background: rgba(174, 111, 42, 0.18);
+  color: #ffe2b8;
+}
+
 .workbench-status {
   display: grid;
   gap: 4px;
@@ -504,13 +619,16 @@ body {
 
 .file-links {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
 }
 
-.file-links a {
+.file-links a,
+.file-links .file-label,
+.file-links .clear-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 34px;
   padding: 0 9px;
   border: 1px solid rgba(255, 255, 255, 0.1);

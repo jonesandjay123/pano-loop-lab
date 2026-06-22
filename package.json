@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "A clean research lab to prove CSS/image-based panoramic background looping for Jovicheer-style scenes.",
+  "description": "Private panorama loop workbench for staging distant background plates and adapters.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

@@ -1,52 +1,53 @@
-# pano-loop-lab — Clean Handoff
+# pano-loop-lab — Workbench Handoff
 
-This repo is now a compact AXB loop prototype, not a broad generation research lab.
+This repo has moved from a fixed A/B/C demo into a panorama loop staging tool.
 
 ## Goal
 
-Show a looping background made from:
+Build and preview a looping distant background from an ordered list of plates:
 
 ```text
-A plate -> AXB adapter -> B plate -> BXC adapter -> C plate -> CXA adapter -> A plate
+plate 0 -> adapter 0→1 -> plate 1 -> adapter 1→2 -> ... -> adapter last→0
 ```
 
-Only `AXB` has a manually completed Photoshop transition right now. `BXC` and `CXA`
-still use raw work canvases, so they should look unfinished in the loop. That is the
-intended visual debug behavior.
-
-## Runtime Assets
-
-Keep runtime assets small:
-
-```text
-public/panos/dawn-valley.jpg
-public/panos/dusk-ridge.jpg
-public/panos/moonlit-tidelands.jpg
-public/panos/adapters-clean/dawn-valley__dusk-ridge-work.png
-public/panos/adapters-clean/dusk-ridge__moonlit-tidelands-work.png
-public/panos/adapters-clean/moonlit-tidelands__dawn-valley-work.png
-public/panos/adapters-clean/dawn-valley__dusk-ridge-photoshop-test1.png
-```
-
-Do not reintroduce candidate registries, legacy seams, GPT/HF sweeps, or image
-generation experiments into `public/panos`.
+`/#adapter-workbench` is the control surface. The homepage reads the resolved workbench state.
 
 ## Geometry
 
-Each adapter is a full `[A][X][B]` image:
-
-- canvas: `3136 x 1344`
-- A anchor: `523px`
-- X region: `2090px`
-- B anchor: `523px`
-
-Runtime uses anchor overlap:
+The old `3136 / 523 / 2090` geometry is obsolete.
 
 ```text
-A plate overlaps AXB's A anchor
-AXB X remains visible
-B plate overlaps AXB's B anchor
+Plate:            6144 x 1536
+Work adapter:     6144 x 1536
+Finished adapter: 6144 x 1536
+
+m = 1024
+left edge  = 1024
+X zone     = 4096
+right edge = 1024
 ```
+
+Work adapter generation:
+
+```text
+from plate right 1024px + blank/manual X zone + to plate left 1024px
+```
+
+The X zone is a Photoshop work area. Do not hide it with runtime blending.
+
+## Runtime Behavior
+
+- Plate order derives all adjacent pairs.
+- Each pair gets a generated work adapter.
+- If a finished adapter is uploaded for a pair, runtime uses it.
+- Otherwise runtime uses the generated work adapter fallback.
+
+## Current Implementation Notes
+
+- Workbench state is browser-local React state for now.
+- Default plates are generated SVG staging placeholders at the correct aspect.
+- Work adapters are generated in-browser with canvas and exposed as PNG object URLs.
+- Upload validation rejects images that are not exactly `6144 x 1536`.
 
 ## Commands
 
@@ -56,4 +57,9 @@ npm run build
 npm run preview
 ```
 
-No backend, no Three.js, no GSAP, no canvas.
+## Next Likely Work
+
+- Add localStorage persistence.
+- Add scene config export/import.
+- Add batch download for all work adapters.
+- Remove old demo assets from `public/panos` once replacement production plates exist.

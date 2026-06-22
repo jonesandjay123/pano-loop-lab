@@ -107,8 +107,8 @@ export function DebugPanel({
       </div>
 
       <p className="debug-notes">
-        Clean mode is locked to <strong>raw — 0</strong>. Unfinished AXB/BXC/CXA
-        adapters should stay visibly wrong until a filled image replaces them.
+        Clean mode is locked to <strong>raw — 0</strong>. Each transition uses a
+        finished adapter when present, otherwise the generated work adapter remains visible.
       </p>
     </aside>
   );

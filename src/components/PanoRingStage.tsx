@@ -29,8 +29,10 @@ function backgroundSizeFor(fit: FitMode): string {
   return "cover";
 }
 
+const RUNTIME_GEOMETRY_HEIGHT = 1536;
+
 function heightScaledPx(px: number): string {
-  return `calc(100dvh * ${px / 1344})`;
+  return `calc(100dvh * ${px / RUNTIME_GEOMETRY_HEIGHT})`;
 }
 
 function Segment({

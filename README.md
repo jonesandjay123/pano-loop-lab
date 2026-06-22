@@ -1,32 +1,51 @@
 # pano-loop-lab
 
-Clean AXB panorama loop prototype.
+這是我自己的循環遠景搭景工具台，不是通用開源套件。
 
-The repo now models the background as:
-
-```text
-A plate -> AXB adapter -> B plate -> BXC adapter -> C plate -> CXA adapter -> A plate
-```
-
-Runtime assets are intentionally small:
+目標是快速建立一組可以橫向循環播放的遠方背景：
 
 ```text
-public/panos/
-  dawn-valley.jpg
-  dusk-ridge.jpg
-  moonlit-tidelands.jpg
-  adapters-clean/
-    dawn-valley__dusk-ridge-work.png
-    dusk-ridge__moonlit-tidelands-work.png
-    moonlit-tidelands__dawn-valley-work.png
-    dawn-valley__dusk-ridge-photoshop-test1.png
+plate 0 -> adapter 0→1 -> plate 1 -> adapter 1→2 -> ... -> adapter last→0
 ```
 
-`photoshop-test1` is the only manually completed adapter right now. The other two
-adapters are still work canvases, so their X regions should look visibly unfinished
-in the loop. That is deliberate: the homepage is now an honest visual debug surface.
+repo 不負責 AI 補圖，也不追求自動把兩張圖接得漂亮。它只做穩定、可預期的流水線：
 
-## Run
+- 上傳 plate
+- 嚴格檢查尺寸
+- 調整順序
+- 依照順序自動推導 pair
+- 自動產生 work adapter
+- 讓我上傳 Photoshop 手修後的 finished adapter
+- 首頁即時用 finished adapter，沒有 finished 時就用 work adapter fallback
+
+## 固定規格
+
+這一版開始不再沿用舊的 `3136 / 523 / 2090` demo 規格。
+
+```text
+Plate:            6144 x 1536
+Work adapter:     6144 x 1536
+Finished adapter: 6144 x 1536
+
+m = 1024
+left edge  = 1024
+X zone     = 4096
+right edge = 1024
+
+ratio = 1 : 4 : 1
+```
+
+work adapter 的組成方式：
+
+```text
+from plate 最右 1024px
++ 中間 4096px Photoshop 工作區
++ to plate 最左 1024px
+```
+
+X 區只是手修底稿，不做智慧融合、不做漸層遮醜。
+
+## 使用
 
 ```bash
 npm install
@@ -34,31 +53,40 @@ npm run dev
 npm run build
 ```
 
-Open:
+首頁：
 
 ```text
 http://localhost:5173/
 ```
 
-The AXB dashboard is available at:
+工具台：
 
 ```text
 http://localhost:5173/#adapter-workbench
 ```
 
-## Contract
+## 圖片方向
 
-Each adapter is a full `[A][X][B]` image at `3136 x 1344`:
+第一組素材建議維持同一個世界觀、同一種地理氣質，但不要做同一張地圖換時間。
 
-- `A` anchor: `523px`
-- `X` region: `2090px`
-- `B` anchor: `523px`
-
-In runtime, adapter anchors overlap their neighboring plates. The visible journey is:
+比較適合：
 
 ```text
-plate A -> X -> plate B
+開闊草坡與遠山村落
+松林山脊與遠方小教堂
+河谷、石橋、紅屋頂小鎮
+湖面、遠山、遠方古堡或遺跡
 ```
 
-Unfilled work canvases are expected to look wrong until a human fills X in Photoshop,
-Kling, Midjourney, Firefly, or another editor.
+也就是同一片中歐 / 類德國 / 阿爾卑斯前緣世界裡的不同段落。
+
+## 目前狀態
+
+工具台目前使用瀏覽器本地狀態，重新整理後會回到內建 staging plates。
+
+下一步會考慮：
+
+- localStorage 保存目前工作狀態
+- 匯出 / 匯入 scene config
+- 更完整的 adapter 批次下載
+- 清理舊 public demo 圖片

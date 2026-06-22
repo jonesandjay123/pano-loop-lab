@@ -4,60 +4,68 @@ Last updated: 2026-06-22.
 
 ## Current Shape
 
-`pano-loop-lab` is a clean AXB loop prototype.
+`pano-loop-lab` is now a browser-local panorama loop workbench.
 
-Runtime sequence:
+The old fixed sequence:
 
 ```text
-dawn-valley -> AXB -> dusk-ridge -> BXC -> moonlit-tidelands -> CXA -> dawn-valley
+dawn-valley -> AXB -> dusk-ridge -> BXC -> moonlit-tidelands -> CXA
 ```
 
-Only `AXB` is manually completed:
+is no longer the runtime source of truth.
+
+The current runtime is resolved from workbench state:
 
 ```text
-public/panos/adapters-clean/dawn-valley__dusk-ridge-photoshop-test1.png
-```
-
-`BXC` and `CXA` intentionally still use raw work canvases:
-
-```text
-public/panos/adapters-clean/dusk-ridge__moonlit-tidelands-work.png
-public/panos/adapters-clean/moonlit-tidelands__dawn-valley-work.png
-```
-
-They should look unfinished in the loop until a human fills their X regions.
-
-## Runtime Assets
-
-The clean runtime asset set is:
-
-```text
-public/panos/dawn-valley.jpg
-public/panos/dusk-ridge.jpg
-public/panos/moonlit-tidelands.jpg
-public/panos/adapters-clean/dawn-valley__dusk-ridge-work.png
-public/panos/adapters-clean/dusk-ridge__moonlit-tidelands-work.png
-public/panos/adapters-clean/moonlit-tidelands__dawn-valley-work.png
-public/panos/adapters-clean/dawn-valley__dusk-ridge-photoshop-test1.png
+plate 0 -> adapter 0→1 -> plate 1 -> adapter 1→2 -> ... -> adapter last→0
 ```
 
 ## Geometry
 
-Each adapter is a full `[A][X][B]` image:
-
-- canvas: `3136 x 1344`
-- A anchor: `523px`
-- X: `2090px`
-- B anchor: `523px`
-
-Runtime uses anchor overlap, so visible motion is:
+Strict production geometry:
 
 ```text
-plate A -> X -> plate B
+Plate:            6144 x 1536
+Work adapter:     6144 x 1536
+Finished adapter: 6144 x 1536
+
+m = 1024
+left edge  = 1024
+X zone     = 4096
+right edge = 1024
 ```
+
+The work adapter is generated deterministically:
+
+```text
+from plate right edge + blank X zone + to plate left edge
+```
+
+The X zone is intentionally unfinished and should stay visible until Photoshop output replaces it.
+
+## Workbench
+
+`/#adapter-workbench` currently supports:
+
+- adding plates
+- replacing plates
+- deleting plates while keeping at least 2
+- reordering plates
+- strict plate dimension validation
+- derived pair selection
+- generated work adapter preview/download
+- finished adapter upload/clear
+- runtime fallback between finished and work adapter
+
+State is local React state only. Refreshing resets to built-in staging plates.
 
 ## Guardrail
 
-Do not reintroduce old candidate registries, legacy seam images, GPT/HF sweeps, or
-bulk working artifacts. If another adapter is manually completed, add one clean
-runtime image under `public/panos/adapters-clean/` and wire that pair to it.
+Do not bring back legacy seam registries, GPT/HF sweep artifacts, or fixed A/B/C assumptions.
+
+The next useful work is persistence/export:
+
+- localStorage state restore
+- scene config export/import
+- batch work adapter download
+- cleanup of old `public/panos` assets after replacement plates exist

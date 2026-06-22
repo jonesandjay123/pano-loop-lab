@@ -1,8 +1,9 @@
 /**
- * Data model for the clean panorama ring.
+ * Data model for the dynamic panorama ring.
  *
- * Runtime order is A, AXB, B, BXC, C, CXA. The adapters are full work-canvas
- * images, not hidden blend zones. Unfinished adapters should remain visible.
+ * Runtime order is derived from the workbench plate order:
+ * plate 0, adapter 0->1, plate 1, adapter 1->2, ... adapter last->0.
+ * Adapters are full [A-edge][X][B-edge] images, not hidden blend zones.
  */
 
 /**
@@ -77,7 +78,7 @@ export interface PanoRingConfig {
 export interface RingSegment {
   key: string;
   kind: "plate" | "seam";
-  /** Debug label, e.g. "dawn-valley" or "dawn-valley → dusk-ridge". */
+  /** Debug label, e.g. "sunlit-pasture" or "sunlit-pasture -> pine-ridge". */
   label: string;
   imageUrl: string;
   widthVw: number;
@@ -97,7 +98,7 @@ export interface RingSegment {
  */
 export interface RingBoundary {
   index: number;
-  /** e.g. "dawn-valley ▸ dawn-valley→dusk-ridge". */
+  /** e.g. "sunlit-pasture -> sunlit-pasture -> pine-ridge". */
   label: string;
   leftKind: "plate" | "seam";
   rightKind: "plate" | "seam";

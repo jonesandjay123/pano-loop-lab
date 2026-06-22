@@ -2,26 +2,33 @@
 
 Read `HANDOFF.md` and `docs/research/STATE.md` before editing.
 
-This repo is now a clean AXB loop prototype. Keep it small.
+This repo is a private panorama loop staging tool. Keep it focused and small.
 
 ## Do
 
-- Keep runtime assets under `public/panos` limited to plates and clean adapters.
-- Use full `[A][X][B]` adapter images with `523px` anchor overlap.
-- Keep the homepage honest: unfinished work canvases should look unfinished.
+- Keep the runtime centered on deterministic plate -> adapter -> plate playback.
+- Use the new strict geometry:
+  - plate: `6144 x 1536`
+  - adapter: `6144 x 1536`
+  - edge `m`: `1024px`
+  - X zone: `4096px`
+- Derive adapter pairs from plate order. Do not hardcode A/B/C.
+- Let unfinished work adapters stay visible until a finished adapter is uploaded.
+- Use browser-only image assembly for work adapters; no backend service is needed.
+- Keep README and user-facing repo docs in Chinese.
 - Run `npm run build` before claiming done.
 
 ## Do Not
 
-- Do not reintroduce legacy seams, candidate registries, GPT/HF sweeps, or bulky
-  working artifacts.
-- Do not add Three.js, canvas, GSAP, backend services, or new libraries.
+- Do not reintroduce legacy seams, candidate registries, GPT/HF sweeps, or bulky working artifacts.
+- Do not add Three.js, GSAP, backend services, or new libraries without a specific need.
+- Do not auto-resize invalid uploads. Reject images that do not match the strict dimensions.
 - Do not hide unfinished adapters with blend tricks.
 
 ## Current Runtime
 
 ```text
-A plate -> AXB -> B plate -> BXC -> C plate -> CXA -> A plate
+plate 0 -> adapter 0→1 -> plate 1 -> adapter 1→2 -> ... -> adapter last→0
 ```
 
-Only AXB has a completed manual Photoshop result right now.
+Workbench state resolves the ring. Finished adapters override generated work adapters; otherwise runtime falls back to the generated work adapter.
