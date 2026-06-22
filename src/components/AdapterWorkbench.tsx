@@ -137,6 +137,18 @@ export function AdapterWorkbench({
     await replacePlate(plate, file);
   };
 
+  const dropFinishedAdapter = async (event: DragEvent<HTMLElement>, pair: WorkbenchPair) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragTarget(null);
+    const file = firstImageFile(event.dataTransfer.files);
+    if (!file) {
+      setNotice({ tone: "warn", text: "拖曳的檔案不是圖片。" });
+      return;
+    }
+    await uploadFinished(pair, file);
+  };
+
   const replacePlate = async (plate: WorkbenchPlate, file: File) => {
     const image = await readImageFile(file);
     if (!validatePlateDimensions(image.width, image.height)) {
@@ -493,7 +505,13 @@ export function AdapterWorkbench({
               {selectedPair && (
                 <div className="details-block">
                   <div className="sidebar-heading">Files</div>
-                  <div className="file-links">
+                  <div
+                    className={`file-links drop-zone ${dragTarget === `finished-${selectedPair.id}` ? "is-dragging" : ""}`}
+                    onDragEnter={(event) => prepareDrop(event, `finished-${selectedPair.id}`)}
+                    onDragOver={(event) => prepareDrop(event, `finished-${selectedPair.id}`)}
+                    onDragLeave={() => setDragTarget(null)}
+                    onDrop={(event) => void dropFinishedAdapter(event, selectedPair)}
+                  >
                     <a href={selectedPair.workAdapterUrl} download={`${selectedPair.id}-work.png`}>
                       下載 work
                     </a>
@@ -505,7 +523,7 @@ export function AdapterWorkbench({
                         下載 finished
                       </a>
                     )}
-                    <label className="file-label">
+                    <label className={`file-label drop-zone ${dragTarget === `finished-${selectedPair.id}` ? "is-dragging" : ""}`}>
                       上傳 finished
                       <input
                         type="file"
