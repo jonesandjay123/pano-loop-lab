@@ -44,11 +44,11 @@ The X zone is a Photoshop work area. Do not hide it with runtime blending.
 
 ## Current Implementation Notes
 
-- Workbench state is browser-local React state with `localStorage` auto-save.
+- Workbench state is browser-local React state with IndexedDB auto-save.
 - Default plates are generated SVG staging placeholders at the correct aspect.
 - Work adapters are generated in-browser with canvas and exposed as PNG object URLs.
 - Upload validation rejects images that are not exactly `6144 x 1536`.
-- Scene config export/import is available from `/#adapter-workbench`.
+- Scene config export/import is available from `/#adapter-workbench` for backup and moving scenes between browsers.
 - Imported scene configs are schema, geometry, and image-dimension checked.
 - All generated work adapters can be downloaded from the Scene file tools.
 - Finished adapters have a round-trip inventory: counts, missing status, batch download, and clear-all.

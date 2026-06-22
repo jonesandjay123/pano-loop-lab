@@ -56,14 +56,14 @@ The X zone is intentionally unfinished and should stay visible until Photoshop o
 - generated work adapter preview/download
 - finished adapter upload/clear
 - runtime fallback between finished and work adapter
-- localStorage auto-save
+- IndexedDB auto-save
 - scene config export/import with geometry and image checks
 - batch download for all generated work adapters
 - finished adapter status inventory
 - batch download / clear-all for finished adapters
 - scene manifest export for external asset handoff
 
-State is local React state backed by `localStorage`. If browser storage quota is exceeded, the workbench asks the user to preserve the scene through config export.
+State is local React state backed by IndexedDB. This keeps large `6144 x 1536` plate and finished-adapter data across page reloads and dev-server restarts in the same browser origin. Scene config export/import remains the explicit backup and cross-browser handoff path.
 
 ## Asset State
 

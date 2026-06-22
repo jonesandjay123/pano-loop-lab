@@ -71,7 +71,9 @@ http://localhost:5173/#adapter-workbench
 
 ## 保存與搬移
 
-工具台會自動把目前場景保存到此瀏覽器的 `localStorage`。如果圖片資料太大導致瀏覽器拒絕保存，請用工具台左側的「匯出 config」保存一份 JSON。
+工具台會自動把目前場景保存到此瀏覽器的 IndexedDB。這是純前端保存，不需要後端；重整頁面或重啟 dev server 後，只要是同一個瀏覽器 origin，場景就會自動還原。
+
+工具台左側的「匯出 config」仍然很重要：它是備份、搬到另一個瀏覽器、或避免瀏覽器資料被清掉時的保險。
 
 scene config 會包含 plate / finished adapter 的圖片資料、順序、label 與目前幾何規格。匯入時會檢查版本、規格和圖片尺寸，不符合就拒絕。
 
@@ -92,7 +94,7 @@ scene config 會包含 plate / finished adapter 的圖片資料、順序、label
 
 ## 目前狀態
 
-工具台目前使用瀏覽器本地狀態加 `localStorage` 自動保存。也可以匯出 / 匯入 scene config。
+工具台目前使用瀏覽器本地狀態加 IndexedDB 自動保存。也可以匯出 / 匯入 scene config。
 
 舊的 `public/panos` demo 圖已移除。現在 runtime 靠內建 staging plates、瀏覽器上傳、或 scene config 匯入。
 
