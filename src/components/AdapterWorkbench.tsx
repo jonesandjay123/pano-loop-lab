@@ -360,7 +360,7 @@ export function AdapterWorkbench({
                 onClick={() => {
                   onReset();
                   setSelectedPairId(null);
-                  setNotice({ tone: "ok", text: "已重置為內建 staging scene。" });
+                  setNotice({ tone: "ok", text: "正在重置為 repo production preset。" });
                 }}
               >
                 重置

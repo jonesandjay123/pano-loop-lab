@@ -67,15 +67,15 @@ State is local React state backed by IndexedDB. This keeps large `6144 x 1536` p
 
 ## Asset State
 
-There are no runtime panorama assets checked into `public/panos` now. Production plates and finished adapters enter through browser upload or scene config import.
+The only checked-in runtime panorama assets should live under `public/panos/production/`. Browser uploads and scene config import remain useful for local experiments.
 
 The first production source plate set is now checked into the repo for handoff/reference:
 
 ```text
-generated/production-plates/raw/00-6144x1536.png
-generated/production-plates/raw/01-6144x1536.png
-generated/production-plates/raw/02-6144x1536.png
-generated/production-plates/raw/03-6144x1536.png
+generated/production-plates/raw/01-plate.png
+generated/production-plates/raw/02-plate.png
+generated/production-plates/raw/03-plate.png
+generated/production-plates/raw/04-plate.png
 ```
 
 All four source plates are exactly `6144 x 1536`. The contact sheet in `generated/production-plates/contact-sheet-current.png` is for visual review only.
@@ -88,6 +88,17 @@ generated/production-plates/finished-adapters/
 
 Those files must also be complete `6144 x 1536` adapter images, not cropped seam-only patches.
 
+The Git-synced runtime preset is:
+
+```text
+public/panos/production/scene.json
+public/panos/production/raw/
+public/panos/production/finished-adapters/
+```
+
+On a fresh browser/origin, the app loads this preset automatically before falling
+back to built-in staging plates.
+
 The first four-plate loop has been proven in the browser with Photoshop-finished adapters. One visible seam still needs manual repair before treating the scene as final art.
 
 ## Guardrail
@@ -98,4 +109,5 @@ The next useful work is polish/content QA:
 
 - repair the one visible Photoshop seam artifact
 - export a workbench scene config once the finished adapters are final
-- keep generated production sources under `generated/production-plates/`, not `public/panos`
+- keep working production sources under `generated/production-plates/`
+- keep the Git-synced runtime preset under `public/panos/production/`

@@ -5,10 +5,10 @@ This folder contains curated production source plates for the current panorama l
 ## Current Set
 
 ```text
-raw/00-6144x1536.png
-raw/01-6144x1536.png
-raw/02-6144x1536.png
-raw/03-6144x1536.png
+raw/01-plate.png
+raw/02-plate.png
+raw/03-plate.png
+raw/04-plate.png
 ```
 
 All four images are exactly `6144 x 1536`.
@@ -32,11 +32,14 @@ left 1024px source edge + filled 4096px X zone + right 1024px target edge
 Suggested names for the current four-plate loop:
 
 ```text
-00-to-01-finished.png
 01-to-02-finished.png
 02-to-03-finished.png
-03-to-00-finished.png
+03-to-04-finished.png
+04-to-01-finished.png
 ```
+
+The app runtime preset mirrors these files under `public/panos/production/` with
+the same filenames plus `public/panos/production/scene.json`.
 
 ## Usage
 

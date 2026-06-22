@@ -53,7 +53,7 @@ The X zone is a Photoshop work area. Do not hide it with runtime blending.
 - All generated work adapters can be downloaded from the Scene file tools.
 - Finished adapters have a round-trip inventory: counts, missing status, batch download, and clear-all.
 - Scene manifest export lists plate order, pair order, suggested filenames, and finished/work status.
-- Old demo files under `public/panos` have been removed; runtime now depends on built-in staging plates, uploads, and imported scene configs.
+- Old demo files under `public/panos` have been removed. The only checked-in runtime image set should live under `public/panos/production/`.
 - The first production plate set is checked in under `generated/production-plates/raw/`.
 
 ## Commands
@@ -69,10 +69,10 @@ npm run preview
 The current production source plates are:
 
 ```text
-generated/production-plates/raw/00-6144x1536.png
-generated/production-plates/raw/01-6144x1536.png
-generated/production-plates/raw/02-6144x1536.png
-generated/production-plates/raw/03-6144x1536.png
+generated/production-plates/raw/01-plate.png
+generated/production-plates/raw/02-plate.png
+generated/production-plates/raw/03-plate.png
+generated/production-plates/raw/04-plate.png
 ```
 
 All four are exactly `6144 x 1536`.
@@ -86,6 +86,15 @@ generated/production-plates/finished-adapters/
 ```
 
 Use this folder for complete `6144 x 1536` finished adapters, not X-only crops.
+
+The cross-machine runtime preset lives under:
+
+```text
+public/panos/production/
+```
+
+`public/panos/production/scene.json` is the canonical Git-synced scene. A fresh
+browser loads it automatically when there is no local IndexedDB scene.
 
 ## Next Likely Work
 

@@ -1,0 +1,61 @@
+{
+  "app": "pano-loop-lab",
+  "version": 1,
+  "exportedAt": "2026-06-22T00:00:00.000Z",
+  "geometry": {
+    "plateWidth": 6144,
+    "plateHeight": 1536,
+    "adapterWidth": 6144,
+    "adapterHeight": 1536,
+    "edgeWidth": 1024,
+    "xWidth": 4096,
+    "aspectRatio": 4,
+    "xFill": "#20242b"
+  },
+  "state": {
+    "plates": [
+      {
+        "id": "plate-01",
+        "label": "Plate 01",
+        "imageUrl": "/panos/production/raw/01-plate.png",
+        "sourceName": "01-plate.png"
+      },
+      {
+        "id": "plate-02",
+        "label": "Plate 02",
+        "imageUrl": "/panos/production/raw/02-plate.png",
+        "sourceName": "02-plate.png"
+      },
+      {
+        "id": "plate-03",
+        "label": "Plate 03",
+        "imageUrl": "/panos/production/raw/03-plate.png",
+        "sourceName": "03-plate.png"
+      },
+      {
+        "id": "plate-04",
+        "label": "Plate 04",
+        "imageUrl": "/panos/production/raw/04-plate.png",
+        "sourceName": "04-plate.png"
+      }
+    ],
+    "finishedAdapters": {
+      "plate-01__plate-02": {
+        "imageUrl": "/panos/production/finished-adapters/01-to-02-finished.png",
+        "sourceName": "01-to-02-finished.png"
+      },
+      "plate-02__plate-03": {
+        "imageUrl": "/panos/production/finished-adapters/02-to-03-finished.png",
+        "sourceName": "02-to-03-finished.png"
+      },
+      "plate-03__plate-04": {
+        "imageUrl": "/panos/production/finished-adapters/03-to-04-finished.png",
+        "sourceName": "03-to-04-finished.png"
+      },
+      "plate-04__plate-01": {
+        "imageUrl": "/panos/production/finished-adapters/04-to-01-finished.png",
+        "sourceName": "04-to-01-finished.png"
+      }
+    }
+  }
+}

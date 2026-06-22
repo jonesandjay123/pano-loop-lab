@@ -96,7 +96,7 @@ scene config 會包含 plate / finished adapter 的圖片資料、順序、label
 
 工具台目前使用瀏覽器本地狀態加 IndexedDB 自動保存。也可以匯出 / 匯入 scene config。
 
-舊的 `public/panos` demo 圖已移除。現在 runtime 靠內建 staging plates、瀏覽器上傳、或 scene config 匯入。
+舊的 `public/panos` demo 圖已移除。現在跨機器同步用的 runtime preset 只放在 `public/panos/production/`。
 
 第一組 production source plates 已經放在：
 
@@ -105,6 +105,14 @@ generated/production-plates/raw/
 ```
 
 目前是四張 `6144 x 1536` PNG，可以用工具台替換進 plate slots，再下載 work adapters 給 Photoshop 手修。`generated/production-plates/contact-sheet-current.png` 只是檢查用 contact sheet，不是 runtime plate。
+
+Git 同步用的正式 runtime preset 在：
+
+```text
+public/panos/production/
+```
+
+其中 `scene.json` 會指向四張 plates 和四張 finished adapters。新機器 `git pull` 後，只要瀏覽器沒有本機 IndexedDB 場景，app 會自動載入這份 production preset。
 
 下一步會考慮：
 

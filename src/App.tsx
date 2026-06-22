@@ -11,6 +11,7 @@ import {
   exportScene,
   importScene,
   generateWorkAdapter,
+  validateWorkbenchStateImages,
 } from "./pano/workbenchState";
 import type { WorkbenchPair } from "./pano/workbenchState";
 import { loadPersistedWorkbenchScene, savePersistedWorkbenchScene } from "./pano/workbenchPersistence";
@@ -28,6 +29,14 @@ type AppView = "seam-lab" | "adapter-workbench";
 
 function readHashView(): AppView {
   return window.location.hash === "#adapter-workbench" ? "adapter-workbench" : "seam-lab";
+}
+
+async function readProductionPreset() {
+  const response = await fetch("/panos/production/scene.json", { cache: "no-store" });
+  if (!response.ok) throw new Error("Production scene preset is missing.");
+  const state = importScene(await response.text());
+  await validateWorkbenchStateImages(state);
+  return state;
 }
 
 export default function App() {
@@ -67,16 +76,27 @@ export default function App() {
         if (legacy) {
           setWorkbenchState(importScene(legacy));
           setStorageStatus("已從舊 localStorage 還原場景，之後會改存 IndexedDB。");
-        } else {
-          setStorageStatus("此瀏覽器會自動保存目前場景。");
+          setStorageReady(true);
+          return;
         }
       } catch {
         if (!cancelled) {
-          setStorageStatus("此瀏覽器會自動保存目前場景。");
+          setStorageStatus("舊 localStorage 無法讀取，改載入 repo production preset。");
         }
-      } finally {
-        if (!cancelled) setStorageReady(true);
       }
+
+      try {
+        const productionPreset = await readProductionPreset();
+        if (cancelled) return;
+        setWorkbenchState(productionPreset);
+        setStorageStatus("已載入 repo production preset。");
+      } catch {
+        if (!cancelled) {
+          setStorageStatus("找不到 repo production preset，使用內建 staging scene。");
+        }
+      }
+
+      if (!cancelled) setStorageReady(true);
     }
 
     void restoreWorkbenchState();
@@ -138,6 +158,17 @@ export default function App() {
     };
   }, [storageReady, workbenchState]);
 
+  const resetToProductionPreset = async () => {
+    setStorageStatus("正在載入 repo production preset。");
+    try {
+      setWorkbenchState(await readProductionPreset());
+      setStorageStatus("已重置為 repo production preset。");
+    } catch {
+      setWorkbenchState(DEFAULT_WORKBENCH_STATE);
+      setStorageStatus("repo production preset 載入失敗，已重置為內建 staging scene。");
+    }
+  };
+
   const patch = (p: Partial<SeamLabState>) => setLab((prev) => ({ ...prev, ...p }));
 
   if (view === "adapter-workbench") {
@@ -147,7 +178,7 @@ export default function App() {
           state={workbenchState}
           pairs={pairs}
           onChange={setWorkbenchState}
-          onReset={() => setWorkbenchState(DEFAULT_WORKBENCH_STATE)}
+          onReset={() => void resetToProductionPreset()}
           generating={generatingAdapters}
           storageStatus={storageStatus}
         />

@@ -12,5 +12,6 @@
   `6144 x 1536`.
 - Old GPT/HF sweeps, soft-adoption variants, legacy seams, and giant working folders
   were research noise for the current goal and should not return to `public/panos`.
+  `public/panos/production/` is reserved for the current Git-synced runtime preset.
 - `generated/production-plates/` may keep curated production source plates and
   review sheets. Runtime assets still enter through upload or scene config import.

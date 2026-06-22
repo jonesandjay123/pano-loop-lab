@@ -17,5 +17,6 @@ m:                1024
 X zone:           4096
 ```
 
-Do not wire finished adapters into `src/` or `public/panos`. The runtime reads the
-browser workbench state, with scene config export/import used for preservation.
+Do not wire finished adapters into `src/`. For local work, upload them through the
+workbench. For cross-machine Git sync, update `public/panos/production/scene.json`
+and the matching files under `public/panos/production/`.
