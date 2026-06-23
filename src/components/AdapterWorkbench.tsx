@@ -62,6 +62,18 @@ function downloadUrl(url: string, filename: string) {
   link.remove();
 }
 
+function cleanMetadataValue(value: string) {
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+function parseOptionalNumber(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 export function AdapterWorkbench({
   state,
   pairs,
@@ -79,6 +91,24 @@ export function AdapterWorkbench({
 
   const patchPlates = (plates: WorkbenchPlate[]) => {
     onChange({ ...state, plates });
+  };
+
+  const patchPlateMetadata = (plateId: string, patch: Partial<WorkbenchPlate>) => {
+    onChange({
+      ...state,
+      plates: state.plates.map((plate) => (plate.id === plateId ? { ...plate, ...patch } : plate)),
+    });
+  };
+
+  const patchAdapterMetadata = (pair: WorkbenchPair, transitionPreset: string) => {
+    const next = { ...state.adapterMetadata };
+    const cleaned = cleanMetadataValue(transitionPreset);
+    if (cleaned) next[pair.id] = { ...next[pair.id], transitionPreset: cleaned };
+    else delete next[pair.id];
+    onChange({
+      ...state,
+      adapterMetadata: next,
+    });
   };
 
   const addPlate = async (file: File) => {
@@ -208,6 +238,72 @@ export function AdapterWorkbench({
     onChange({ ...state, finishedAdapters: next });
     setNotice({ tone: "ok", text: "已回到 work adapter fallback。" });
   };
+
+  const renderRegionMetadata = (plate: WorkbenchPlate, label: string) => (
+    <div className="metadata-card" key={plate.id}>
+      <div className="metadata-title">{label}</div>
+      <label>
+        <span>stagingPreset</span>
+        <input
+          value={plate.stagingPreset ?? ""}
+          onChange={(event) => patchPlateMetadata(plate.id, { stagingPreset: cleanMetadataValue(event.currentTarget.value) })}
+        />
+      </label>
+      <label>
+        <span>lightingPreset</span>
+        <input
+          value={plate.lightingPreset ?? ""}
+          onChange={(event) => patchPlateMetadata(plate.id, { lightingPreset: cleanMetadataValue(event.currentTarget.value) })}
+        />
+      </label>
+      <label>
+        <span>particlePreset</span>
+        <input
+          value={plate.particlePreset ?? ""}
+          onChange={(event) => patchPlateMetadata(plate.id, { particlePreset: cleanMetadataValue(event.currentTarget.value) })}
+        />
+      </label>
+      <label>
+        <span>ribbonPalette</span>
+        <input
+          value={plate.ribbonPalette ?? ""}
+          onChange={(event) => patchPlateMetadata(plate.id, { ribbonPalette: cleanMetadataValue(event.currentTarget.value) })}
+        />
+      </label>
+      <div className="metadata-row">
+        <label>
+          <span>anchorX</span>
+          <input
+            inputMode="decimal"
+            value={plate.cameraHints?.anchorX ?? ""}
+            onChange={(event) =>
+              patchPlateMetadata(plate.id, {
+                cameraHints: {
+                  ...plate.cameraHints,
+                  anchorX: parseOptionalNumber(event.currentTarget.value),
+                },
+              })
+            }
+          />
+        </label>
+        <label>
+          <span>lookY</span>
+          <input
+            inputMode="decimal"
+            value={plate.cameraHints?.preferredLookY ?? ""}
+            onChange={(event) =>
+              patchPlateMetadata(plate.id, {
+                cameraHints: {
+                  ...plate.cameraHints,
+                  preferredLookY: parseOptionalNumber(event.currentTarget.value),
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    </div>
+  );
 
   const exportConfig = () => {
     const blob = new Blob([exportScene(state)], { type: "application/json" });
@@ -525,6 +621,26 @@ export function AdapterWorkbench({
                   </span>
                 </div>
               </div>
+
+              {selectedPair && (
+                <div className="details-block">
+                  <div className="sidebar-heading">World metadata</div>
+                  <div className="metadata-grid">
+                    {renderRegionMetadata(selectedPair.from, "From region")}
+                    {renderRegionMetadata(selectedPair.to, "To region")}
+                    <div className="metadata-card">
+                      <div className="metadata-title">Adapter</div>
+                      <label>
+                        <span>transitionPreset</span>
+                        <input
+                          value={state.adapterMetadata?.[selectedPair.id]?.transitionPreset ?? ""}
+                          onChange={(event) => patchAdapterMetadata(selectedPair, event.currentTarget.value)}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {selectedPair && (
                 <div className="details-block">

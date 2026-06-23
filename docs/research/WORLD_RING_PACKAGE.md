@@ -86,6 +86,19 @@ src/pano/worldRingPackage.ts
 - `stringifyWorldRingPackage`
 - `buildWorldRingPackageFromWorkbench`
 
+Workbench scene config 的 metadata 存放位置：
+
+```text
+state.plates[].stagingPreset
+state.plates[].lightingPreset
+state.plates[].particlePreset
+state.plates[].ribbonPalette
+state.plates[].cameraHints
+state.adapterMetadata[pairId].transitionPreset
+```
+
+`transitionPreset` 不放在 `finishedAdapters` 裡，因為 finished adapter 是圖片資產狀態；transition metadata 應該在清掉或替換 finished 圖時保留下來。
+
 ## Production sample
 
 目前 repo 內已有 production manifest：
@@ -139,6 +152,12 @@ __boundaryT
 ```
 
 6. 用 `stagingPreset` / `transitionPreset` 先放 debug markers，再接真正 props、lighting、particles。
+
+更詳細的明日交接檔在：
+
+```text
+docs/research/JOVICHEER_WORLD_STAGE_HANDOFF.md
+```
 
 ## 邊界
 

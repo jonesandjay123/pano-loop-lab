@@ -74,22 +74,32 @@
     "finishedAdapters": {
       "plate-01__plate-02": {
         "imageUrl": "/panos/production/finished-adapters/01-to-02-finished.png",
-        "sourceName": "01-to-02-finished.png",
-        "transitionPreset": "morning-pasture-to-sunset-lake"
+        "sourceName": "01-to-02-finished.png"
       },
       "plate-02__plate-03": {
         "imageUrl": "/panos/production/finished-adapters/02-to-03-finished.png",
-        "sourceName": "02-to-03-finished.png",
-        "transitionPreset": "sunset-lake-to-cloud-shrine"
+        "sourceName": "02-to-03-finished.png"
       },
       "plate-03__plate-04": {
         "imageUrl": "/panos/production/finished-adapters/03-to-04-finished.png",
-        "sourceName": "03-to-04-finished.png",
-        "transitionPreset": "cloud-shrine-to-moon-castle"
+        "sourceName": "03-to-04-finished.png"
       },
       "plate-04__plate-01": {
         "imageUrl": "/panos/production/finished-adapters/04-to-01-finished.png",
-        "sourceName": "04-to-01-finished.png",
+        "sourceName": "04-to-01-finished.png"
+      }
+    },
+    "adapterMetadata": {
+      "plate-01__plate-02": {
+        "transitionPreset": "morning-pasture-to-sunset-lake"
+      },
+      "plate-02__plate-03": {
+        "transitionPreset": "sunset-lake-to-cloud-shrine"
+      },
+      "plate-03__plate-04": {
+        "transitionPreset": "cloud-shrine-to-moon-castle"
+      },
+      "plate-04__plate-01": {
         "transitionPreset": "moon-castle-to-morning-pasture"
       }
     }

@@ -91,6 +91,10 @@ type WorldRingPackage = {
 
 `Region` 可以承載 `stagingPreset`、`lightingPreset`、`particlePreset`、`ribbonPalette`、`cameraHints`。`Adapter` 可以承載 `transitionPreset`。
 
+`/#adapter-workbench` 右側有小型 metadata editor，可以直接編輯 selected pair 的 from/to region metadata，以及該 adapter 的 `transitionPreset`。這些資料會存進 scene config，並在匯出 world-ring 時寫進 manifest。
+
+Scene config 裡 region metadata 存在各 plate 上；adapter metadata 獨立存在 `state.adapterMetadata`，不跟 finished adapter 圖片綁死。清除或替換 finished adapter 不會清掉 `transitionPreset`。
+
 `pano-loop-lab` 只保存與匯出這些 metadata；不在這裡 render Jovicheer 的 3D props。
 
 ## Production assets
@@ -111,6 +115,12 @@ public/panos/production/scene.json
 public/panos/production/world-ring.json
 public/panos/production/raw/
 public/panos/production/finished-adapters/
+```
+
+給 `jovicheer-world-stage` 的明日交接檔在：
+
+```text
+docs/research/JOVICHEER_WORLD_STAGE_HANDOFF.md
 ```
 
 Photoshop-filled full adapter 工作檔應放在：
@@ -147,4 +157,4 @@ npm run build
 
 - 修目前 Photoshop 成品裡那條可見 seam artifact。
 - 在 `jovicheer-world-stage` 讀取 `public/panos/production/world-ring.json`，先做背景 ring + telemetry 的最小垂直切片。
-- 如果 metadata 需要人工調整，再在 workbench 裡加很小的 region / adapter metadata editor。
+- `jovicheer-world-stage` 依照 `docs/research/JOVICHEER_WORLD_STAGE_HANDOFF.md` 做第一個 consume slice。

@@ -28,6 +28,9 @@ export interface WorkbenchPlate {
 export interface WorkbenchFinishedAdapter {
   imageUrl: string;
   sourceName: string;
+}
+
+export interface WorkbenchAdapterMetadata {
   transitionPreset?: string;
 }
 
@@ -42,6 +45,7 @@ export interface WorkbenchPair {
 export interface WorkbenchState {
   plates: WorkbenchPlate[];
   finishedAdapters: Record<string, WorkbenchFinishedAdapter | undefined>;
+  adapterMetadata?: Record<string, WorkbenchAdapterMetadata | undefined>;
 }
 
 interface WorkbenchSceneFile {
@@ -108,6 +112,7 @@ export const DEFAULT_WORKBENCH_STATE: WorkbenchState = {
     samplePlate("Misty Lake Castle", ["#b7c0c7", "#748180", "#49685f", "#879682"], "Lake surface / far castle hill / soft mist", "lake-castle"),
   ],
   finishedAdapters: {},
+  adapterMetadata: {},
 };
 
 export function pairId(fromId: string, toId: string) {
@@ -224,6 +229,7 @@ function validateImportedState(value: unknown): WorkbenchState {
   if (!isRecord(value)) throw new Error("Scene state is missing.");
   const plates = value.plates;
   const finishedAdapters = value.finishedAdapters;
+  const adapterMetadata = value.adapterMetadata;
 
   if (!Array.isArray(plates) || plates.length < 2) {
     throw new Error("Scene must contain at least 2 plates.");
@@ -259,12 +265,31 @@ function validateImportedState(value: unknown): WorkbenchState {
       normalizedFinished[key] = {
         imageUrl,
         sourceName: typeof adapter.sourceName === "string" ? adapter.sourceName : "imported finished adapter",
-        transitionPreset: typeof adapter.transitionPreset === "string" ? adapter.transitionPreset : undefined,
       };
     });
   }
 
-  return { plates: normalizedPlates, finishedAdapters: normalizedFinished };
+  const normalizedAdapterMetadata: Record<string, WorkbenchAdapterMetadata | undefined> = {};
+  if (isRecord(adapterMetadata)) {
+    Object.entries(adapterMetadata).forEach(([key, metadata]) => {
+      if (!metadata) return;
+      if (!isRecord(metadata)) throw new Error(`Adapter metadata ${key} is invalid.`);
+      normalizedAdapterMetadata[key] = {
+        transitionPreset: typeof metadata.transitionPreset === "string" ? metadata.transitionPreset : undefined,
+      };
+    });
+  }
+
+  if (isRecord(finishedAdapters)) {
+    Object.entries(finishedAdapters).forEach(([key, adapter]) => {
+      if (!isRecord(adapter)) return;
+      if (typeof adapter.transitionPreset === "string" && !normalizedAdapterMetadata[key]?.transitionPreset) {
+        normalizedAdapterMetadata[key] = { transitionPreset: adapter.transitionPreset };
+      }
+    });
+  }
+
+  return { plates: normalizedPlates, finishedAdapters: normalizedFinished, adapterMetadata: normalizedAdapterMetadata };
 }
 
 export function importScene(text: string): WorkbenchState {

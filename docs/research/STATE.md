@@ -63,6 +63,7 @@ The X zone is intentionally unfinished and should stay visible until Photoshop o
 - batch download / clear-all for finished adapters
 - scene manifest export for external asset handoff
 - world-ring package export for Jovicheer consumer
+- small region / adapter metadata editor for the selected pair
 
 State is local React state backed by IndexedDB. This keeps large `6144 x 1536` plate and finished-adapter data across page reloads and dev-server restarts in the same browser origin. Scene config export/import remains the explicit backup and cross-browser handoff path.
 
@@ -107,6 +108,8 @@ Adapter metadata 目前可承載：
 transitionPreset
 ```
 
+Workbench scene config 中，adapter metadata 存在 `state.adapterMetadata`，不跟 `finishedAdapters` 圖片物件綁死。清除 finished adapter 只會回到 work fallback，不會清掉 transition preset。
+
 `pano-loop-lab` 只保存與匯出這些欄位；不在這裡 render Jovicheer 3D props、lighting、wind 或 particles。
 
 ## Asset State
@@ -141,6 +144,12 @@ public/panos/production/raw/
 public/panos/production/finished-adapters/
 ```
 
+給 `jovicheer-world-stage` 的明日交接文件：
+
+```text
+docs/research/JOVICHEER_WORLD_STAGE_HANDOFF.md
+```
+
 On a fresh browser/origin, the app loads this preset automatically before falling
 back to built-in staging plates.
 
@@ -154,6 +163,6 @@ The next useful work is polish/content QA + consumer integration:
 
 - repair the one visible Photoshop seam artifact
 - keep `public/panos/production/world-ring.json` in sync with final production assets
-- in `jovicheer-world-stage`, consume the package as region/adapter/boundary data
+- in `jovicheer-world-stage`, follow `docs/research/JOVICHEER_WORLD_STAGE_HANDOFF.md` and consume the package as region/adapter/boundary data
 - keep working production sources under `generated/production-plates/`
 - keep the Git-synced runtime preset under `public/panos/production/`

@@ -28,6 +28,7 @@ plates[]
 - 自動產生 work adapter
 - 接收 Photoshop 手修後的 finished adapter
 - finished / work fallback loop preview
+- 編輯 region / adapter metadata
 - 匯出 scene config 作為備份
 - 匯出 world-ring package 給 `jovicheer-world-stage`
 
@@ -127,6 +128,14 @@ type Adapter = {
 
 `pano-loop-lab` 只保存、驗證、匯出這些 metadata。它不負責把 presets 真的渲染成 Jovicheer foreground。
 
+工具台右側的 `World metadata` 區可以編輯 selected pair 的 from/to region metadata，以及該 pair 的 `transitionPreset`。scene config 會保存這些欄位；adapter metadata 存在 `state.adapterMetadata`，不依賴 finished adapter 圖片是否存在。
+
+明天給 `jovicheer-world-stage` Codex 的直接交接檔：
+
+```text
+docs/research/JOVICHEER_WORLD_STAGE_HANDOFF.md
+```
+
 ## 使用
 
 ```bash
@@ -174,4 +183,4 @@ public/panos/production/finished-adapters/
 
 - 修目前 Photoshop finished adapter 裡的一條可見 seam artifact。
 - 讓 `jovicheer-world-stage` 讀 `world-ring.json`，先做 background ring + telemetry。
-- 如果需要手動調 presets，再替 workbench 加小型 region / adapter metadata editor。
+- 讓 `jovicheer-world-stage` 依照 `docs/research/JOVICHEER_WORLD_STAGE_HANDOFF.md` 讀 `world-ring.json`，先做 background ring + telemetry。

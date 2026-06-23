@@ -133,13 +133,23 @@ export function buildWorldRingPackageFromWorkbench(
       lightingPreset: plate.lightingPreset,
       particlePreset: plate.particlePreset,
       ribbonPalette: plate.ribbonPalette,
-      cameraHints: plate.cameraHints,
+      cameraHints: compactCameraHints(plate.cameraHints),
     })),
     adapters: pairs.map((pair) => ({
       from: pair.from.id,
       to: pair.to.id,
       image: pair.finishedAdapter?.imageUrl ?? pair.workAdapterUrl,
-      transitionPreset: pair.finishedAdapter?.transitionPreset,
+      transitionPreset: state.adapterMetadata?.[pair.id]?.transitionPreset,
     })),
   };
+}
+
+function compactCameraHints(hints: RegionCameraHints | undefined): RegionCameraHints | undefined {
+  if (!hints) return undefined;
+  const compact: RegionCameraHints = {};
+  if (typeof hints.anchorX === "number" && Number.isFinite(hints.anchorX)) compact.anchorX = hints.anchorX;
+  if (typeof hints.preferredLookY === "number" && Number.isFinite(hints.preferredLookY)) {
+    compact.preferredLookY = hints.preferredLookY;
+  }
+  return Object.keys(compact).length > 0 ? compact : undefined;
 }
