@@ -1,0 +1,92 @@
+{
+  "id": "production-first-ring",
+  "version": 1,
+  "geometry": {
+    "plateWidth": 6144,
+    "plateHeight": 1536,
+    "adapterWidth": 6144,
+    "adapterHeight": 1536,
+    "edgeWidth": 1024,
+    "xWidth": 4096
+  },
+  "regions": [
+    {
+      "id": "plate-01",
+      "label": "Plate 01",
+      "plate": "raw/01-plate.png",
+      "stagingPreset": "alpine-pasture",
+      "lightingPreset": "clear-morning",
+      "particlePreset": "soft-pollen",
+      "ribbonPalette": "warm-field",
+      "cameraHints": {
+        "anchorX": 0.5,
+        "preferredLookY": 0.47
+      }
+    },
+    {
+      "id": "plate-02",
+      "label": "Plate 02",
+      "plate": "raw/02-plate.png",
+      "stagingPreset": "sunset-lake-path",
+      "lightingPreset": "late-gold",
+      "particlePreset": "lake-motes",
+      "ribbonPalette": "sunset-paper",
+      "cameraHints": {
+        "anchorX": 0.5,
+        "preferredLookY": 0.48
+      }
+    },
+    {
+      "id": "plate-03",
+      "label": "Plate 03",
+      "plate": "raw/03-plate.png",
+      "stagingPreset": "cloud-mountain-shrine",
+      "lightingPreset": "cool-highland",
+      "particlePreset": "thin-mist",
+      "ribbonPalette": "mountain-paper",
+      "cameraHints": {
+        "anchorX": 0.5,
+        "preferredLookY": 0.46
+      }
+    },
+    {
+      "id": "plate-04",
+      "label": "Plate 04",
+      "plate": "raw/04-plate.png",
+      "stagingPreset": "moonlit-castle-lake",
+      "lightingPreset": "blue-moon",
+      "particlePreset": "night-fireflies",
+      "ribbonPalette": "moon-paper",
+      "cameraHints": {
+        "anchorX": 0.5,
+        "preferredLookY": 0.49
+      }
+    }
+  ],
+  "adapters": [
+    {
+      "from": "plate-01",
+      "to": "plate-02",
+      "image": "finished-adapters/01-to-02-finished.png",
+      "transitionPreset": "morning-pasture-to-sunset-lake"
+    },
+    {
+      "from": "plate-02",
+      "to": "plate-03",
+      "image": "finished-adapters/02-to-03-finished.png",
+      "transitionPreset": "sunset-lake-to-cloud-shrine"
+    },
+    {
+      "from": "plate-03",
+      "to": "plate-04",
+      "image": "finished-adapters/03-to-04-finished.png",
+      "transitionPreset": "cloud-shrine-to-moon-castle"
+    },
+    {
+      "from": "plate-04",
+      "to": "plate-01",
+      "image": "finished-adapters/04-to-01-finished.png",
+      "transitionPreset": "moon-castle-to-morning-pasture"
+    }
+  ]
+}

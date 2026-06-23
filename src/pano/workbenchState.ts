@@ -1,4 +1,5 @@
 import type { PanoRingConfig, PanoSeam } from "./panoTypes";
+import type { RegionCameraHints } from "./worldRingPackage";
 
 export const WORKBENCH_GEOMETRY = {
   plateWidth: 6144,
@@ -17,11 +18,17 @@ export interface WorkbenchPlate {
   imageUrl: string;
   sourceName: string;
   locked?: boolean;
+  stagingPreset?: string;
+  lightingPreset?: string;
+  particlePreset?: string;
+  ribbonPalette?: string;
+  cameraHints?: RegionCameraHints;
 }
 
 export interface WorkbenchFinishedAdapter {
   imageUrl: string;
   sourceName: string;
+  transitionPreset?: string;
 }
 
 export interface WorkbenchPair {
@@ -234,6 +241,11 @@ function validateImportedState(value: unknown): WorkbenchState {
       imageUrl,
       sourceName: typeof plate.sourceName === "string" ? plate.sourceName : "imported plate",
       locked: Boolean(plate.locked),
+      stagingPreset: typeof plate.stagingPreset === "string" ? plate.stagingPreset : undefined,
+      lightingPreset: typeof plate.lightingPreset === "string" ? plate.lightingPreset : undefined,
+      particlePreset: typeof plate.particlePreset === "string" ? plate.particlePreset : undefined,
+      ribbonPalette: typeof plate.ribbonPalette === "string" ? plate.ribbonPalette : undefined,
+      cameraHints: normalizeCameraHints(plate.cameraHints),
     };
   });
 
@@ -247,6 +259,7 @@ function validateImportedState(value: unknown): WorkbenchState {
       normalizedFinished[key] = {
         imageUrl,
         sourceName: typeof adapter.sourceName === "string" ? adapter.sourceName : "imported finished adapter",
+        transitionPreset: typeof adapter.transitionPreset === "string" ? adapter.transitionPreset : undefined,
       };
     });
   }
@@ -316,6 +329,16 @@ function loadImage(url: string): Promise<HTMLImageElement> {
     image.onload = () => resolve(image);
     image.onerror = () => reject(new Error("Adapter source image failed to load."));
   });
+}
+
+function normalizeCameraHints(value: unknown): RegionCameraHints | undefined {
+  if (!isRecord(value)) return undefined;
+  const hints: RegionCameraHints = {};
+  if (typeof value.anchorX === "number" && Number.isFinite(value.anchorX)) hints.anchorX = value.anchorX;
+  if (typeof value.preferredLookY === "number" && Number.isFinite(value.preferredLookY)) {
+    hints.preferredLookY = value.preferredLookY;
+  }
+  return Object.keys(hints).length > 0 ? hints : undefined;
 }
 
 export async function generateWorkAdapter(from: WorkbenchPlate, to: WorkbenchPlate): Promise<string> {

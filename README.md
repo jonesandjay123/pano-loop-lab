@@ -1,45 +1,59 @@
 # pano-loop-lab
 
-這是我自己的循環遠景搭景工具台，不是通用開源套件。
+`pano-loop-lab` 是 Jovicheer 的背景環形世界 authoring tool，不是通用開源套件，也不是 `jovicheer-world-stage` runtime。
 
-目標是快速建立一組可以橫向循環播放的遠方背景：
+它負責把一組遠景 plates 做成可橫向循環的背景 ring：
 
 ```text
 plate 0 -> adapter 0→1 -> plate 1 -> adapter 1→2 -> ... -> adapter last→0
 ```
 
-repo 不負責 AI 補圖，也不追求自動把兩張圖接得漂亮。它只做穩定、可預期的流水線：
+目前已實測成功：
 
-- 上傳 plate
-- 嚴格檢查尺寸
-- 調整順序
-- 依照順序自動推導 pair
+```text
+plates[]
+→ work adapters
+→ Photoshop finished adapters
+→ upload finished
+→ 4-region closed loop
+```
+
+## Repo 定位
+
+`pano-loop-lab` 做：
+
+- plate 上傳、替換、排序
+- 嚴格尺寸驗證
+- 自動推導 adjacent pairs
 - 自動產生 work adapter
-- 讓我上傳 Photoshop 手修後的 finished adapter
-- 批次下載所有 work adapter 給 Photoshop
-- 追蹤每組 pair 是 finished 還是 work fallback
-- 批次下載 finished adapters
-- 匯出外部交付用 manifest
-- 首頁即時用 finished adapter，沒有 finished 時就用 work adapter fallback
+- 接收 Photoshop 手修後的 finished adapter
+- finished / work fallback loop preview
+- 匯出 scene config 作為備份
+- 匯出 world-ring package 給 `jovicheer-world-stage`
 
-## 固定規格
+`pano-loop-lab` 不做：
 
-這一版開始不再沿用舊的 `3136 / 523 / 2090` demo 規格。
+- Jovicheer 3D props renderer
+- wind / particles / lighting runtime
+- camera ritual
+- runtime seam 猜測或 blend 遮醜
+- 把整個世界壓平成一張巨大背景圖
+
+## 固定 production geometry
+
+這一版不再沿用舊的 `3136 / 523 / 2090` demo 規格。
 
 ```text
 Plate:            6144 x 1536
 Work adapter:     6144 x 1536
 Finished adapter: 6144 x 1536
 
-m = 1024
-left edge  = 1024
-X zone     = 4096
-right edge = 1024
-
-ratio = 1 : 4 : 1
+edgeWidth:        1024
+xWidth:           4096
+ratio:            1 : 4 : 1
 ```
 
-work adapter 的組成方式：
+work adapter 的組成：
 
 ```text
 from plate 最右 1024px
@@ -47,7 +61,71 @@ from plate 最右 1024px
 + to plate 最左 1024px
 ```
 
-X 區只是手修底稿，不做智慧融合、不做漸層遮醜。
+finished adapter 也是完整 `6144 x 1536` 圖，不是只輸出中間 X zone。X zone 是手修底稿，未完成時應該誠實顯示，不用 runtime blend 藏起來。
+
+## World-ring package
+
+`jovicheer-world-stage` 之後會 consume 同一套 world-ring schema。它需要知道：
+
+- 目前有哪些 regions
+- 每個 region 的 plate asset 是哪一張
+- adjacent regions 之間用哪張 adapter
+- 目前靠近哪個 boundary
+- region / adapter 對應哪些 staging、lighting、particles、ribbon、camera hints
+
+第一版 schema 在：
+
+```text
+src/pano/worldRingPackage.ts
+```
+
+production manifest 在：
+
+```text
+public/panos/production/world-ring.json
+```
+
+目前核心結構：
+
+```ts
+type WorldRingPackage = {
+  id: string;
+  version: 1;
+  geometry: {
+    plateWidth: number;
+    plateHeight: number;
+    adapterWidth: number;
+    adapterHeight: number;
+    edgeWidth: number;
+    xWidth: number;
+  };
+  regions: Region[];
+  adapters: Adapter[];
+};
+
+type Region = {
+  id: string;
+  label: string;
+  plate: string;
+  stagingPreset?: string;
+  lightingPreset?: string;
+  particlePreset?: string;
+  ribbonPalette?: string;
+  cameraHints?: {
+    anchorX?: number;
+    preferredLookY?: number;
+  };
+};
+
+type Adapter = {
+  from: string;
+  to: string;
+  image: string;
+  transitionPreset?: string;
+};
+```
+
+`pano-loop-lab` 只保存、驗證、匯出這些 metadata。它不負責把 presets 真的渲染成 Jovicheer foreground。
 
 ## 使用
 
@@ -57,7 +135,7 @@ npm run dev
 npm run build
 ```
 
-首頁：
+首頁預覽：
 
 ```text
 http://localhost:5173/
@@ -69,53 +147,31 @@ http://localhost:5173/
 http://localhost:5173/#adapter-workbench
 ```
 
-## 保存與搬移
+工具台會自動保存到瀏覽器 IndexedDB。重整頁面或重啟 dev server 後，只要是同一個 browser origin，就會還原目前場景。
 
-工具台會自動把目前場景保存到此瀏覽器的 IndexedDB。這是純前端保存，不需要後端；重整頁面或重啟 dev server 後，只要是同一個瀏覽器 origin，場景就會自動還原。
+「匯出 config」是完整備份，包含圖片資料。「匯出 world-ring」是給 Jovicheer consumer 的 manifest JSON；第一版不打 zip，asset path 會先明確寫在 JSON 裡。
 
-工具台左側的「匯出 config」仍然很重要：它是備份、搬到另一個瀏覽器、或避免瀏覽器資料被清掉時的保險。
+## Production preset
 
-scene config 會包含 plate / finished adapter 的圖片資料、順序、label 與目前幾何規格。匯入時會檢查版本、規格和圖片尺寸，不符合就拒絕。
-
-## 圖片方向
-
-第一組素材建議維持同一個世界觀、同一種地理氣質，但不要做同一張地圖換時間。
-
-比較適合：
-
-```text
-開闊草坡與遠山村落
-松林山脊與遠方小教堂
-河谷、石橋、紅屋頂小鎮
-湖面、遠山、遠方古堡或遺跡
-```
-
-也就是同一片中歐 / 類德國 / 阿爾卑斯前緣世界裡的不同段落。
-
-## 目前狀態
-
-工具台目前使用瀏覽器本地狀態加 IndexedDB 自動保存。也可以匯出 / 匯入 scene config。
-
-舊的 `public/panos` demo 圖已移除。現在跨機器同步用的 runtime preset 只放在 `public/panos/production/`。
-
-第一組 production source plates 已經放在：
+第一組 production source plates：
 
 ```text
 generated/production-plates/raw/
 ```
 
-目前是四張 `6144 x 1536` PNG，可以用工具台替換進 plate slots，再下載 work adapters 給 Photoshop 手修。`generated/production-plates/contact-sheet-current.png` 只是檢查用 contact sheet，不是 runtime plate。
-
-Git 同步用的正式 runtime preset 在：
+Git 同步用 runtime preset：
 
 ```text
-public/panos/production/
+public/panos/production/scene.json
+public/panos/production/world-ring.json
+public/panos/production/raw/
+public/panos/production/finished-adapters/
 ```
 
-其中 `scene.json` 會指向四張 plates 和四張 finished adapters。新機器 `git pull` 後，只要瀏覽器沒有本機 IndexedDB 場景，app 會自動載入這份 production preset。
+新機器 `git pull` 後，如果瀏覽器沒有本機 IndexedDB 場景，app 會自動載入 `public/panos/production/scene.json`。`world-ring.json` 是明天給 `jovicheer-world-stage` consume 的起點。
 
-下一步會考慮：
+## 下一步
 
-- 修掉目前 Photoshop 成品裡那條可見接縫
-- finished adapters 都確認後，從工具台匯出一份 scene config
-- 視需要加入更完整的成品檢查清單
+- 修目前 Photoshop finished adapter 裡的一條可見 seam artifact。
+- 讓 `jovicheer-world-stage` 讀 `world-ring.json`，先做 background ring + telemetry。
+- 如果需要手動調 presets，再替 workbench 加小型 region / adapter metadata editor。

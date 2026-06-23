@@ -1,8 +1,8 @@
-# Production Plates
+# Production plates
 
-This folder contains curated production source plates for the current panorama loop.
+這個資料夾保存目前 production ring 的來源素材與 Photoshop finished adapter 工作成果。真正給 app / consumer 讀取的 Git-synced preset 會 mirror 到 `public/panos/production/`。
 
-## Current Set
+## Current set
 
 ```text
 raw/01-plate.png
@@ -11,25 +11,25 @@ raw/03-plate.png
 raw/04-plate.png
 ```
 
-All four images are exactly `6144 x 1536`.
+四張 plate 都必須是精準 `6144 x 1536`。
 
-`contact-sheet-current.png` is a review sheet only. Do not use it as a runtime plate.
+`contact-sheet-current.png` 只用來檢查，不是 runtime plate，也不要寫進 world-ring package。
 
-## Finished Adapters
+## Finished adapters
 
-Photoshop-filled connection images belong in:
+Photoshop-filled connection images 放在：
 
 ```text
 finished-adapters/
 ```
 
-Each file in that folder should be a full `6144 x 1536` adapter image:
+每張都必須是完整 `6144 x 1536` adapter：
 
 ```text
 left 1024px source edge + filled 4096px X zone + right 1024px target edge
 ```
 
-Suggested names for the current four-plate loop:
+目前四區 loop 的檔名：
 
 ```text
 01-to-02-finished.png
@@ -38,15 +38,26 @@ Suggested names for the current four-plate loop:
 04-to-01-finished.png
 ```
 
-The app runtime preset mirrors these files under `public/panos/production/` with
-the same filenames plus `public/panos/production/scene.json`.
+## Runtime mirror
+
+app runtime preset mirror 在：
+
+```text
+public/panos/production/scene.json
+public/panos/production/world-ring.json
+public/panos/production/raw/
+public/panos/production/finished-adapters/
+```
+
+`scene.json` 是 workbench / preview 用的 production preset。`world-ring.json` 是給 `jovicheer-world-stage` consume 的 schema manifest。
 
 ## Usage
 
-1. Open `/#adapter-workbench`.
-2. Replace or add plate slots with the files in `raw/`.
-3. Download the generated work adapters.
-4. Fill the X regions in Photoshop.
-5. Save the Photoshop output in `finished-adapters/`.
-6. Upload the finished adapters back into the matching pairs.
-7. Export a scene config once the loop is approved.
+1. 開啟 `/#adapter-workbench`。
+2. 使用 `raw/` 裡的 plate 建立或替換 slots。
+3. 下載 generated work adapters。
+4. 在 Photoshop 補完中間 X zone。
+5. 將完整 finished adapter 存到 `finished-adapters/`。
+6. 上傳 finished adapters 回 matching pairs。
+7. 確認 loop preview。
+8. 更新 runtime mirror 與 `world-ring.json`。

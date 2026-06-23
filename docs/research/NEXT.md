@@ -1,10 +1,11 @@
 # NEXT.md
 
-Next useful steps:
+下一步建議：
 
-1. Repair the one visible Photoshop seam in the current four-plate loop.
-2. Reload `/#adapter-workbench`, upload the corrected finished adapter, and verify the homepage loop again.
-3. Export a scene config from the workbench once all finished adapters are accepted.
-4. Keep the production source plates under `generated/production-plates/raw/`.
+1. 修目前四區 production loop 裡那條可見 Photoshop seam artifact。
+2. 重新載入 `/#adapter-workbench`，上傳修正後的 finished adapter，確認首頁 loop。
+3. 同步更新 `public/panos/production/scene.json` 與 `public/panos/production/world-ring.json`。
+4. 在 `jovicheer-world-stage` 做第一個最小 consume slice：讀 world-ring manifest、flatten region/adapter sequence、渲染背景 ring、發布 world telemetry。
+5. 如果 presets 需要人工維護，再替 workbench 加很小的 region / adapter metadata editor。
 
-Do not add back legacy research candidates, old seam registries, or fixed A/B/C assumptions.
+不要加回 legacy research candidates、old seam registries、GPT/HF sweeps，或固定 A/B/C assumptions。不要把 workbench UI 搬進 `jovicheer-world-stage`。

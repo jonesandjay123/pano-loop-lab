@@ -11,6 +11,7 @@ import {
   validateWorkbenchStateImages,
 } from "../pano/workbenchState";
 import type { WorkbenchFinishedAdapter, WorkbenchPair, WorkbenchPlate, WorkbenchState } from "../pano/workbenchState";
+import { buildWorldRingPackageFromWorkbench, stringifyWorldRingPackage } from "../pano/worldRingPackage";
 
 type Notice = { tone: "ok" | "warn"; text: string } | null;
 
@@ -298,6 +299,26 @@ export function AdapterWorkbench({
     setNotice({ tone: "ok", text: "已匯出 scene manifest。" });
   };
 
+  const exportWorldRingPackage = () => {
+    try {
+      const payload = stringifyWorldRingPackage(
+        buildWorldRingPackageFromWorkbench(state, pairs, {
+          id: "workbench-ring",
+        }),
+      );
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      downloadUrl(url, `world-ring-${new Date().toISOString().slice(0, 10)}.json`);
+      URL.revokeObjectURL(url);
+      setNotice({ tone: "ok", text: "已匯出 world-ring package。" });
+    } catch (error) {
+      setNotice({
+        tone: "warn",
+        text: error instanceof Error ? `world-ring 匯出失敗：${error.message}` : "world-ring 匯出失敗。",
+      });
+    }
+  };
+
   const importConfig = async (file: File) => {
     try {
       const text = await file.text();
@@ -342,6 +363,9 @@ export function AdapterWorkbench({
               </button>
               <button type="button" onClick={exportManifest} disabled={pairs.length === 0}>
                 匯出 manifest
+              </button>
+              <button type="button" onClick={exportWorldRingPackage} disabled={pairs.length === 0}>
+                匯出 world-ring
               </button>
               <label>
                 匯入 config

@@ -1,10 +1,10 @@
 # STATE.md — current repo state
 
-Last updated: 2026-06-22.
+Last updated: 2026-06-23.
 
 ## Current Shape
 
-`pano-loop-lab` is now a browser-local panorama loop workbench.
+`pano-loop-lab` 現在是 Jovicheer 的背景環形世界 authoring tool。它仍是 browser-local panorama loop workbench，但輸出方向已收斂為 `world-ring` package，供 `jovicheer-world-stage` consume。
 
 The old fixed sequence was:
 
@@ -14,7 +14,7 @@ dawn-valley -> AXB -> dusk-ridge -> BXC -> moonlit-tidelands -> CXA
 
 It is no longer the runtime source of truth, and the old demo image files have been removed from `public/panos`.
 
-The current runtime is resolved from workbench state:
+目前 preview/runtime 仍由 workbench state resolve：
 
 ```text
 plate 0 -> adapter 0→1 -> plate 1 -> adapter 1→2 -> ... -> adapter last→0
@@ -62,8 +62,52 @@ The X zone is intentionally unfinished and should stay visible until Photoshop o
 - finished adapter status inventory
 - batch download / clear-all for finished adapters
 - scene manifest export for external asset handoff
+- world-ring package export for Jovicheer consumer
 
 State is local React state backed by IndexedDB. This keeps large `6144 x 1536` plate and finished-adapter data across page reloads and dev-server restarts in the same browser origin. Scene config export/import remains the explicit backup and cross-browser handoff path.
+
+## World-ring Package
+
+第一版 schema 已定義在：
+
+```text
+src/pano/worldRingPackage.ts
+```
+
+它包含：
+
+```text
+WorldRingPackage
+Region
+Adapter
+WORLD_RING_GEOMETRY
+validateWorldRingPackage
+buildWorldRingPackageFromWorkbench
+```
+
+production sample manifest 已放在：
+
+```text
+public/panos/production/world-ring.json
+```
+
+這份 manifest 保留 `regions[]`、`adapters[]` 和 geometry，不把背景壓平成單張圖。Region metadata 目前可承載：
+
+```text
+stagingPreset
+lightingPreset
+particlePreset
+ribbonPalette
+cameraHints
+```
+
+Adapter metadata 目前可承載：
+
+```text
+transitionPreset
+```
+
+`pano-loop-lab` 只保存與匯出這些欄位；不在這裡 render Jovicheer 3D props、lighting、wind 或 particles。
 
 ## Asset State
 
@@ -92,6 +136,7 @@ The Git-synced runtime preset is:
 
 ```text
 public/panos/production/scene.json
+public/panos/production/world-ring.json
 public/panos/production/raw/
 public/panos/production/finished-adapters/
 ```
@@ -105,9 +150,10 @@ The first four-plate loop has been proven in the browser with Photoshop-finished
 
 Do not bring back legacy seam registries, GPT/HF sweep artifacts, or fixed A/B/C assumptions.
 
-The next useful work is polish/content QA:
+The next useful work is polish/content QA + consumer integration:
 
 - repair the one visible Photoshop seam artifact
-- export a workbench scene config once the finished adapters are final
+- keep `public/panos/production/world-ring.json` in sync with final production assets
+- in `jovicheer-world-stage`, consume the package as region/adapter/boundary data
 - keep working production sources under `generated/production-plates/`
 - keep the Git-synced runtime preset under `public/panos/production/`
